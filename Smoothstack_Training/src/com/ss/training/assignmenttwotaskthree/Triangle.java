@@ -3,12 +3,8 @@ package com.ss.training.assignmenttwotaskthree;
 public class Triangle implements Shape {
 	private double sideA, sideB, sideC;
 
-	private static double maxOfThree(double numA, double numB, double numC) {
-		return Math.max(Math.max(numA, numB), numC);
-	}
-
 	private static boolean triangleInequalitySatisfied(double sideA, double sideB, double sideC) {
-		double longestSide = maxOfThree(sideA, sideB, sideC);
+		double longestSide = Math.max(Math.max(sideA, sideB), sideC);
 		return sideA + sideB + sideC - longestSide >= longestSide;
 	}
 
