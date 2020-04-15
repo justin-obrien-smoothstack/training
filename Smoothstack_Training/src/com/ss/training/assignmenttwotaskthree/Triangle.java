@@ -25,7 +25,7 @@ public class Triangle implements Shape {
 	}
 
 	public double calculateArea() {
-		if (sideA + sideB + sideC == 0)
+		if (sideA == 0 || sideB == 0 || sideC == 0)
 			return 0;
 		// Use the law of cosines and the Pythagorean identity to calculate the height.
 		double base = sideA, cosC = (sideA * sideA + sideB * sideB - sideC * sideC) / (2 * sideA * sideB),
