@@ -30,8 +30,9 @@ public class LibraryManager {
 	 * @param args not used
 	 */
 	public static void main(String[] args) {
+		int i;
 		char optsDelimiter = '\t';
-		String dirPath = "resources/LibraryManager/", ext = ".ser";
+		String dirPath = "resources/LibraryManager/", ext = ".ser", opt;
 		String[][] entitiesOpts = { { "B", "Book" }, { "A", "Author" }, { "P", "Publisher" } },
 				opsOpts = { { "C", "Create" }, { "R", "Read" }, { "U", "Update" }, { "D", "Delete" } };
 		StringBuilder filePath = new StringBuilder(dirPath + ext);
@@ -48,8 +49,8 @@ public class LibraryManager {
 		Service service;
 		Service[] services;
 		OptionsPrinter optionsPrinter = opts -> {
-			for (String[] opt : opts)
-				System.out.println(opt[0] + optsDelimiter + opt[1]);
+			for (String[] entityOpts : entitiesOpts)
+				System.out.println(entityOpts[0] + optsDelimiter + entityOpts[1]);
 		};
 		MessagePrinter optionsPromptPrinter = action -> System.out
 				.print("Enter any of the above to make a selection, or enter anything else to " + action + ": ");
@@ -59,103 +60,102 @@ public class LibraryManager {
 			bookService = BookService.getInstance(books, authors, publishers, scanner);
 			authorService = AuthorService.getInstance(books, authors, publishers, scanner);
 			publisherService = PublisherService.getInstance(books, authors, publishers, scanner);
-			services = new Service[] {bookService, authorService, publisherService};
-			if(bookService.getModified()) {
-				
-			}
-			
-			for (String[] opt : entitiesOpts) {
-				filePath.replace(dirPath.length(), filePath.length() - ext.length(), opt[0]);
-				file = new File(filePath.toString());
-				if (file.exists()) {
-					try (ObjectInputStream inputFile = new ObjectInputStream(new FileInputStream(file))) {
-						switch (opt[0]) {
-						case "B":
-							while (true) {
-								try {
-									book = (Book) inputFile.readObject();
-									books.put(book.getId(), book);
-								} catch (EOFException e) {
-									break;
+			services = new Service[] { bookService, authorService, publisherService };
+			try {
+				for (String[] entityOpts : entitiesOpts) {
+					filePath.replace(dirPath.length(), filePath.length() - ext.length(), entityOpts[0]);
+					file = new File(filePath.toString());
+					if (file.exists()) {
+						try (ObjectInputStream inputFile = new ObjectInputStream(new FileInputStream(file))) {
+							switch (entityOpts[0]) {
+							case "B":
+								while (true) {
+									try {
+										book = (Book) inputFile.readObject();
+										books.put(book.getId(), book);
+									} catch (EOFException e) {
+										break;
+									}
 								}
-							}
-							break;
-						case "A":
-							while (true) {
-								try {
-									author = (Author) inputFile.readObject();
-									authors.put(author.getId(), author);
-								} catch (EOFException e) {
-									break;
+								break;
+							case "A":
+								while (true) {
+									try {
+										author = (Author) inputFile.readObject();
+										authors.put(author.getId(), author);
+									} catch (EOFException e) {
+										break;
+									}
 								}
-							}
-							break;
-						case "P":
-							while (true) {
-								try {
-									publisher = (Publisher) inputFile.readObject();
-									publishers.put(publisher.getId(), publisher);
-								} catch (EOFException e) {
-									break;
+								break;
+							case "P":
+								while (true) {
+									try {
+										publisher = (Publisher) inputFile.readObject();
+										publishers.put(publisher.getId(), publisher);
+									} catch (EOFException e) {
+										break;
+									}
 								}
+								break;
 							}
-							break;
+						} catch (Exception e) {
+							fileErrorPrinter.print("read from", filePath.toString());
+							return;
 						}
-					} catch (Exception e) {
-						fileErrorPrinter.print("read from", filePath.toString());
-						return;
 					}
 				}
-			}
-
-			while (true) {
-				System.out.println("What information do you want to operate on?");
-				optionsPrinter.print(entitiesOpts);
-				optionsPromptPrinter.print("exit");
-				switch (scanner.nextLine().toLowerCase()) {
-				case "b":
-				case "book":
-					service = bookService;
-					break;
-				case "a":
-				case "author":
-					service = authorService;
-					break;
-				case "p":
-				case "publisher":
-					service = publisherService;
-					break;
-				default:
-					return;
+				while (true) {
+					System.out.println("What information do you want to operate on?");
+					optionsPrinter.print(entitiesOpts);
+					optionsPromptPrinter.print("exit");
+					switch (scanner.nextLine().toLowerCase()) {
+					case "b":
+					case "book":
+						service = bookService;
+						break;
+					case "a":
+					case "author":
+						service = authorService;
+						break;
+					case "p":
+					case "publisher":
+						service = publisherService;
+						break;
+					default:
+						return;
+					}
+					System.out.println("What operation do you want to do?");
+					optionsPrinter.print(opsOpts);
+					optionsPromptPrinter.print("go back");
+					switch (scanner.nextLine().toLowerCase()) {
+					case "c":
+					case "create":
+						service.create();
+						break;
+					case "r":
+					case "read":
+						service.read();
+						break;
+					case "u":
+					case "update":
+						service.update();
+						break;
+					case "d":
+					case "delete":
+						service.delete();
+						break;
+					}
 				}
-				System.out.println("What operation do you want to do?");
-				optionsPrinter.print(opsOpts);
-				optionsPromptPrinter.print("go back");
-				switch (scanner.nextLine().toLowerCase()) {
-				case "c":
-				case "create":
-					service.create();
-					break;
-				case "r":
-				case "read":
-					service.read();
-					break;
-				case "u":
-				case "update":
-					service.update();
-					break;
-				case "d":
-				case "delete":
-					service.delete();
-					break;
-				}
-			}
-		} finally {
-			for (String[] opt : entitiesOpts) {
-				filePath.replace(dirPath.length(), filePath.length() - ext.length(), opt[0]);
+			} finally {
+				for (i = 0; i < services.length; i++)
+					if (!services[i].getModified())
+						continue;
+				opt = entitiesOpts[i][0];
+				filePath.replace(dirPath.length(), filePath.length() - ext.length(), opt);
 				file = new File(filePath.toString());
 				try (ObjectOutputStream outputFile = new ObjectOutputStream(new FileOutputStream(file))) {
-					switch (opt[0]) {
+					switch (opt) {
 					case "B":
 						books.forEach((id, thisBook) -> {
 							try {
@@ -187,7 +187,6 @@ public class LibraryManager {
 				} catch (Exception e) {
 					fileErrorPrinter.print("write to", filePath.toString());
 				}
-
 			}
 		}
 	}

@@ -114,6 +114,8 @@ public interface Service {
 		}
 	}
 
+	public boolean getModified();
+	
 	public void create(); // creates a new entry in the file
 
 	public void read(); // reads entries from the file
