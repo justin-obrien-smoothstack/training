@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.ss.training.librarymanager.entities;
 
 import java.io.Serializable;
