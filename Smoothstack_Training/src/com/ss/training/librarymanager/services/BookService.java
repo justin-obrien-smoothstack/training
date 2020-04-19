@@ -15,6 +15,7 @@ import com.ss.training.librarymanager.entities.Publisher;
  */
 public class BookService implements Service {
 	public static BookService instance = null;
+	boolean modified = false;
 	private HashMap<Long, Book> books;
 	private HashMap<Long, Author> authors;
 	private HashMap<Long, Publisher> publishers;
@@ -35,6 +36,57 @@ public class BookService implements Service {
 		return instance;
 	}
 
+	/**
+	 * @return the instance
+	 */
+	public static BookService getInstance() {
+		return instance;
+	}
+
+
+
+	/**
+	 * @return the modified
+	 */
+	public boolean getModified() {
+		return modified;
+	}
+
+	/**
+	 * @param modified the modified to set
+	 */
+	public void setModified(boolean modified) {
+		this.modified = modified;
+	}
+
+	/**
+	 * @return the books
+	 */
+	public HashMap<Long, Book> getBooks() {
+		return books;
+	}
+
+	/**
+	 * @return the authors
+	 */
+	public HashMap<Long, Author> getAuthors() {
+		return authors;
+	}
+
+	/**
+	 * @return the publishers
+	 */
+	public HashMap<Long, Publisher> getPublishers() {
+		return publishers;
+	}
+
+	/**
+	 * @return the scanner
+	 */
+	public Scanner getScanner() {
+		return scanner;
+	}
+
 	public void create() {
 		String title;
 		long id, authorId, publisherId;
@@ -51,6 +103,7 @@ public class BookService implements Service {
 			return;
 		Book book = new Book(id, title, authorId, publisherId);
 		books.put(book.getId(), book);
+		modified = true;
 		System.out.println("Book created.");
 	}
 
@@ -97,6 +150,7 @@ public class BookService implements Service {
 		default:
 			return;
 		}
+		modified = true;
 		System.out.println("Book updated.");
 	}
 
@@ -105,6 +159,7 @@ public class BookService implements Service {
 		if ((id = inputBookId("book", "delete", books, scanner)) <= 0)
 			return;
 		books.remove(id);
+		modified = true;
 		System.out.println("Book deleted.");
 	}
 }

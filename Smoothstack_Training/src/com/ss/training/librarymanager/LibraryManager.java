@@ -42,7 +42,11 @@ public class LibraryManager {
 		Book book;
 		Author author;
 		Publisher publisher;
+		BookService bookService;
+		AuthorService authorService;
+		PublisherService publisherService;
 		Service service;
+		Service[] services;
 		OptionsPrinter optionsPrinter = opts -> {
 			for (String[] opt : opts)
 				System.out.println(opt[0] + optsDelimiter + opt[1]);
@@ -52,9 +56,14 @@ public class LibraryManager {
 		MessagePrinter fileErrorPrinter = strings -> System.out
 				.println("Error: Could not" + strings[0] + " the file " + strings[1] + ".");
 		try (Scanner scanner = new Scanner(System.in)) {
-			BookService bookService = BookService.getInstance(books, authors, publishers, scanner);
-			AuthorService authorService = AuthorService.getInstance(books, authors, scanner);
-			PublisherService publisherService = PublisherService.getInstance(books, publishers, scanner);
+			bookService = BookService.getInstance(books, authors, publishers, scanner);
+			authorService = AuthorService.getInstance(books, authors, publishers, scanner);
+			publisherService = PublisherService.getInstance(books, authors, publishers, scanner);
+			services = new Service[] {bookService, authorService, publisherService};
+			if(bookService.getModified()) {
+				
+			}
+			
 			for (String[] opt : entitiesOpts) {
 				filePath.replace(dirPath.length(), filePath.length() - ext.length(), opt[0]);
 				file = new File(filePath.toString());

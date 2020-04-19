@@ -5,6 +5,7 @@ import java.util.Scanner;
 
 import com.ss.training.librarymanager.entities.Author;
 import com.ss.training.librarymanager.entities.Book;
+import com.ss.training.librarymanager.entities.Publisher;
 
 /**
  * This singleton class performs CRUD operations on Author objects.
@@ -14,26 +15,38 @@ import com.ss.training.librarymanager.entities.Book;
  */
 public class AuthorService implements Service {
 	public static AuthorService instance = null;
+	boolean modified = false;
 	private HashMap<Long, Book> books;
 	private HashMap<Long, Author> authors;
+	private HashMap<Long, Publisher> publishers;
 	private Scanner scanner;
 
-	private AuthorService(HashMap<Long, Book> books, HashMap<Long, Author> authors, Scanner scanner) {
+	private AuthorService(HashMap<Long, Book> books, HashMap<Long, Author> authors, HashMap<Long, Publisher> publishers,
+			Scanner scanner) {
 		this.books = books;
 		this.authors = authors;
+		this.publishers = publishers;
 		this.scanner = scanner;
 	}
 
-	public static AuthorService getInstance(HashMap<Long, Book> books, HashMap<Long, Author> authors, Scanner scanner) {
+	public static AuthorService getInstance(HashMap<Long, Book> books, HashMap<Long, Author> authors,
+			HashMap<Long, Publisher> publishers, Scanner scanner) {
 		if (instance == null)
-			instance = new AuthorService(books, authors, scanner);
+			instance = new AuthorService(books, authors, publishers, scanner);
 		return instance;
+	}
+
+	/**
+	 * @return the modified
+	 */
+	public boolean getModified() {
+		return modified;
 	}
 
 	public void create() {
 		long id;
 		String name;
-		if((id = nextAuthorId(authors)) <= 0) {
+		if ((id = nextAuthorId(authors)) <= 0) {
 			lmsFullErrorPrinter.print("authors");
 			return;
 		}
@@ -42,6 +55,7 @@ public class AuthorService implements Service {
 			return;
 		Author author = new Author(id, name);
 		authors.put(author.getId(), author);
+		modified = true;
 		System.out.println("Author created.");
 	}
 
@@ -64,6 +78,7 @@ public class AuthorService implements Service {
 		if ("".equals(name = scanner.nextLine()))
 			return;
 		authors.get(id).setName(name);
+		modified = true;
 		System.out.println("Author updated.");
 	}
 
@@ -75,11 +90,13 @@ public class AuthorService implements Service {
 			deletionWarner.print("written", "author", confirmer);
 			if (!confirmer.equals(scanner.nextLine()))
 				return;
+			books.values().stream().filter(book -> book.getAuthor() == id).forEach(book -> {
+				books.remove(book.getId());
+			});
+			BookService.getInstance(books, authors, publishers, scanner).setModified(true);
 		}
 		authors.remove(id);
-		books.values().stream().filter(book -> book.getAuthor() == id).forEach(book -> {
-			books.remove(book.getId());
-		});
+		modified = true;
 		System.out.println("Author deleted.");
 	}
 }

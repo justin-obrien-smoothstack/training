@@ -3,6 +3,7 @@ package com.ss.training.librarymanager.services;
 import java.util.HashMap;
 import java.util.Scanner;
 
+import com.ss.training.librarymanager.entities.Author;
 import com.ss.training.librarymanager.entities.Book;
 import com.ss.training.librarymanager.entities.Publisher;
 
@@ -14,21 +15,32 @@ import com.ss.training.librarymanager.entities.Publisher;
  */
 public class PublisherService implements Service {
 	public static PublisherService instance = null;
+	boolean modified = false;
 	private HashMap<Long, Book> books;
+	private HashMap<Long, Author> authors;
 	private HashMap<Long, Publisher> publishers;
 	private Scanner scanner;
 
-	private PublisherService(HashMap<Long, Book> books, HashMap<Long, Publisher> publishers, Scanner scanner) {
+	private PublisherService(HashMap<Long, Book> books, HashMap<Long, Author> authors,
+			HashMap<Long, Publisher> publishers, Scanner scanner) {
 		this.books = books;
+		this.authors = authors;
 		this.publishers = publishers;
 		this.scanner = scanner;
 	}
 
-	public static PublisherService getInstance(HashMap<Long, Book> books, HashMap<Long, Publisher> publishers,
-			Scanner scanner) {
+	public static PublisherService getInstance(HashMap<Long, Book> books, HashMap<Long, Author> authors,
+			HashMap<Long, Publisher> publishers, Scanner scanner) {
 		if (instance == null)
-			instance = new PublisherService(books, publishers, scanner);
+			instance = new PublisherService(books, authors, publishers, scanner);
 		return instance;
+	}
+
+	/**
+	 * @return the modified
+	 */
+	public boolean getModified() {
+		return modified;
 	}
 
 	public void create() {
@@ -46,6 +58,7 @@ public class PublisherService implements Service {
 			return;
 		Publisher publisher = new Publisher(id, name, address);
 		publishers.put(publisher.getId(), publisher);
+		modified = true;
 		System.out.println("Publisher created.");
 	}
 
@@ -85,6 +98,7 @@ public class PublisherService implements Service {
 		default:
 			return;
 		}
+		modified = true;
 		System.out.println("Publisher updated.");
 	}
 
@@ -96,11 +110,13 @@ public class PublisherService implements Service {
 			deletionWarner.print("published", "publisher", confirmer);
 			if (!confirmer.equals(scanner.nextLine()))
 				return;
+			books.values().stream().filter(book -> book.getPublisher() == id).forEach(book -> {
+				books.remove(book.getId());
+			});
+			BookService.getInstance(books, authors, publishers, scanner).setModified(true);
 		}
 		publishers.remove(id);
-		books.values().stream().filter(book -> book.getPublisher() == id).forEach(book -> {
-			books.remove(book.getId());
-		});
+		modified = true;
 		System.out.println("Publisher deleted.");
 	}
 }
