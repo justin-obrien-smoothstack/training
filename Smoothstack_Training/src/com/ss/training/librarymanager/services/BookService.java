@@ -43,8 +43,6 @@ public class BookService implements Service {
 		return instance;
 	}
 
-
-
 	/**
 	 * @return the modified
 	 */
@@ -59,38 +57,10 @@ public class BookService implements Service {
 		this.modified = modified;
 	}
 
-	/**
-	 * @return the books
-	 */
-	public HashMap<Long, Book> getBooks() {
-		return books;
-	}
-
-	/**
-	 * @return the authors
-	 */
-	public HashMap<Long, Author> getAuthors() {
-		return authors;
-	}
-
-	/**
-	 * @return the publishers
-	 */
-	public HashMap<Long, Publisher> getPublishers() {
-		return publishers;
-	}
-
-	/**
-	 * @return the scanner
-	 */
-	public Scanner getScanner() {
-		return scanner;
-	}
-
 	public void create() {
 		String title;
 		long id, authorId, publisherId;
-		if((id = nextBookId(books)) <= 0) {
+		if ((id = nextBookId(books)) <= 0) {
 			lmsFullErrorPrinter.print("books");
 			return;
 		}

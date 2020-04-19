@@ -13,13 +13,76 @@ import com.ss.training.librarymanager.services.BookService;
  *
  */
 
-@RunWith(Suite.class)
 public class BookServiceTest {
-
+	
 	@Test
-	public void createTest() {
-		BookService bookService = BookService.getInstance(books, authors, publishers, scanner);
-		assertEquals(, actual);
+	public void getInstancePosTest() {
+		
+	}
+	
+	@Test
+	public void getInstanceNegTest() {
+		
+	}
+	
+	@Test
+	public void getModifiedPosTest() {
+		
+	}
+	
+	@Test
+	public void getModifiedNegTest() {
+		
+	}
+	
+	@Test
+	public void setModifiedPosTest() {
+		
+	}
+	
+	@Test
+	public void setModifiedNegTest() {
+		
+	}
+	
+	@Test
+	public void createPosTest() {
+		
+	}
+	
+	@Test
+	public void createNegTest() {
+		
+	}
+	
+	@Test
+	public void readPosTest() {
+		
+	}
+	
+	@Test
+	public void readNegTest() {
+		
+	}
+	
+	@Test
+	public void updatePosTest() {
+		
+	}
+	
+	@Test
+	public void updateNegTest() {
+		
+	}
+	
+	@Test
+	public void deletePosTest() {
+		
+	}
+	
+	@Test
+	public void deleteNegTest() {
+		
 	}
 
 }
