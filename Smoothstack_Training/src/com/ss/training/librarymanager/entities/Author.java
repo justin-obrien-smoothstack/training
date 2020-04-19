@@ -10,7 +10,7 @@ import java.io.Serializable;
  *
  */
 public class Author implements Serializable {
-	private static final long serialVersionUID = 3880194602782396001L;
+	private static final long serialVersionUID = -3301717654407922685L;
 	private final long id; // primary key of the author
 	private String name; // name of the author
 

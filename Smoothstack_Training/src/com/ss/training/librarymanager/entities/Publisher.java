@@ -7,7 +7,7 @@ import java.io.Serializable;
  *
  */
 public class Publisher implements Serializable {
-	private static final long serialVersionUID = 5259732366592281794L;
+	private static final long serialVersionUID = -7078785292541424454L;
 	private final long id; // primary key of the publisher
 	private String name; // name of the publisher
 	private String address; // address of the publisher
