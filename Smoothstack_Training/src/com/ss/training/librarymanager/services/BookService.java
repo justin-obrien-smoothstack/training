@@ -8,7 +8,7 @@ import com.ss.training.librarymanager.entities.Book;
 import com.ss.training.librarymanager.entities.Publisher;
 
 /**
- * This singleton class performs CRUD operations on Book objects.
+ * singleton class; performs CRUD operations with Book objects
  * 
  * @author Justin O'Brien
  *
