@@ -1,6 +1,9 @@
-package com.ss.training.librarymanager.test.service;
+/**
+ * 
+ */
+package com.ss.training.librarymanager.test.service.book;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import java.util.HashMap;
 import java.util.Scanner;
@@ -9,8 +12,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.TextFromStandardInputStream;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
 
 import com.ss.training.librarymanager.entities.Author;
 import com.ss.training.librarymanager.entities.Book;
@@ -23,9 +24,7 @@ import com.ss.training.librarymanager.services.PublisherService;
  * @author Justin O'Brien
  *
  */
-
-public class AuthorServiceTest {
-
+public class BookServiceCreatePosTest {
 	static HashMap<Long, Book> books;
 	static HashMap<Long, Author> authors;
 	static HashMap<Long, Publisher> publishers;
@@ -51,84 +50,16 @@ public class AuthorServiceTest {
 		books.put(bookOne.getId(), bookOne);
 		authors.put(authorOne.getId(), authorOne);
 		publishers.put(publisherOne.getId(), publisherOne);
-	}
-
-	@Test
-	public void getInstancePosTest() {
-
-	}
-
-	@Test
-	public void getInstanceNegTest() {
-
-	}
-
-	@Test
-	public void getModifiedPosTest() {
-
-	}
-
-	@Test
-	public void getModifiedNegTest() {
-
+		scanner = new Scanner(System.in);
 	}
 
 	@Test
 	public void createPosTest() {
-		try (Scanner scanner = new Scanner(System.in)) {
-			stdIn.provideLines("Book2", "1", "1");
-			BookService.getInstance(books, authors, publishers, scanner).create();
-			Book bookTwo = books.get((long) 2);
-			assertTrue("Book2".equals(bookTwo.getTitle()) && bookTwo.getAuthor() == 1 && bookTwo.getPublisher() == 1);
-		}
-	}
-
-	@Test
-	public void createNegTest() {
-		try (Scanner scanner = new Scanner(System.in)) {
-
-		}
-	}
-
-	@Test
-	public void readPosTest() {
-		try (Scanner scanner = new Scanner(System.in)) {
-
-		}
-	}
-
-	@Test
-	public void readNegTest() {
-		try (Scanner scanner = new Scanner(System.in)) {
-
-		}
-	}
-
-	@Test
-	public void updatePosTest() {
-		try (Scanner scanner = new Scanner(System.in)) {
-
-		}
-	}
-
-	@Test
-	public void updateNegTest() {
-		try (Scanner scanner = new Scanner(System.in)) {
-
-		}
-	}
-
-	@Test
-	public void deletePosTest() {
-		try (Scanner scanner = new Scanner(System.in)) {
-
-		}
-	}
-
-	@Test
-	public void deleteNegTest() {
-		try (Scanner scanner = new Scanner(System.in)) {
-
-		}
+		stdIn.provideLines("Book2", "1", "1");
+		BookService.getInstance(books, authors, publishers, scanner).create();
+		Book bookTwo = books.get((long) 2);
+		assertEquals("Book2", bookTwo.getTitle());
+		assertEquals(1, bookTwo.getAuthor());
+		assertEquals(1, bookTwo.getPublisher());
 	}
 }
