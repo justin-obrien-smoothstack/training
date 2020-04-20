@@ -37,13 +37,6 @@ public class BookService implements Service {
 	}
 
 	/**
-	 * @return the instance
-	 */
-	public static BookService getInstance() {
-		return instance;
-	}
-
-	/**
 	 * @return the modified
 	 */
 	public boolean getModified() {
