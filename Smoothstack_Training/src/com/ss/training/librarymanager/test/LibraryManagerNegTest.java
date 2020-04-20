@@ -26,7 +26,7 @@ import com.ss.training.librarymanager.entities.Publisher;
  *
  */
 
-public class LibraryManagerNegTest {
+public class LibraryManagerNegTest { // passed
 
 	@Rule
 	public final TextFromStandardInputStream stdIn = TextFromStandardInputStream.emptyStandardInputStream();
@@ -55,9 +55,19 @@ public class LibraryManagerNegTest {
 	public void negTest() throws IOException, ClassNotFoundException {
 		stdIn.provideLines("");
 		String path = "resources/LibraryManager/";
-		Book expectedBook = new Book(1, "Book1", 1, 1), actualBook;
-		Author expectedAuthor = new Author(1, "Author1"), actualAuthor;
-		Publisher expectedPublisher = new Publisher(1, "Publisher1", "Address1"), actualPublisher;
+		Book expectedBook, actualBook;
+		Author expectedAuthor, actualAuthor;
+		Publisher expectedPublisher, actualPublisher;
+		try (ObjectInputStream inFile = new ObjectInputStream(new FileInputStream(path + "B.ser"))) {
+			expectedBook = (Book) inFile.readObject();
+		}
+		try (ObjectInputStream inFile = new ObjectInputStream(new FileInputStream(path + "A.ser"))) {
+			expectedAuthor = (Author) inFile.readObject();
+		}
+		try (ObjectInputStream inFile = new ObjectInputStream(new FileInputStream(path + "P.ser"))) {
+			expectedPublisher = (Publisher) inFile.readObject();
+		}
+		LibraryManager.main(null);
 		try (ObjectInputStream inFile = new ObjectInputStream(new FileInputStream(path + "B.ser"))) {
 			actualBook = (Book) inFile.readObject();
 		}
@@ -67,7 +77,6 @@ public class LibraryManagerNegTest {
 		try (ObjectInputStream inFile = new ObjectInputStream(new FileInputStream(path + "P.ser"))) {
 			actualPublisher = (Publisher) inFile.readObject();
 		}
-		LibraryManager.main(null);
 		assertEquals(expectedBook.getId(), actualBook.getId());
 		assertEquals(expectedBook.getTitle(), actualBook.getTitle());
 		assertEquals(expectedBook.getAuthor(), actualBook.getAuthor());
