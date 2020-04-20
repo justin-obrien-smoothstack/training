@@ -19,7 +19,7 @@ import com.ss.training.librarymanager.functionalinterfaces.OptionsPrinter;
  */
 public interface Service {
 
-	String delimiter = "\t\t", confirmer = "OK";
+	String confirmer = "OK";
 
 	MessagePrinter infoPrompter = (strings) -> {
 		System.out.print("Enter the " + strings[0] + " of the " + strings[1] + " to " + strings[2] + ", or enter "
@@ -41,7 +41,7 @@ public interface Service {
 
 			deletionWarner = (strings) -> System.out.print("Warning: This will cause all books " + strings[0]
 					+ " by this " + strings[1] + " to be deleted as well. Enter " + strings[2]
-					+ " to confirm, or enter anything else to cancel the operation: ");
+					+ " to proceed, or enter anything else to cancel the operation: ");
 
 	OptionsPrinter optionsPrinter = opts -> {
 		for (String[] opt : opts)
@@ -74,8 +74,8 @@ public interface Service {
 		while (true) {
 			infoPrompter.print("ID number", entity, action, "anything other than a positive integer");
 			try {
-				id = scanner.nextLong();
-			} catch (InputMismatchException e) {
+				id = Long.parseLong(scanner.nextLine());
+			} catch (NumberFormatException e) {
 				return 0;
 			}
 			if (id <= 0 || books.containsKey(id))
@@ -89,8 +89,8 @@ public interface Service {
 		while (true) {
 			infoPrompter.print("ID number", entity, action, "anything other than a positive integer");
 			try {
-				id = scanner.nextLong();
-			} catch (InputMismatchException e) {
+				id = Long.parseLong(scanner.nextLine());
+			} catch (NumberFormatException e) {
 				return 0;
 			}
 			if (id <= 0 || authors.containsKey(id))
@@ -104,8 +104,8 @@ public interface Service {
 		while (true) {
 			infoPrompter.print("ID number", entity, action, "anything other than a positive integer");
 			try {
-				id = scanner.nextLong();
-			} catch (InputMismatchException e) {
+				id = Long.parseLong(scanner.nextLine());
+			} catch (NumberFormatException e) {
 				return 0;
 			}
 			if (id <= 0 || publishers.containsKey(id))

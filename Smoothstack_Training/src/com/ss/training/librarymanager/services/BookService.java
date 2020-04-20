@@ -81,10 +81,10 @@ public class BookService implements Service {
 		System.out.println();
 		books.keySet().stream().sorted().forEach(id -> {
 			Book book = books.get(id);
-			System.out.println("ID number:" + delimiter + book.getId());
-			System.out.println("Title:" + delimiter + book.getTitle());
-			System.out.println("Author:" + delimiter + authors.get(book.getAuthor()).getName());
-			System.out.println("Publisher:" + delimiter + publishers.get(book.getPublisher()).getName());
+			System.out.println("ID number: " + book.getId());
+			System.out.println("Title:     " + book.getTitle());
+			System.out.println("Author:    " + authors.get(book.getAuthor()).getName());
+			System.out.println("Publisher: " + publishers.get(book.getPublisher()).getName());
 			System.out.println();
 		});
 	}
@@ -100,7 +100,7 @@ public class BookService implements Service {
 		switch (scanner.nextLine().toLowerCase()) {
 		case "t":
 		case "title":
-			infoPrompter.print("title", "books", "update", "a blank line");
+			infoPrompter.print("title", "book", "update", "a blank line");
 			if ("".equals(newTitle = scanner.nextLine()))
 				return;
 			books.get(id).setTitle(newTitle);

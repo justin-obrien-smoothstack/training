@@ -1,6 +1,7 @@
 package com.ss.training.librarymanager.services;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Scanner;
 
 import com.ss.training.librarymanager.entities.Author;
@@ -63,11 +64,12 @@ public class PublisherService implements Service {
 	}
 
 	public void read() {
+		System.out.println();
 		publishers.keySet().stream().sorted().forEach(id -> {
 			Publisher publisher = publishers.get(id);
-			System.out.println("ID number:" + delimiter + publisher.getId());
-			System.out.println("Name:" + delimiter + publisher.getName());
-			System.out.println("Address:" + delimiter + publisher.getAddress());
+			System.out.println("ID number: " + publisher.getId());
+			System.out.println("Name:      " + publisher.getName());
+			System.out.println("Address:   " + publisher.getAddress());
 			System.out.println();
 		});
 	}
@@ -104,6 +106,7 @@ public class PublisherService implements Service {
 
 	public void delete() {
 		long id;
+		HashSet<Long> booksToRemoveIds = new HashSet<Long>();
 		if ((id = inputPublisherId("publisher", "delete", publishers, scanner)) <= 0)
 			return;
 		if (books.values().stream().filter(book -> book.getPublisher() == id).count() != 0) {
@@ -111,7 +114,10 @@ public class PublisherService implements Service {
 			if (!confirmer.equals(scanner.nextLine()))
 				return;
 			books.values().stream().filter(book -> book.getPublisher() == id).forEach(book -> {
-				books.remove(book.getId());
+				booksToRemoveIds.add(book.getId());
+			});
+			booksToRemoveIds.stream().forEach(bookId -> {
+				books.remove(bookId);
 			});
 			BookService.getInstance(books, authors, publishers, scanner).setModified(true);
 		}

@@ -1,6 +1,7 @@
 package com.ss.training.librarymanager.services;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Scanner;
 
 import com.ss.training.librarymanager.entities.Author;
@@ -60,10 +61,11 @@ public class AuthorService implements Service {
 	}
 
 	public void read() {
+		System.out.println();
 		authors.keySet().stream().sorted().forEach(id -> {
 			Author author = authors.get(id);
-			System.out.println("ID number:" + delimiter + author.getId());
-			System.out.println("Name:" + delimiter + author.getName());
+			System.out.println("ID number: " + author.getId());
+			System.out.println("Name:      " + author.getName());
 			System.out.println();
 		});
 
@@ -84,6 +86,7 @@ public class AuthorService implements Service {
 
 	public void delete() {
 		long id;
+		HashSet<Long> booksToRemoveIds = new HashSet<Long>();
 		if ((id = inputAuthorId("author", "delete", authors, scanner)) <= 0)
 			return;
 		if (books.values().stream().filter(book -> book.getAuthor() == id).count() != 0) {
@@ -91,7 +94,10 @@ public class AuthorService implements Service {
 			if (!confirmer.equals(scanner.nextLine()))
 				return;
 			books.values().stream().filter(book -> book.getAuthor() == id).forEach(book -> {
-				books.remove(book.getId());
+				booksToRemoveIds.add(book.getId());
+			});
+			booksToRemoveIds.stream().forEach(bookId -> {
+				books.remove(bookId);
 			});
 			BookService.getInstance(books, authors, publishers, scanner).setModified(true);
 		}

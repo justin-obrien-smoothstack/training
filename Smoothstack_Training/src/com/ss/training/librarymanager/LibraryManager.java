@@ -49,11 +49,11 @@ public class LibraryManager {
 		Service service;
 		Service[] services;
 		OptionsPrinter optionsPrinter = opts -> {
-			for (String[] entityOpts : entitiesOpts)
-				System.out.println(entityOpts[0] + optsDelimiter + entityOpts[1]);
+			for (String[] thisOpt : opts)
+				System.out.println(thisOpt[0] + optsDelimiter + thisOpt[1]);
 		};
 		MessagePrinter optionsPromptPrinter = action -> System.out
-				.print("Enter any of the above to make a selection, or enter anything else to " + action + ": ");
+				.print("Enter any of the above to make a selection, or enter anything else to " + action[0] + ": ");
 		MessagePrinter fileErrorPrinter = strings -> System.out
 				.println("Error: Could not" + strings[0] + " the file " + strings[1] + ".");
 		try (Scanner scanner = new Scanner(System.in)) {
@@ -148,44 +148,45 @@ public class LibraryManager {
 					}
 				}
 			} finally {
-				for (i = 0; i < services.length; i++)
+				for (i = 0; i < services.length; i++) {
 					if (!services[i].getModified())
 						continue;
-				opt = entitiesOpts[i][0];
-				filePath.replace(dirPath.length(), filePath.length() - ext.length(), opt);
-				file = new File(filePath.toString());
-				try (ObjectOutputStream outputFile = new ObjectOutputStream(new FileOutputStream(file))) {
-					switch (opt) {
-					case "B":
-						books.forEach((id, thisBook) -> {
-							try {
-								outputFile.writeObject(thisBook);
-							} catch (Exception e) {
-								fileErrorPrinter.print("write book #" + id + " to", filePath.toString());
-							}
-						});
-						break;
-					case "A":
-						authors.forEach((id, thisAuthor) -> {
-							try {
-								outputFile.writeObject(thisAuthor);
-							} catch (Exception e) {
-								fileErrorPrinter.print("write author #" + id + " to", filePath.toString());
-							}
-						});
-						break;
-					case "P":
-						publishers.forEach((id, thisPublisher) -> {
-							try {
-								outputFile.writeObject(thisPublisher);
-							} catch (Exception e) {
-								fileErrorPrinter.print("write publisher #" + id + " to", filePath.toString());
-							}
-						});
-						break;
+					opt = entitiesOpts[i][0];
+					filePath.replace(dirPath.length(), filePath.length() - ext.length(), opt);
+					file = new File(filePath.toString());
+					try (ObjectOutputStream outputFile = new ObjectOutputStream(new FileOutputStream(file))) {
+						switch (opt) {
+						case "B":
+							books.forEach((id, thisBook) -> {
+								try {
+									outputFile.writeObject(thisBook);
+								} catch (Exception e) {
+									fileErrorPrinter.print("write book #" + id + " to", filePath.toString());
+								}
+							});
+							break;
+						case "A":
+							authors.forEach((id, thisAuthor) -> {
+								try {
+									outputFile.writeObject(thisAuthor);
+								} catch (Exception e) {
+									fileErrorPrinter.print("write author #" + id + " to", filePath.toString());
+								}
+							});
+							break;
+						case "P":
+							publishers.forEach((id, thisPublisher) -> {
+								try {
+									outputFile.writeObject(thisPublisher);
+								} catch (Exception e) {
+									fileErrorPrinter.print("write publisher #" + id + " to", filePath.toString());
+								}
+							});
+							break;
+						}
+					} catch (Exception e) {
+						fileErrorPrinter.print("write to", filePath.toString());
 					}
-				} catch (Exception e) {
-					fileErrorPrinter.print("write to", filePath.toString());
 				}
 			}
 		}
