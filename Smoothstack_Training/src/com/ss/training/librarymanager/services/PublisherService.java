@@ -15,7 +15,7 @@ import com.ss.training.librarymanager.entities.Publisher;
  *
  */
 public class PublisherService implements Service {
-	public static PublisherService instance = null;
+	private static PublisherService instance = null;
 	boolean modified = false;
 	private HashMap<Long, Book> books;
 	private HashMap<Long, Author> authors;
