@@ -50,17 +50,6 @@ public class BookServiceTest {
 		books.put(bookOne.getId(), bookOne);
 		authors.put(authorOne.getId(), authorOne);
 		publishers.put(publisherOne.getId(), publisherOne);
-		// scanner = new Scanner(System.in);
-		// bookService = BookService.getInstance(books, authors, publishers, scanner);
-		// authorService = AuthorService.getInstance(books, authors, publishers,
-		// scanner);
-		// publisherService = PublisherService.getInstance(books, authors, publishers,
-		// scanner);
-	}
-
-	@After
-	public void after() {
-		// scanner.close();
 	}
 
 	@Test
