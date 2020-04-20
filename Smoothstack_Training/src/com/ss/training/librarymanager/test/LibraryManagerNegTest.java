@@ -52,7 +52,7 @@ public class LibraryManagerNegTest { // passed
 	}
 
 	@Test
-	public void negTest() throws IOException, ClassNotFoundException {
+	public void negTest() throws IOException, ClassNotFoundException { // passed
 		stdIn.provideLines("");
 		String path = "resources/LibraryManager/";
 		Book expectedBook, actualBook;
