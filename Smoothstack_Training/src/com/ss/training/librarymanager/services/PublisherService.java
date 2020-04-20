@@ -52,10 +52,10 @@ public class PublisherService implements Service {
 			return;
 		}
 		infoPrompter.print("name", "publisher", "create", "a blank line");
-		if ("".equals(name = scanner.nextLine()))
+		if ("".equals(name = scanner.nextLine()) || name == null)
 			return;
 		infoPrompter.print("address", "publisher", "create", "a blank line");
-		if ("".equals(address = scanner.nextLine()))
+		if ("".equals(address = scanner.nextLine()) || address == null)
 			return;
 		Publisher publisher = new Publisher(id, name, address);
 		publishers.put(publisher.getId(), publisher);

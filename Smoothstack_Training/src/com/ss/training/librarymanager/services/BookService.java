@@ -65,7 +65,7 @@ public class BookService implements Service {
 			return;
 		}
 		infoPrompter.print("title", "book", "create", "a blank line");
-		if ("".equals(title = scanner.nextLine()))
+		if ("".equals(title = scanner.nextLine()) || title == null)
 			return;
 		if ((authorId = inputAuthorId("author of the book", "create", authors, scanner)) <= 0)
 			return;

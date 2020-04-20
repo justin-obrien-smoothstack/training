@@ -77,7 +77,7 @@ public class AuthorService implements Service {
 		if ((id = inputAuthorId("author", "update", authors, scanner)) <= 0)
 			return;
 		infoPrompter.print("name", "author", "update", "a blank line");
-		if ("".equals(name = scanner.nextLine()))
+		if ("".equals(name = scanner.nextLine()) || name == null)
 			return;
 		authors.get(id).setName(name);
 		modified = true;
