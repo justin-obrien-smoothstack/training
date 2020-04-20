@@ -13,7 +13,7 @@ import org.junit.contrib.java.lang.system.TextFromStandardInputStream;
 import com.ss.training.librarymanager.entities.Author;
 import com.ss.training.librarymanager.entities.Book;
 import com.ss.training.librarymanager.entities.Publisher;
-import com.ss.training.librarymanager.services.BookService;
+import com.ss.training.librarymanager.services.AuthorService;
 
 /**
  * @author Justin O'Brien
@@ -46,12 +46,10 @@ public class AuthorServiceCreatePosTest {
 	}
 
 	@Test
-	public void test() {
-		stdIn.provideLines("Book2", "1", "1");
-		BookService.getInstance(books, authors, publishers, scanner).create();
-		Book bookTwo = books.get((long) 2);
-		assertEquals("Book2", bookTwo.getTitle());
-		assertEquals(1, bookTwo.getAuthor());
-		assertEquals(1, bookTwo.getPublisher());
+	public void test() { // passed
+		stdIn.provideLines("Author2");
+		AuthorService.getInstance(books, authors, publishers, scanner).create();
+		authorTwo = authors.get((long) 2);
+		assertEquals("Author2", authorTwo.getName());
 	}
 }

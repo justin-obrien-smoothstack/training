@@ -1,3 +1,5 @@
+package com.ss.training.librarymanager.test.service.publisher;import static org.junit.Assert.assertFalse;
+
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -9,12 +11,13 @@ import org.junit.contrib.java.lang.system.TextFromStandardInputStream;
 import com.ss.training.librarymanager.entities.Author;
 import com.ss.training.librarymanager.entities.Book;
 import com.ss.training.librarymanager.entities.Publisher;
+import com.ss.training.librarymanager.services.PublisherService;
 
 /**
  * @author Justin O'Brien
  *
  */
-public class Test {
+public class PublisherServiceCreateNegTest {
 	static HashMap<Long, Book> books;
 	static HashMap<Long, Author> authors;
 	static HashMap<Long, Publisher> publishers;
@@ -41,7 +44,9 @@ public class Test {
 	}
 
 	@Test
-	public void Test() {
-		
+	public void test() { // passed
+		stdIn.provideLines("");
+		PublisherService.getInstance(books, authors, publishers, scanner).create();
+		assertFalse(publishers.containsKey((long) 2));
 	}
 }

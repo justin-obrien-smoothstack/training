@@ -51,10 +51,10 @@ public class BookServiceCreatePosTest {
 	}
 
 	@Test
-	public void createPosTest() {
+	public void test() { // passed
 		stdIn.provideLines("Book2", "1", "1");
 		BookService.getInstance(books, authors, publishers, scanner).create();
-		Book bookTwo = books.get((long) 2);
+		bookTwo = books.get((long) 2);
 		assertEquals("Book2", bookTwo.getTitle());
 		assertEquals(1, bookTwo.getAuthor());
 		assertEquals(1, bookTwo.getPublisher());

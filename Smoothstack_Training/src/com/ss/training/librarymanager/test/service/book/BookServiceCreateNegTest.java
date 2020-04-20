@@ -52,11 +52,9 @@ public class BookServiceCreateNegTest {
 	}
 
 	@Test
-	public void createNegTest() {
-		Scanner scannerCreateNeg = new Scanner(System.in);
+	public void test() { // passed
 		stdIn.provideLines("");
-		BookService.getInstance(books, authors, publishers, scannerCreateNeg).create();
+		BookService.getInstance(books, authors, publishers, scanner).create();
 		assertFalse(books.containsKey((long) 2));
-		scannerCreateNeg.close();
 	}
 }

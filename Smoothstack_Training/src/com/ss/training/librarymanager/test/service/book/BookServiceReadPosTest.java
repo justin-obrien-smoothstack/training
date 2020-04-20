@@ -1,20 +1,23 @@
+package com.ss.training.librarymanager.test.service.book;import static org.junit.Assert.assertEquals;
+
 import java.util.HashMap;
 import java.util.Scanner;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.contrib.java.lang.system.TextFromStandardInputStream;
+import org.junit.contrib.java.lang.system.SystemOutRule;
 
 import com.ss.training.librarymanager.entities.Author;
 import com.ss.training.librarymanager.entities.Book;
 import com.ss.training.librarymanager.entities.Publisher;
+import com.ss.training.librarymanager.services.BookService;
 
 /**
  * @author Justin O'Brien
  *
  */
-public class Test {
+public class BookServiceReadPosTest {
 	static HashMap<Long, Book> books;
 	static HashMap<Long, Author> authors;
 	static HashMap<Long, Publisher> publishers;
@@ -24,7 +27,7 @@ public class Test {
 	static Scanner scanner;
 
 	@Rule
-	public final TextFromStandardInputStream stdIn = TextFromStandardInputStream.emptyStandardInputStream();
+	public final SystemOutRule stdOut = new SystemOutRule().enableLog();
 
 	@Before
 	public void before() {
@@ -41,7 +44,8 @@ public class Test {
 	}
 
 	@Test
-	public void Test() {
-		
+	public void test() { // passed
+		BookService.getInstance(books, authors, publishers, scanner).read();
+		assertEquals(stdOut.getLogWithNormalizedLineSeparator(), "\nID number: 1\nTitle:     Book1\nAuthor:    Author1\nPublisher: Publisher1\n\n");
 	}
 }

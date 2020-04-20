@@ -1,3 +1,7 @@
+package com.ss.training.librarymanager.test.service.book;
+
+import static org.junit.Assert.assertEquals;
+
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -9,12 +13,13 @@ import org.junit.contrib.java.lang.system.TextFromStandardInputStream;
 import com.ss.training.librarymanager.entities.Author;
 import com.ss.training.librarymanager.entities.Book;
 import com.ss.training.librarymanager.entities.Publisher;
+import com.ss.training.librarymanager.services.BookService;
 
 /**
  * @author Justin O'Brien
  *
  */
-public class Test {
+public class BookServiceDeleteNegTest {
 	static HashMap<Long, Book> books;
 	static HashMap<Long, Author> authors;
 	static HashMap<Long, Publisher> publishers;
@@ -41,7 +46,9 @@ public class Test {
 	}
 
 	@Test
-	public void Test() {
-		
+	public void test() { // passed
+		stdIn.provideLines("");
+		BookService.getInstance(books, authors, publishers, scanner).delete();
+		assertEquals(books.size(), 1);
 	}
 }
