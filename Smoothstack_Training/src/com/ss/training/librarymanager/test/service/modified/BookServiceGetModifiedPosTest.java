@@ -19,7 +19,7 @@ import com.ss.training.librarymanager.services.BookService;
  * @author Justin O'Brien
  *
  */
-public class BookServiceGetModifiedPosTest { // passed
+public class BookServiceGetModifiedPosTest {
 
 	@Rule
 	public final TextFromStandardInputStream stdIn = TextFromStandardInputStream.emptyStandardInputStream();
@@ -40,7 +40,7 @@ public class BookServiceGetModifiedPosTest { // passed
 	}
 	
 	@Test
-	public void test() {
+	public void test() { // passed
 		stdIn.provideLines("Book2","1","1");
 		Scanner scanner = new Scanner(System.in);
 		bookService = BookService.getInstance(books, authors, publishers, scanner);
