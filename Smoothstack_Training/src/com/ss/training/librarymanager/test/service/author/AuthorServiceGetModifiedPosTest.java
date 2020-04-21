@@ -1,4 +1,4 @@
-package com.ss.training.librarymanager.test.service.modified;
+package com.ss.training.librarymanager.test.service.author;
 
 import static org.junit.Assert.assertTrue;
 
@@ -13,14 +13,13 @@ import org.junit.contrib.java.lang.system.TextFromStandardInputStream;
 import com.ss.training.librarymanager.entities.Author;
 import com.ss.training.librarymanager.entities.Book;
 import com.ss.training.librarymanager.entities.Publisher;
-import com.ss.training.librarymanager.services.BookService;
+import com.ss.training.librarymanager.services.AuthorService;
 
 /**
  * @author Justin O'Brien
  *
  */
-public class BookServiceGetModifiedPosTest {
-
+public class AuthorServiceGetModifiedPosTest {
 	@Rule
 	public final TextFromStandardInputStream stdIn = TextFromStandardInputStream.emptyStandardInputStream();
 
@@ -30,7 +29,7 @@ public class BookServiceGetModifiedPosTest {
 	static Book bookOne = new Book(1, "Book1", 1, 1);
 	static Author authorOne = new Author(1, "Author1");
 	static Publisher publisherOne = new Publisher(1, "Publisher1", "Address1");
-	static BookService bookService;
+	static AuthorService authorService;
 
 	@Before
 	public void before() {
@@ -41,10 +40,10 @@ public class BookServiceGetModifiedPosTest {
 	
 	@Test
 	public void test() { // passed
-		stdIn.provideLines("Book2","1","1");
+		stdIn.provideLines("Author2");
 		Scanner scanner = new Scanner(System.in);
-		bookService = BookService.getInstance(books, authors, publishers, scanner);
-		bookService.create();
-		assertTrue(bookService.getModified());
+		authorService = AuthorService.getInstance(books, authors, publishers, scanner);
+		authorService.create();
+		assertTrue(authorService.getModified());
 	}
 }

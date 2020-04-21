@@ -1,4 +1,4 @@
-package com.ss.training.librarymanager.test.service.modified;
+package com.ss.training.librarymanager.test.service.publisher;
 
 import static org.junit.Assert.assertFalse;
 
