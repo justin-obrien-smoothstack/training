@@ -1,7 +1,6 @@
 package com.ss.training.librarymanager.services;
 
 import java.util.HashMap;
-import java.util.InputMismatchException;
 import java.util.Scanner;
 
 import com.ss.training.librarymanager.entities.Author;
