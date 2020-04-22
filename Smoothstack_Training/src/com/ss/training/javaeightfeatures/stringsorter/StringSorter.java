@@ -60,16 +60,16 @@ public class StringSorter {
 		String[] stringsToSort = { "Java", "JUnit", "agile", "scrum", "SQL", "Spring", "Angular", "REST", "JavaScript",
 				"Node.js" };
 		System.out.println("- Initial array:");
-		Utils.printStringArray(stringsToSort);
+		Utils.printStringArray(stringsToSort.clone());
 		System.out.println("- By length:");
-		Utils.printStringArray(sortByLength(stringsToSort));
+		Utils.printStringArray(sortByLength(stringsToSort.clone()));
 		System.out.println("- By reverse length:");
-		Utils.printStringArray(sortByReverseLength(stringsToSort));
+		Utils.printStringArray(sortByReverseLength(stringsToSort.clone()));
 		System.out.println("- Alphabetically by first character only:");
-		Utils.printStringArray(sortAlphabeticallyByFirstCharacterOnly(stringsToSort));
+		Utils.printStringArray(sortAlphabeticallyByFirstCharacterOnly(stringsToSort.clone()));
 		System.out.println("- By presence of lowercase e, without static helper method");
-		Utils.printStringArray(sortByPresenceOfLowercaseEWithoutHelper(stringsToSort));
+		Utils.printStringArray(sortByPresenceOfLowercaseEWithoutHelper(stringsToSort.clone()));
 		System.out.println("- By presence of lowercase e, with static helper method");
-		Utils.printStringArray(sortByPresenceOfLowercaseEWithHelper(stringsToSort));
+		Utils.printStringArray(sortByPresenceOfLowercaseEWithHelper(stringsToSort.clone()));
 	}
 }

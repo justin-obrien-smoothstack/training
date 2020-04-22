@@ -17,7 +17,7 @@ public class GetMonthLengths {
 		System.out.println("Year: " + year);
 		for (Month month : Month.values()) {
 			yearMonth = year.atMonth(month);
-			periods.put(month, Period.between(yearMonth.atDay(1), yearMonth.atEndOfMonth()).plusDays(1));
+			periods.put(month, Period.ofDays(yearMonth.atEndOfMonth().getDayOfMonth()));
 			System.out.println(month + ": " + periods.get(month).getDays() + " days");
 		}
 		return periods;
