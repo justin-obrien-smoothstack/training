@@ -1,0 +1,12 @@
+1.
+I'd use java.time.ZonedDateTime.
+
+2.
+previousThursday = randomDate.minusDays((randomDate.minusDays(1).getDayOfWeek().getValue() - DayOfWeek.THURSDAY.getValue() + 7) % 7 + 1);
+
+3.
+ZoneId is an abstract class and so cannot be instantiated; ZoneOffset is an instantiable subclass of ZoneId. 
+
+4.
+zonedDateTime = instant.atZone(zoneId);
+instant = zonedDateTime.toInstant();
