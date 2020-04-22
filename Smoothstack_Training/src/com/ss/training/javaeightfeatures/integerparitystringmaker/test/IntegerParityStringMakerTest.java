@@ -1,4 +1,4 @@
-package com.ss.training.javaeightfeatures.test;
+package com.ss.training.javaeightfeatures.integerparitystringmaker.test;
 
 import static org.junit.Assert.assertEquals;
 
@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.ss.training.javaeightfeatures.IntegerParityStringMaker;
+import com.ss.training.javaeightfeatures.integerparitystringmaker.IntegerParityStringMaker;
 
 /**
  * @author Justin O'Brien

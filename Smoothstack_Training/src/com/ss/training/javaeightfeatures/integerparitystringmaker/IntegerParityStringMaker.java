@@ -1,4 +1,4 @@
-package com.ss.training.javaeightfeatures;
+package com.ss.training.javaeightfeatures.integerparitystringmaker;
 
 import java.util.List;
 

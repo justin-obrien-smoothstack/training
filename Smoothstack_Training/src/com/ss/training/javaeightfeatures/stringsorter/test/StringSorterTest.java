@@ -1,22 +1,24 @@
-package com.ss.training.javaeightfeatures.test;
+package com.ss.training.javaeightfeatures.stringsorter.test;
 
 import static org.junit.Assert.assertArrayEquals;
 
+import org.junit.Before;
 import org.junit.Test;
 
-import com.ss.training.javaeightfeatures.StringSorter;
+import com.ss.training.javaeightfeatures.stringsorter.StringSorter;
 
 /**
- * These tests don't really work because the ordering of elements that compare
- * equal isn't necessarily the same as in the starting array.
- * 
  * @author Justin O'Brien
- *
  */
 public class StringSorterTest {
 
-	static String[] stringsToSort = { "Java", "JUnit", "agile", "scrum", "SQL", "MySQL", "Spring", "Angular",
-			"JavaScript", "Node.js" };
+	static String[] stringsToSort;
+
+	@Before
+	public void before() {
+		stringsToSort = new String[] { "Java", "JUnit", "agile", "scrum", "SQL", "MySQL", "Spring", "Angular",
+				"JavaScript", "Node.js" };
+	}
 
 	@Test
 	public void sortByLengthTest() {

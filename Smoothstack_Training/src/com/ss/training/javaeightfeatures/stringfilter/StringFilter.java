@@ -1,4 +1,4 @@
-package com.ss.training.javaeightfeatures;
+package com.ss.training.javaeightfeatures.stringfilter;
 
 import java.util.List;
 import java.util.stream.Collectors;
