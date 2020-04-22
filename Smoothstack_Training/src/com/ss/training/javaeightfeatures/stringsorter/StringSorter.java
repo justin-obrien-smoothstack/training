@@ -23,10 +23,6 @@ public class StringSorter {
 			char charOne, charTwo;
 			try {
 				charOne = stringOne.toLowerCase().charAt(0);
-			} catch (StringIndexOutOfBoundsException e) {
-				return 0;
-			}
-			try {
 				charTwo = stringTwo.toLowerCase().charAt(0);
 			} catch (StringIndexOutOfBoundsException e) {
 				return 0;
