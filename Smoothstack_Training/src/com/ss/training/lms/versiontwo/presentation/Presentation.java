@@ -1,11 +1,11 @@
 package com.ss.training.lms.versiontwo.presentation;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
-import com.ss.training.lms.versiontwo.LMS;
 import com.ss.training.lms.versiontwo.business.Business;
 
 /**
@@ -41,7 +41,8 @@ public class Presentation {
 	/**
 	 * Text shown to the user in menus
 	 */
-	public final String exit = "Exit", librarian = "Librarian", admin = "Administrator", borrower = "Borrower";
+	public final String exit = "Exit", librarian = "Librarian", admin = "Administrator", borrower = "Borrower",
+			rootMenuPrompt = "Welcome to the library management system. Please indicate what type of user you are.";;
 	private final String genericPrompt = "What would you like to do?",
 			cardPrompt = "Please enter your library card number, or enter 0 to go back.",
 			manageBranchPrompt = "Which branch do you manage?",
@@ -57,7 +58,7 @@ public class Presentation {
 			crudGenres = crud + "genres", crudPublishers = crud + "publishers",
 			crudBranches = crud + "library branches", crudBorrowers = crud + "borrowers",
 			override = "Override due date for a book loan", checkoutBook = "Check out a book",
-			returnBook = "Return a book", updateBranch = "Update branch information",
+			returnBook = "Return a book", librarianUpdateBranch = "Update branch information",
 			addCopies = "Add copies of a book to your branch";
 
 	private final Scanner scanner = new Scanner(System.in);
@@ -117,6 +118,58 @@ public class Presentation {
 	}
 
 	/**
+	 * Prepares lists of options and primary keys to be used by getSelectionPk
+	 * 
+	 * @param options     The list that will contain the options to be presented to
+	 *                    the user
+	 * @param pks         The list that will contain the primary keys corresponding
+	 *                    to the options, as well as 0 for the option to return to
+	 *                    the previous menu
+	 * @param optionArray The options to be presented to the user, other than
+	 *                    returning to the previous menu
+	 * @param pkArray     The primary keys corresponding to the options
+	 */
+	private void prepareForPkSelection(List<String> options, List<Integer> pks, String[] optionArray,
+			Integer[] pkArray) {
+		resetList(options, optionArray);
+		resetList(pks, pkArray);
+		options.add(0, goBack);
+		pks.add(0, 0);
+	}
+
+	/**
+	 * Gets a selection from the user and returns its primary key
+	 * 
+	 * @param prompt  The prompt to show the user
+	 * @param options The options presented to the user
+	 * @param pks     The primary keys corresponding to the options
+	 * @return The primary key of the option selected by the user
+	 */
+	private int getSelectionPk(String prompt, List<String> options, List<Integer> pks) {
+		return 0; // placeholder
+	}
+
+	/**
+	 * Gets a library branch selection from the user
+	 * 
+	 * @param prompt The prompt to show the user
+	 * @return Primary key of the selected branch, or 0 if the user wants to go back
+	 *         to the previous menu
+	 */
+	private int getBranchSelection(String prompt) {
+		int selectedOption;
+		ArrayList<String> options = new ArrayList<String>();
+		List<Integer> branchPks = new ArrayList<Integer>();
+		Object[][] branchPksAndNames = business.getBranchPksAndNames();
+		options.add(goBack);
+		branchPks.add(0);
+		options.addAll(Arrays.asList((String[]) branchPksAndNames[1]));
+		branchPks.addAll(Arrays.asList((Integer[]) branchPksAndNames[0]));
+		selectedOption = getOptionSelection(prompt, options);
+		return branchPks.get(selectedOption);
+	}
+
+	/**
 	 * Gets the user's card number
 	 * 
 	 * @return the user's card number, or 0 if the user wants to go back to the
@@ -142,8 +195,8 @@ public class Presentation {
 	 */
 	public void presentMenu(String prompt, List<String> options, List<Object> parameters) {
 		int selectedOption, cardNumber, branchPk, bookPk;
-		Object[][] branchPksAndNames;
-		ArrayList<Integer> branchPks;
+		Object[][] bookPksTitlesAndAuthors;
+		ArrayList<Integer> bookPks = new ArrayList<Integer>();
 		for (;;) {
 			selectedOption = getOptionSelection(prompt, options);
 			switch (options.get(selectedOption)) {
@@ -168,20 +221,14 @@ public class Presentation {
 				presentMenu(genericPrompt, options, parameters);
 				break;
 			case manageBranch:
-				branchPksAndNames = business.getBranchPksAndNames();
-				resetList(options, (String[]) branchPksAndNames[1]); 
-				resetList(branchPks, (Integer[]) branchPksAndNames[0]);
-				options.add(0, goBack);
-				branchPks.add(0, null);
-				selectedOption = getOptionSelection(manageBranchPrompt, options);
-				if (selectedOption == 0)
+				branchPk = getBranchSelection(manageBranchPrompt);
+				if (branchPk == 0)
 					return;
-				branchPk = branchPks.get(selectedOption);
-				resetList(options, updateBranch, addCopies);
+				resetList(options, librarianUpdateBranch, addCopies);
 				resetList(parameters, branchPk);
 				presentMenu(genericPrompt, options, parameters);
 				break;
-			case updateBranch:
+			case librarianUpdateBranch:
 				final String cancelOperation = "0", noChange = "", newName, newAddress;
 				branchPk = (Integer) parameters.get(0);
 				printBranchUpdateInfo(branchPk);
@@ -201,46 +248,30 @@ public class Presentation {
 				// add more here
 				return;
 			case checkoutBook:
-				ArrayList<Integer> availableBookPks = new ArrayList<Integer>();
 				cardNumber = (Integer) parameters.get(0);
-				options = business.getDbColumnAsStrings(LMS.branchTable, LMS.branchPkColumn); // left off here
-				branchPks = business.getDbColumnAsIntegers(LMS.branchTable, LMS.branchPkColumn);
-				options.add(0, goBack);
-				branchPks.add(0, null);
-				selectedOption = getOptionSelection(checkoutBranchPrompt, options);
-				if (selectedOption == 0)
+				branchPk = getBranchSelection(checkoutBranchPrompt);
+				if (branchPk == 0)
 					return;
-				branchPk = branchPks.get(selectedOption);
-				options = business.getAvailableBookTitlesAndAuthors(branchPk);
-				availableBookPks = business.getAvailableBookPks(branchPk);
-				options.add(0, goBack);
-				availableBookPks.add(0, null);
-				selectedOption = getOptionSelection(checkoutBookPrompt, options);
-				if (selectedOption == 0)
+				bookPksTitlesAndAuthors = business.getAvailableBookPksTitlesAndAuthors(branchPk);
+				prepareForPkSelection(options, bookPks, (String[]) bookPksTitlesAndAuthors[1],
+						(Integer[]) bookPksTitlesAndAuthors[0]);
+				bookPk = getSelectionPk(checkoutBookPrompt, options, bookPks);
+				if (bookPk == 0)
 					return;
-				bookPk = availableBookPks.get(selectedOption);
 				System.out.println(business.checkoutBook(cardNumber, branchPk, bookPk));
 				return;
 			case returnBook:
-				ArrayList<Integer> returnableBookPks = new ArrayList<Integer>();
 				cardNumber = (Integer) parameters.get(0);
-				options = business.getDbColumnAsStrings(LMS.branchTable, LMS.branchPkColumn);
-				branchPks = business.getDbColumnAsIntegers(LMS.branchTable, LMS.branchPkColumn);
-				options.add(0, goBack);
-				branchPks.add(0, null);
-				selectedOption = getOptionSelection(returnBranchPrompt, options);
-				if (selectedOption == 0)
+				branchPk = getBranchSelection(returnBranchPrompt);
+				if (branchPk == 0)
 					return;
-				branchPk = branchPks.get(selectedOption);
-				options = business.getReturnableBookTitlesAndAuthors(cardNumber, branchPk);
-				returnableBookPks = business.getReturnableBookPks(cardNumber, branchPk);
-				options.add(0, goBack);
-				returnableBookPks.add(0, null);
-				selectedOption = getOptionSelection(returnBookPrompt, options);
-				if (selectedOption == 0)
+				bookPksTitlesAndAuthors = business.getReturnableBookPksTitlesAndAuthors(cardNumber, branchPk);
+				prepareForPkSelection(options, bookPks, (String[]) bookPksTitlesAndAuthors[1],
+						(Integer[]) bookPksTitlesAndAuthors[0]);
+				bookPk = getSelectionPk(returnBookPrompt, options, bookPks);
+				if (bookPk == 0)
 					return;
-				bookPk = returnableBookPks.get(selectedOption);
-				System.out.println(business.checkoutBook(cardNumber, branchPk, bookPk));
+				System.out.println(business.returnBook(cardNumber, branchPk, bookPk));
 				return;
 			}
 		}

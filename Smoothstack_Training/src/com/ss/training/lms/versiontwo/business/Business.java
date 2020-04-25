@@ -14,14 +14,14 @@ public class Business {
 	 * The single instance of this class
 	 */
 	static Business instance = null;
-	
+
 	/**
 	 * Private constructor to make this class a singleton
 	 */
 	private Business() {
 
 	}
-	
+
 	/**
 	 * Gets the single instance of this class
 	 * 
@@ -44,25 +44,25 @@ public class Business {
 //	public ArrayList<String> getDbColumnAsStrings(String table, String column) {
 //		return null; // placeholder
 //	}
-	
+
+//	/**
+//	 * Gets a column of a database table as a list of integers
+//	 * 
+//	 * @param table  The table to get the column from
+//	 * @param column The column to get
+//	 * @return Array containing all entries of the specified column of the specified
+//	 *         table
+//	 */
+//	public ArrayList<Integer> getDbColumnAsIntegers(String table, String column) {
+//		return null; // placeholder
+//	}
+
 	/**
 	 * Gets primary keys and names of all library branches
 	 * 
 	 * @return Primary keys (first row) and names (second row) of branches
 	 */
-	public Object[][] getBranchPksAndNames(){
-		return null; // placeholder
-	}
-
-	/**
-	 * Gets a column of a database table as a list of integers
-	 * 
-	 * @param table  The table to get the column from
-	 * @param column The column to get
-	 * @return Array containing all entries of the specified column of the specified
-	 *         table
-	 */
-	public ArrayList<Integer> getDbColumnAsIntegers(String table, String column) {
+	public Object[][] getBranchPksAndNames() {
 		return null; // placeholder
 	}
 
@@ -90,22 +90,14 @@ public class Business {
 	}
 
 	/**
-	 * Gets primary keys of all books available at a library branch
+	 * Gets primary keys, titles, and authors of all books available for checkout at
+	 * a library branch
 	 * 
 	 * @param branchPk The primary key of the branch
-	 * @return Primary keys for all books available at the branch
+	 * @return The primary keys of the available books (row 0) and strings
+	 *         containing their titles and authors (row 1)
 	 */
-	public ArrayList<Integer> getAvailableBookPks(int branchPk) {
-		return null; // placeholder
-	}
-
-	/**
-	 * Gets title/author strings for all books available at a library branch
-	 * 
-	 * @param branchPk The primary key of the branch
-	 * @return Title/author strings for all books available at the branch
-	 */
-	public ArrayList<String> getAvailableBookTitlesAndAuthors(int branchPk) {
+	public Object[][] getAvailableBookPksTitlesAndAuthors(int branchPk) {
 		return null; // placeholder
 	}
 
@@ -122,23 +114,27 @@ public class Business {
 	}
 
 	/**
-	 * Gets primary keys of all books returnable to a library branch by a borrower
+	 * Gets primary keys, titles, and authors of all books returnable to a library
+	 * branch by a borrower
 	 * 
-	 * @param branchPk The primary key of the branch
-	 * @return Primary keys for all books available at the branch
+	 * @param cardNumber The card number of the borrower
+	 * @param branchPk   The primary key of the branch
+	 * @return The primary keys of the returnable books (row 0) and strings
+	 *         containing their titles and authors (row 1)
 	 */
-	public ArrayList<Integer> getReturnableBookPks(int cardNumber, int branchPk) {
+	public Object[][] getReturnableBookPksTitlesAndAuthors(int cardNumber, int branchPk) {
 		return null; // placeholder
 	}
-
+	
 	/**
-	 * Gets title/author strings for all books returnable to a library branch by a
-	 * borrower
+	 * Returns a book to a library branch from a borrower
 	 * 
-	 * @param branchPk The primary key of the branch
-	 * @return Title/author strings for all books available at the branch
+	 * @param cardNumber The borrower's card number
+	 * @param branchPk   The primary key of the branch
+	 * @param bookPk     The primary key of the book
+	 * @return A message to tell the user whether the transaction succeeded
 	 */
-	public ArrayList<String> getReturnableBookTitlesAndAuthors(int cardNumber, int branchPk) {
+	public String returnBook(int cardNumber, int branchPk, int bookPk) {
 		return null; // placeholder
 	}
 }
