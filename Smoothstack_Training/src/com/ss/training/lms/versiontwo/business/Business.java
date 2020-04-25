@@ -11,14 +11,46 @@ import java.util.List;
 public class Business {
 
 	/**
-	 * Gets a column of a database table as a list of strings
-	 * 
-	 * @param table  The table to get the column from
-	 * @param column The column to get
-	 * @return Array containing all entries of the specified column of the specified
-	 *         table
+	 * The single instance of this class
 	 */
-	public static ArrayList<String> getDbColumnAsStrings(String table, String column) {
+	static Business instance = null;
+	
+	/**
+	 * Private constructor to make this class a singleton
+	 */
+	private Business() {
+
+	}
+	
+	/**
+	 * Gets the single instance of this class
+	 * 
+	 * @return The single instance of this class
+	 */
+	public static Business getInstance() {
+		if (instance == null)
+			instance = new Business();
+		return instance;
+	}
+
+//	/**
+//	 * Gets a column of a database table as a list of strings
+//	 * 
+//	 * @param table  The table to get the column from
+//	 * @param column The column to get
+//	 * @return Array containing all entries of the specified column of the specified
+//	 *         table
+//	 */
+//	public ArrayList<String> getDbColumnAsStrings(String table, String column) {
+//		return null; // placeholder
+//	}
+	
+	/**
+	 * Gets primary keys and names of all library branches
+	 * 
+	 * @return Primary keys (first row) and names (second row) of branches
+	 */
+	public Object[][] getBranchPksAndNames(){
 		return null; // placeholder
 	}
 
@@ -30,7 +62,7 @@ public class Business {
 	 * @return Array containing all entries of the specified column of the specified
 	 *         table
 	 */
-	public static ArrayList<Integer> getDbColumnAsIntegers(String table, String column) {
+	public ArrayList<Integer> getDbColumnAsIntegers(String table, String column) {
 		return null; // placeholder
 	}
 
@@ -40,7 +72,7 @@ public class Business {
 	 * @param branchPk The branch's primary key
 	 * @return The branch's name
 	 */
-	public static String getBranchName(int branchPk) {
+	public String getBranchName(int branchPk) {
 		return null; // placeholder
 	}
 
@@ -53,7 +85,7 @@ public class Business {
 	 *                   corresponding attribute of the branch won't be changed
 	 * @return A message to tell the user whether the operations succeeded
 	 */
-	public static String librarianUpdateBranch(String newName, String newAddress, String noChange) {
+	public String librarianUpdateBranch(String newName, String newAddress, String noChange) {
 		return null; // placeholder
 	}
 
@@ -63,7 +95,7 @@ public class Business {
 	 * @param branchPk The primary key of the branch
 	 * @return Primary keys for all books available at the branch
 	 */
-	public static ArrayList<Integer> getAvailableBookPks(int branchPk) {
+	public ArrayList<Integer> getAvailableBookPks(int branchPk) {
 		return null; // placeholder
 	}
 
@@ -73,7 +105,7 @@ public class Business {
 	 * @param branchPk The primary key of the branch
 	 * @return Title/author strings for all books available at the branch
 	 */
-	public static ArrayList<String> getAvailableBookTitlesAndAuthors(int branchPk) {
+	public ArrayList<String> getAvailableBookTitlesAndAuthors(int branchPk) {
 		return null; // placeholder
 	}
 
@@ -85,7 +117,7 @@ public class Business {
 	 * @param bookPk     The primary key of the book
 	 * @return A message to tell the user whether the transaction succeeded
 	 */
-	public static String checkoutBook(int cardNumber, int branchPk, int bookPk) {
+	public String checkoutBook(int cardNumber, int branchPk, int bookPk) {
 		return null; // placeholder
 	}
 
@@ -95,7 +127,7 @@ public class Business {
 	 * @param branchPk The primary key of the branch
 	 * @return Primary keys for all books available at the branch
 	 */
-	public static ArrayList<Integer> getReturnableBookPks(int cardNumber, int branchPk) {
+	public ArrayList<Integer> getReturnableBookPks(int cardNumber, int branchPk) {
 		return null; // placeholder
 	}
 
@@ -106,7 +138,7 @@ public class Business {
 	 * @param branchPk The primary key of the branch
 	 * @return Title/author strings for all books available at the branch
 	 */
-	public static ArrayList<String> getReturnableBookTitlesAndAuthors(int cardNumber, int branchPk) {
+	public ArrayList<String> getReturnableBookTitlesAndAuthors(int cardNumber, int branchPk) {
 		return null; // placeholder
 	}
 }

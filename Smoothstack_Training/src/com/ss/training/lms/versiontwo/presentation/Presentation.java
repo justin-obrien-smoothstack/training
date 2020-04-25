@@ -16,33 +16,59 @@ import com.ss.training.lms.versiontwo.business.Business;
 public class Presentation {
 
 	/**
+	 * The single instance of this class
+	 */
+	static Presentation instance = null;
+
+	/**
+	 * Private constructor to make this class a singleton
+	 */
+	private Presentation() {
+
+	}
+
+	/**
+	 * Gets the single instance of this class
+	 * 
+	 * @return The single instance of this class
+	 */
+	public static Presentation getInstance() {
+		if (instance == null)
+			instance = new Presentation();
+		return instance;
+	}
+
+	/**
 	 * Text shown to the user in menus
 	 */
-	public static final String exit = "Exit", librarian = "Librarian", admin = "Administrator", borrower = "Borrower";
-	private static final String genericPrompt = "What would you like to do?",
+	public final String exit = "Exit", librarian = "Librarian", admin = "Administrator", borrower = "Borrower";
+	private final String genericPrompt = "What would you like to do?",
 			cardPrompt = "Please enter your library card number, or enter 0 to go back.",
 			manageBranchPrompt = "Which branch do you manage?",
-			branchNamePrompt = "What is the branch's new name? Enter a blank line if it hasn't changed.",
-			branchAddressPrompt = "What is the branch's new address? Enter a blank line if it hasn't changed.",
+			updateBranchNamePrompt = "What is the branch's new name? Enter a blank line if it hasn't changed.",
+			updateBranchAddressPrompt = "What is the branch's new address? Enter a blank line if it hasn't changed.",
+			addCopiesPrompt = "Which book would you like to add copies of?",
 			checkoutBranchPrompt = "Which branch would you like to check out a book from?",
 			checkoutBookPrompt = "Which book would you like to check out?",
 			returnBranchPrompt = "Which branch would you like to return a book to?",
 			returnBookPrompt = "Which book would you like to return?";
-	private static final String goBack = "Return to the previous menu", manageBranch = "Manage your branch",
+	private final String goBack = "Return to the previous menu", manageBranch = "Manage your branch",
 			crud = "Create/Read/Update/Delete ", crudBooks = crud + "books", crudAuthors = crud + "authors",
 			crudGenres = crud + "genres", crudPublishers = crud + "publishers",
 			crudBranches = crud + "library branches", crudBorrowers = crud + "borrowers",
 			override = "Override due date for a book loan", checkoutBook = "Check out a book",
 			returnBook = "Return a book", updateBranch = "Update branch information",
 			addCopies = "Add copies of a book to your branch";
-	private static final Scanner scanner = new Scanner(System.in);
+
+	private final Scanner scanner = new Scanner(System.in);
+	Business business = Business.getInstance();
 
 	/**
 	 * Prints numbered options available from a menu
 	 * 
 	 * @param options The options to be printed
 	 */
-	private static void printOptions(List<String> options) {
+	private void printOptions(List<String> options) {
 
 	}
 
@@ -53,7 +79,7 @@ public class Presentation {
 	 * @param options The options the user is to select from
 	 * @return The number corresponding to the option the user selects
 	 */
-	private static int getOptionSelection(String prompt, List<String> options) {
+	private int getOptionSelection(String prompt, List<String> options) {
 		return 0; // placeholder
 	}
 
@@ -63,7 +89,18 @@ public class Presentation {
 	 * @param list        The list to be reset
 	 * @param newElements The new contents to populate the list
 	 */
-	private static void resetList(List<String> list, String... newElements) {
+	private void resetList(List<String> list, String... newElements) {
+		list.clear();
+		Collections.addAll(list, newElements);
+	}
+
+	/**
+	 * Removes all elements in a list of integers and repopulates the list
+	 * 
+	 * @param list        The list to be reset
+	 * @param newElements The new contents to populate the list
+	 */
+	private void resetList(List<Integer> list, Integer... newElements) {
 		list.clear();
 		Collections.addAll(list, newElements);
 	}
@@ -74,7 +111,7 @@ public class Presentation {
 	 * @param list        The list to be reset
 	 * @param newElements The new contents to populate the list
 	 */
-	private static void resetList(List<Object> list, Object... newElements) {
+	private void resetList(List<Object> list, Object... newElements) {
 		list.clear();
 		Collections.addAll(list, newElements);
 	}
@@ -85,12 +122,12 @@ public class Presentation {
 	 * @return the user's card number, or 0 if the user wants to go back to the
 	 *         previous menu
 	 */
-	private static int getCardNumber() {
+	private int getCardNumber() {
 		return 0; // placeholder
 	}
 
-	private static void printBranchUpdateInfo(int branchPk) {
-		final String branchName = Business.getBranchName(branchPk);
+	private void printBranchUpdateInfo(int branchPk) {
+		final String branchName = business.getBranchName(branchPk);
 		System.out.println("Updating branch: " + branchName + " (#+" + branchPk
 				+ ")\nEnter 0 at any prompt to cancel the operation.");
 	}
@@ -103,11 +140,13 @@ public class Presentation {
 	 * @param parameters Anything else the application may need to execute
 	 *                   functionality available through the menu to be presented
 	 */
-	public static void presentMenu(String prompt, List<String> options, List<Object> parameters) {
-		int optionSelection, cardNumber, branchPk, bookPk;
+	public void presentMenu(String prompt, List<String> options, List<Object> parameters) {
+		int selectedOption, cardNumber, branchPk, bookPk;
+		Object[][] branchPksAndNames;
 		ArrayList<Integer> branchPks;
 		for (;;) {
-			switch (options.get(getOptionSelection(prompt, options))) {
+			selectedOption = getOptionSelection(prompt, options);
+			switch (options.get(selectedOption)) {
 			case exit:
 			case goBack:
 				return;
@@ -129,14 +168,15 @@ public class Presentation {
 				presentMenu(genericPrompt, options, parameters);
 				break;
 			case manageBranch:
-				options = Business.getDbColumnAsStrings(LMS.branchTable, LMS.branchPkColumn);
-				branchPks = Business.getDbColumnAsIntegers(LMS.branchTable, LMS.branchPkColumn);
+				branchPksAndNames = business.getBranchPksAndNames();
+				resetList(options, (String[]) branchPksAndNames[1]); 
+				resetList(branchPks, (Integer[]) branchPksAndNames[0]);
 				options.add(0, goBack);
 				branchPks.add(0, null);
-				optionSelection = getOptionSelection(manageBranchPrompt, options);
-				if (optionSelection == 0)
+				selectedOption = getOptionSelection(manageBranchPrompt, options);
+				if (selectedOption == 0)
 					return;
-				branchPk = branchPks.get(optionSelection);
+				branchPk = branchPks.get(selectedOption);
 				resetList(options, updateBranch, addCopies);
 				resetList(parameters, branchPk);
 				presentMenu(genericPrompt, options, parameters);
@@ -145,58 +185,63 @@ public class Presentation {
 				final String cancelOperation = "0", noChange = "", newName, newAddress;
 				branchPk = (Integer) parameters.get(0);
 				printBranchUpdateInfo(branchPk);
-				System.out.println(branchNamePrompt);
+				System.out.println(updateBranchNamePrompt);
 				newName = scanner.nextLine();
 				if (cancelOperation.equals(newName))
 					return;
-				System.out.println(branchAddressPrompt);
+				System.out.println(updateBranchAddressPrompt);
 				newAddress = scanner.nextLine();
 				if (cancelOperation.equals(newAddress))
 					return;
-				System.out.println(Business.librarianUpdateBranch(newName, newAddress, noChange));
-				break;
+				System.out.println(business.librarianUpdateBranch(newName, newAddress, noChange));
+				return;
+			case addCopies:
+				branchPk = (Integer) parameters.get(0);
+				System.out.println(addCopiesPrompt);
+				// add more here
+				return;
 			case checkoutBook:
 				ArrayList<Integer> availableBookPks = new ArrayList<Integer>();
 				cardNumber = (Integer) parameters.get(0);
-				options = Business.getDbColumnAsStrings(LMS.branchTable, LMS.branchPkColumn);
-				branchPks = Business.getDbColumnAsIntegers(LMS.branchTable, LMS.branchPkColumn);
+				options = business.getDbColumnAsStrings(LMS.branchTable, LMS.branchPkColumn); // left off here
+				branchPks = business.getDbColumnAsIntegers(LMS.branchTable, LMS.branchPkColumn);
 				options.add(0, goBack);
 				branchPks.add(0, null);
-				optionSelection = getOptionSelection(checkoutBranchPrompt, options);
-				if (optionSelection == 0)
+				selectedOption = getOptionSelection(checkoutBranchPrompt, options);
+				if (selectedOption == 0)
 					return;
-				branchPk = branchPks.get(optionSelection);
-				options = Business.getAvailableBookTitlesAndAuthors(branchPk);
-				availableBookPks = Business.getAvailableBookPks(branchPk);
+				branchPk = branchPks.get(selectedOption);
+				options = business.getAvailableBookTitlesAndAuthors(branchPk);
+				availableBookPks = business.getAvailableBookPks(branchPk);
 				options.add(0, goBack);
 				availableBookPks.add(0, null);
-				optionSelection = getOptionSelection(checkoutBookPrompt, options);
-				if (optionSelection == 0)
+				selectedOption = getOptionSelection(checkoutBookPrompt, options);
+				if (selectedOption == 0)
 					return;
-				bookPk = availableBookPks.get(optionSelection);
-				System.out.println(Business.checkoutBook(cardNumber, branchPk, bookPk));
-				break;
+				bookPk = availableBookPks.get(selectedOption);
+				System.out.println(business.checkoutBook(cardNumber, branchPk, bookPk));
+				return;
 			case returnBook:
 				ArrayList<Integer> returnableBookPks = new ArrayList<Integer>();
 				cardNumber = (Integer) parameters.get(0);
-				options = Business.getDbColumnAsStrings(LMS.branchTable, LMS.branchPkColumn);
-				branchPks = Business.getDbColumnAsIntegers(LMS.branchTable, LMS.branchPkColumn);
+				options = business.getDbColumnAsStrings(LMS.branchTable, LMS.branchPkColumn);
+				branchPks = business.getDbColumnAsIntegers(LMS.branchTable, LMS.branchPkColumn);
 				options.add(0, goBack);
 				branchPks.add(0, null);
-				optionSelection = getOptionSelection(returnBranchPrompt, options);
-				if (optionSelection == 0)
+				selectedOption = getOptionSelection(returnBranchPrompt, options);
+				if (selectedOption == 0)
 					return;
-				branchPk = branchPks.get(optionSelection);
-				options = Business.getReturnableBookTitlesAndAuthors(cardNumber, branchPk);
-				returnableBookPks = Business.getReturnableBookPks(cardNumber, branchPk);
+				branchPk = branchPks.get(selectedOption);
+				options = business.getReturnableBookTitlesAndAuthors(cardNumber, branchPk);
+				returnableBookPks = business.getReturnableBookPks(cardNumber, branchPk);
 				options.add(0, goBack);
 				returnableBookPks.add(0, null);
-				optionSelection = getOptionSelection(returnBookPrompt, options);
-				if (optionSelection == 0)
+				selectedOption = getOptionSelection(returnBookPrompt, options);
+				if (selectedOption == 0)
 					return;
-				bookPk = returnableBookPks.get(optionSelection);
-				System.out.println(Business.checkoutBook(cardNumber, branchPk, bookPk));
-				break;
+				bookPk = returnableBookPks.get(selectedOption);
+				System.out.println(business.checkoutBook(cardNumber, branchPk, bookPk));
+				return;
 			}
 		}
 	}

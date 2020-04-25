@@ -18,9 +18,10 @@ public class LMS {
 	public static void main(String[] args) {
 		String rootMenuPrompt = "Welcome to the library management system. Please indicate what type of user you are.";
 		ArrayList<String> rootMenuOptions = new ArrayList<String>();
+		Presentation presentation = Presentation.getInstance();
 		Collections.addAll(rootMenuOptions,
-				new String[] { Presentation.exit, Presentation.librarian, Presentation.borrower, Presentation.admin });
+				new String[] { presentation.exit, presentation.librarian, presentation.borrower, presentation.admin });
 		ArrayList<Object> rootMenuParameters = new ArrayList<Object>();
-		Presentation.presentMenu(rootMenuPrompt, rootMenuOptions, rootMenuParameters);
+		presentation.presentMenu(rootMenuPrompt, rootMenuOptions, rootMenuParameters);
 	}
 }
