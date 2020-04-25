@@ -3,6 +3,7 @@ package com.ss.training.lms.versiontwo.presentation;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Scanner;
 
 import com.ss.training.lms.versiontwo.LMS;
 import com.ss.training.lms.versiontwo.business.Business;
@@ -21,6 +22,8 @@ public class Presentation {
 	private static final String genericPrompt = "What would you like to do?",
 			cardPrompt = "Please enter your library card number, or enter 0 to go back.",
 			manageBranchPrompt = "Which branch do you manage?",
+			branchNamePrompt = "What is the branch's new name? Enter a blank line if it hasn't changed.",
+			branchAddressPrompt = "What is the branch's new address? Enter a blank line if it hasn't changed.",
 			checkoutBranchPrompt = "Which branch would you like to check out a book from?",
 			checkoutBookPrompt = "Which book would you like to check out?",
 			returnBranchPrompt = "Which branch would you like to return a book to?",
@@ -32,6 +35,7 @@ public class Presentation {
 			override = "Override due date for a book loan", checkoutBook = "Check out a book",
 			returnBook = "Return a book", updateBranch = "Update branch information",
 			addCopies = "Add copies of a book to your branch";
+	private static final Scanner scanner = new Scanner(System.in);
 
 	/**
 	 * Prints numbered options available from a menu
@@ -53,11 +57,23 @@ public class Presentation {
 		return 0; // placeholder
 	}
 
+	/**
+	 * Removes all elements in a list of strings and repopulates the list
+	 * 
+	 * @param list        The list to be reset
+	 * @param newElements The new contents to populate the list
+	 */
 	private static void resetList(List<String> list, String... newElements) {
 		list.clear();
 		Collections.addAll(list, newElements);
 	}
 
+	/**
+	 * Removes all elements in a list of objects and repopulates the list
+	 * 
+	 * @param list        The list to be reset
+	 * @param newElements The new contents to populate the list
+	 */
 	private static void resetList(List<Object> list, Object... newElements) {
 		list.clear();
 		Collections.addAll(list, newElements);
@@ -71,6 +87,12 @@ public class Presentation {
 	 */
 	private static int getCardNumber() {
 		return 0; // placeholder
+	}
+
+	private static void printBranchUpdateInfo(int branchPk) {
+		final String branchName = Business.getBranchName(branchPk);
+		System.out.println("Updating branch: " + branchName + " (#+" + branchPk
+				+ ")\nEnter 0 at any prompt to cancel the operation.");
 	}
 
 	/**
@@ -120,8 +142,18 @@ public class Presentation {
 				presentMenu(genericPrompt, options, parameters);
 				break;
 			case updateBranch:
+				final String cancelOperation = "0", noChange = "", newName, newAddress;
 				branchPk = (Integer) parameters.get(0);
-				
+				printBranchUpdateInfo(branchPk);
+				System.out.println(branchNamePrompt);
+				newName = scanner.nextLine();
+				if (cancelOperation.equals(newName))
+					return;
+				System.out.println(branchAddressPrompt);
+				newAddress = scanner.nextLine();
+				if (cancelOperation.equals(newAddress))
+					return;
+				System.out.println(Business.librarianUpdateBranch(newName, newAddress, noChange));
 				break;
 			case checkoutBook:
 				ArrayList<Integer> availableBookPks = new ArrayList<Integer>();
