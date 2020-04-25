@@ -1,5 +1,8 @@
 package com.ss.training.lms.versiontwo;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 import com.ss.training.lms.versiontwo.presentation.Presentation;
 
 /**
@@ -14,9 +17,10 @@ public class LMS {
 
 	public static void main(String[] args) {
 		String rootMenuPrompt = "Welcome to the library management system. Please indicate what type of user you are.";
-		String[] rootMenuOptions = { Presentation.exit, Presentation.librarian, Presentation.borrower,
-				Presentation.admin };
-		Object[] rootMenuParameters = null;
+		ArrayList<String> rootMenuOptions = new ArrayList<String>();
+		Collections.addAll(rootMenuOptions,
+				new String[] { Presentation.exit, Presentation.librarian, Presentation.borrower, Presentation.admin });
+		ArrayList<Object> rootMenuParameters = new ArrayList<Object>();
 		Presentation.presentMenu(rootMenuPrompt, rootMenuOptions, rootMenuParameters);
 	}
 }
