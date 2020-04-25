@@ -6,7 +6,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
-import com.ss.training.lms.versiontwo.business.Business;
+import com.ss.training.lms.versiontwo.business.AdminService;
+import com.ss.training.lms.versiontwo.business.BorrowerService;
+import com.ss.training.lms.versiontwo.business.LibrarianService;
 
 /**
  * Presentation tier of LMS application
@@ -44,7 +46,7 @@ public class Presentation {
 	public final String exit = "Exit", librarian = "Librarian", admin = "Administrator", borrower = "Borrower",
 			rootMenuPrompt = "Welcome to the library management system. Please indicate what type of user you are.";;
 	private final String genericPrompt = "What would you like to do?",
-			cardPrompt = "Please enter your library card number, or enter 0 to go back.",
+			borrowerCardPrompt = "Enter your library card number, or enter 0 to go back.",
 			manageBranchPrompt = "Which branch do you manage?",
 			updateBranchNamePrompt = "What is the branch's new name? Enter a blank line if it hasn't changed.",
 			updateBranchAddressPrompt = "What is the branch's new address? Enter a blank line if it hasn't changed.",
@@ -52,7 +54,8 @@ public class Presentation {
 			checkoutBranchPrompt = "Which branch would you like to check out a book from?",
 			checkoutBookPrompt = "Which book would you like to check out?",
 			returnBranchPrompt = "Which branch would you like to return a book to?",
-			returnBookPrompt = "Which book would you like to return?";
+			returnBookPrompt = "Which book would you like to return?",
+			adminCardPrompt = "Enter the borrower's card number, or enter 0 to go back.";
 	private final String goBack = "Return to the previous menu", manageBranch = "Manage your branch",
 			crud = "Create/Read/Update/Delete ", crudBooks = crud + "books", crudAuthors = crud + "authors",
 			crudGenres = crud + "genres", crudPublishers = crud + "publishers",
@@ -62,7 +65,9 @@ public class Presentation {
 			changeCopies = "Change the number of copies of a book at your branch";
 
 	private final Scanner scanner = new Scanner(System.in);
-	Business business = Business.getInstance();
+	LibrarianService librarianService = LibrarianService.getInstance();
+	BorrowerService borrowerService = BorrowerService.getInstance();
+	AdminService adminService = AdminService.getInstance();
 
 	/**
 	 * Prints numbered options available from a menu
@@ -118,18 +123,17 @@ public class Presentation {
 	}
 
 	/**
-	 * Prepares to have an element from one list selected based on the user's
-	 * selection of an option from another list
+	 * Prepares to select an integer based on the user's selection of string
 	 * 
 	 * @param userOptions      The list that will contain the options to be
 	 *                         presented to the user
-	 * @param crossOptions     The list that will contain the elements that can be
-	 *                         selected based on the user's choice, as well as 0 for
-	 *                         the option to return to the previous menu
+	 * @param crossOptions     The list that will contain the integers that can be
+	 *                         selected based on the user's choice
 	 * @param userOptionArray  The options to be presented to the user, other than
 	 *                         returning to the previous menu
-	 * @param crossOptionArray The elements that can be selected based on the user's
-	 *                         choice
+	 * @param crossOptionArray The integers that can be selected based on the user's
+	 *                         choice, other than that corresponding to returning to
+	 *                         the previous menu
 	 */
 	private void prepareForCrossSelection(List<String> userOptions, List<Integer> crossOptions,
 			String[] userOptionArray, Integer[] crossOptionArray) {
@@ -140,14 +144,13 @@ public class Presentation {
 	}
 
 	/**
-	 * Gets a selection from the user and chooses a corresponding but different
-	 * entity
+	 * Gets a selection from the user and chooses a corresponding integer
 	 * 
 	 * @param prompt       The prompt to show the user
 	 * @param userOptions  The options presented to the user
-	 * @param crossOptions The elements that can be selected based on the user's
+	 * @param crossOptions The integers that can be selected based on the user's
 	 *                     choice
-	 * @return The element corresponding to the option chosen by the user
+	 * @return The integer corresponding to the option chosen by the user
 	 */
 	private int getCrossSelection(String prompt, List<String> userOptions, List<Integer> crossOptions) {
 		return 0; // placeholder
@@ -164,7 +167,7 @@ public class Presentation {
 		int selectedOption;
 		ArrayList<String> options = new ArrayList<String>();
 		List<Integer> branchPks = new ArrayList<Integer>();
-		Object[][] branchPksAndNames = business.getBranchPksAndNames();
+		Object[][] branchPksAndNames = librarianService.getBranchPksAndNames();
 		options.add(goBack);
 		branchPks.add(0);
 		options.addAll(Arrays.asList((String[]) branchPksAndNames[1]));
@@ -176,15 +179,16 @@ public class Presentation {
 	/**
 	 * Gets the user's card number
 	 * 
-	 * @return the user's card number, or 0 if the user wants to go back to the
-	 *         previous menu
+	 * @param prompt The prompt to show the user
+	 * @return The card number input by the user, or 0 if the user wants to go back
+	 *         to the previous menu
 	 */
-	private int getCardNumber() {
+	private int getCardNumber(String prompt) {
 		return 0; // placeholder
 	}
 
 	private void printBranchUpdateInfo(int branchPk) {
-		final String branchName = business.getBranchName(branchPk);
+		final String branchName = librarianService.getBranchName(branchPk);
 		System.out.println("Updating branch: " + branchName + " (#+" + branchPk
 				+ ")\nEnter 0 at any prompt to cancel the operation.");
 	}
@@ -223,7 +227,7 @@ public class Presentation {
 				presentMenu(genericPrompt, options, parameters);
 				break;
 			case borrower:
-				cardNumber = getCardNumber();
+				cardNumber = getCardNumber(borrowerCardPrompt);
 				if (cardNumber == 0)
 					return;
 				resetList(parameters, cardNumber);
@@ -255,46 +259,56 @@ public class Presentation {
 				newAddress = scanner.nextLine();
 				if (cancelOperation.equals(newAddress))
 					return;
-				System.out.println(business.librarianUpdateBranch(newName, newAddress, noChange));
+				System.out.println(librarianService.updateBranch(newName, newAddress, noChange));
 				return;
 			case changeCopies:
 				int newNumberOfCopies;
 				branchPk = (Integer) parameters.get(0);
-				bookPksTitlesAndAuthors = business.getAllBookPksTitlesAndAuthors();
+				bookPksTitlesAndAuthors = librarianService.getAllBookPksTitlesAndAuthors();
 				prepareForCrossSelection(options, bookPks, (String[]) bookPksTitlesAndAuthors[1],
 						(Integer[]) bookPksTitlesAndAuthors[0]);
 				bookPk = getCrossSelection(changeCopiesPrompt, options, bookPks);
 				if (bookPk == 0)
 					return;
 				newNumberOfCopies = getNewNumberOfCopies(branchPk, bookPk);
-				System.out.println(business.updateNumberOfCopies(branchPk, bookPk, newNumberOfCopies));
+				System.out.println(librarianService.updateNumberOfCopies(branchPk, bookPk, newNumberOfCopies));
 				return;
 			case checkoutBook:
 				cardNumber = (Integer) parameters.get(0);
 				branchPk = getBranchSelection(checkoutBranchPrompt);
 				if (branchPk == 0)
 					return;
-				bookPksTitlesAndAuthors = business.getAvailableBookPksTitlesAndAuthors(branchPk);
+				bookPksTitlesAndAuthors = borrowerService.getAvailableBookPksTitlesAndAuthors(branchPk);
 				prepareForCrossSelection(options, bookPks, (String[]) bookPksTitlesAndAuthors[1],
 						(Integer[]) bookPksTitlesAndAuthors[0]);
 				bookPk = getCrossSelection(checkoutBookPrompt, options, bookPks);
 				if (bookPk == 0)
 					return;
-				System.out.println(business.checkoutBook(cardNumber, branchPk, bookPk));
+				System.out.println(borrowerService.checkoutBook(cardNumber, branchPk, bookPk));
 				return;
 			case returnBook:
 				cardNumber = (Integer) parameters.get(0);
 				branchPk = getBranchSelection(returnBranchPrompt);
 				if (branchPk == 0)
 					return;
-				bookPksTitlesAndAuthors = business.getReturnableBookPksTitlesAndAuthors(cardNumber, branchPk);
+				bookPksTitlesAndAuthors = borrowerService.getReturnableBookPksTitlesAndAuthors(cardNumber, branchPk);
 				prepareForCrossSelection(options, bookPks, (String[]) bookPksTitlesAndAuthors[1],
 						(Integer[]) bookPksTitlesAndAuthors[0]);
 				bookPk = getCrossSelection(returnBookPrompt, options, bookPks);
 				if (bookPk == 0)
 					return;
-				System.out.println(business.returnBook(cardNumber, branchPk, bookPk));
+				System.out.println(borrowerService.returnBook(cardNumber, branchPk, bookPk));
 				return;
+			case crudBooks:
+			case crudAuthors:
+			case crudGenres:
+			case crudPublishers:
+			case crudBranches:
+			case crudBorrowers:
+			case override:
+				cardNumber = getCardNumber(adminCardPrompt);
+				branchPk = getBranchSelection(overrideBranchPrompt);
+				
 			}
 		}
 	}
