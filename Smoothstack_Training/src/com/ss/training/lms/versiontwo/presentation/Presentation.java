@@ -48,7 +48,7 @@ public class Presentation {
 			manageBranchPrompt = "Which branch do you manage?",
 			updateBranchNamePrompt = "What is the branch's new name? Enter a blank line if it hasn't changed.",
 			updateBranchAddressPrompt = "What is the branch's new address? Enter a blank line if it hasn't changed.",
-			addCopiesPrompt = "Which book would you like to add copies of?",
+			changeCopiesPrompt = "Which book would you like to change the number of copies of?",
 			checkoutBranchPrompt = "Which branch would you like to check out a book from?",
 			checkoutBookPrompt = "Which book would you like to check out?",
 			returnBranchPrompt = "Which branch would you like to return a book to?",
@@ -59,7 +59,7 @@ public class Presentation {
 			crudBranches = crud + "library branches", crudBorrowers = crud + "borrowers",
 			override = "Override due date for a book loan", checkoutBook = "Check out a book",
 			returnBook = "Return a book", librarianUpdateBranch = "Update branch information",
-			addCopies = "Add copies of a book to your branch";
+			changeCopies = "Change the number of copies of a book at your branch";
 
 	private final Scanner scanner = new Scanner(System.in);
 	Business business = Business.getInstance();
@@ -118,34 +118,38 @@ public class Presentation {
 	}
 
 	/**
-	 * Prepares lists of options and primary keys to be used by getSelectionPk
+	 * Prepares to have an element from one list selected based on the user's
+	 * selection of an option from another list
 	 * 
-	 * @param options     The list that will contain the options to be presented to
-	 *                    the user
-	 * @param pks         The list that will contain the primary keys corresponding
-	 *                    to the options, as well as 0 for the option to return to
-	 *                    the previous menu
-	 * @param optionArray The options to be presented to the user, other than
-	 *                    returning to the previous menu
-	 * @param pkArray     The primary keys corresponding to the options
+	 * @param userOptions      The list that will contain the options to be
+	 *                         presented to the user
+	 * @param crossOptions     The list that will contain the elements that can be
+	 *                         selected based on the user's choice, as well as 0 for
+	 *                         the option to return to the previous menu
+	 * @param userOptionArray  The options to be presented to the user, other than
+	 *                         returning to the previous menu
+	 * @param crossOptionArray The elements that can be selected based on the user's
+	 *                         choice
 	 */
-	private void prepareForPkSelection(List<String> options, List<Integer> pks, String[] optionArray,
-			Integer[] pkArray) {
-		resetList(options, optionArray);
-		resetList(pks, pkArray);
-		options.add(0, goBack);
-		pks.add(0, 0);
+	private void prepareForCrossSelection(List<String> userOptions, List<Integer> crossOptions,
+			String[] userOptionArray, Integer[] crossOptionArray) {
+		resetList(userOptions, userOptionArray);
+		resetList(crossOptions, crossOptionArray);
+		userOptions.add(0, goBack);
+		crossOptions.add(0, 0);
 	}
 
 	/**
-	 * Gets a selection from the user and returns its primary key
+	 * Gets a selection from the user and chooses a corresponding but different
+	 * entity
 	 * 
-	 * @param prompt  The prompt to show the user
-	 * @param options The options presented to the user
-	 * @param pks     The primary keys corresponding to the options
-	 * @return The primary key of the option selected by the user
+	 * @param prompt       The prompt to show the user
+	 * @param userOptions  The options presented to the user
+	 * @param crossOptions The elements that can be selected based on the user's
+	 *                     choice
+	 * @return The element corresponding to the option chosen by the user
 	 */
-	private int getSelectionPk(String prompt, List<String> options, List<Integer> pks) {
+	private int getCrossSelection(String prompt, List<String> userOptions, List<Integer> crossOptions) {
 		return 0; // placeholder
 	}
 
@@ -183,6 +187,17 @@ public class Presentation {
 		final String branchName = business.getBranchName(branchPk);
 		System.out.println("Updating branch: " + branchName + " (#+" + branchPk
 				+ ")\nEnter 0 at any prompt to cancel the operation.");
+	}
+
+	/**
+	 * Gets the new number of copies of a book at a branch from the user
+	 * 
+	 * @param branchPk The primary key of the branch
+	 * @param bookPk   The primary key of the book
+	 * @return The new number of copies
+	 */
+	private int getNewNumberOfCopies(int branchPk, int bookPk) {
+		return 0; // placeholder
 	}
 
 	/**
@@ -224,7 +239,7 @@ public class Presentation {
 				branchPk = getBranchSelection(manageBranchPrompt);
 				if (branchPk == 0)
 					return;
-				resetList(options, librarianUpdateBranch, addCopies);
+				resetList(options, librarianUpdateBranch, changeCopies);
 				resetList(parameters, branchPk);
 				presentMenu(genericPrompt, options, parameters);
 				break;
@@ -242,10 +257,17 @@ public class Presentation {
 					return;
 				System.out.println(business.librarianUpdateBranch(newName, newAddress, noChange));
 				return;
-			case addCopies:
+			case changeCopies:
+				int newNumberOfCopies;
 				branchPk = (Integer) parameters.get(0);
-				System.out.println(addCopiesPrompt);
-				// add more here
+				bookPksTitlesAndAuthors = business.getAllBookPksTitlesAndAuthors();
+				prepareForCrossSelection(options, bookPks, (String[]) bookPksTitlesAndAuthors[1],
+						(Integer[]) bookPksTitlesAndAuthors[0]);
+				bookPk = getCrossSelection(changeCopiesPrompt, options, bookPks);
+				if (bookPk == 0)
+					return;
+				newNumberOfCopies = getNewNumberOfCopies(branchPk, bookPk);
+				System.out.println(business.updateNumberOfCopies(branchPk, bookPk, newNumberOfCopies));
 				return;
 			case checkoutBook:
 				cardNumber = (Integer) parameters.get(0);
@@ -253,9 +275,9 @@ public class Presentation {
 				if (branchPk == 0)
 					return;
 				bookPksTitlesAndAuthors = business.getAvailableBookPksTitlesAndAuthors(branchPk);
-				prepareForPkSelection(options, bookPks, (String[]) bookPksTitlesAndAuthors[1],
+				prepareForCrossSelection(options, bookPks, (String[]) bookPksTitlesAndAuthors[1],
 						(Integer[]) bookPksTitlesAndAuthors[0]);
-				bookPk = getSelectionPk(checkoutBookPrompt, options, bookPks);
+				bookPk = getCrossSelection(checkoutBookPrompt, options, bookPks);
 				if (bookPk == 0)
 					return;
 				System.out.println(business.checkoutBook(cardNumber, branchPk, bookPk));
@@ -266,9 +288,9 @@ public class Presentation {
 				if (branchPk == 0)
 					return;
 				bookPksTitlesAndAuthors = business.getReturnableBookPksTitlesAndAuthors(cardNumber, branchPk);
-				prepareForPkSelection(options, bookPks, (String[]) bookPksTitlesAndAuthors[1],
+				prepareForCrossSelection(options, bookPks, (String[]) bookPksTitlesAndAuthors[1],
 						(Integer[]) bookPksTitlesAndAuthors[0]);
-				bookPk = getSelectionPk(returnBookPrompt, options, bookPks);
+				bookPk = getCrossSelection(returnBookPrompt, options, bookPks);
 				if (bookPk == 0)
 					return;
 				System.out.println(business.returnBook(cardNumber, branchPk, bookPk));
@@ -276,4 +298,5 @@ public class Presentation {
 			}
 		}
 	}
+
 }

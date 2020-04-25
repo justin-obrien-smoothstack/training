@@ -90,6 +90,28 @@ public class Business {
 	}
 
 	/**
+	 * Gets primary keys, titles, and authors of all books in the database
+	 * 
+	 * @return The primary keys of all books in the database (row 0) and strings
+	 *         containing their titles and authors (row 1)
+	 */
+	public Object[][] getAllBookPksTitlesAndAuthors() {
+		return null; // placeholder
+	}
+
+	/**
+	 * Updates the number of copies of a book at a library branch
+	 * 
+	 * @param branchPk          The primary key of the branch
+	 * @param bookPk            The primary key of the book
+	 * @param newNumberOfCopies The new number of copies of the book at the branch
+	 * @return A string indicating whether the operation succeeded
+	 */
+	public String updateNumberOfCopies(int branchPk, int bookPk, int newNumberOfCopies) {
+		return null; // placeholder
+	}
+
+	/**
 	 * Gets primary keys, titles, and authors of all books available for checkout at
 	 * a library branch
 	 * 
@@ -125,7 +147,7 @@ public class Business {
 	public Object[][] getReturnableBookPksTitlesAndAuthors(int cardNumber, int branchPk) {
 		return null; // placeholder
 	}
-	
+
 	/**
 	 * Returns a book to a library branch from a borrower
 	 * 
