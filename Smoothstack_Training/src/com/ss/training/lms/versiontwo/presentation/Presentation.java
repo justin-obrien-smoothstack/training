@@ -442,7 +442,38 @@ public class Presentation {
 	 * @return A string with information on all objects of the given type
 	 */
 	private String readObjects(String objectType) {
-		return null; // placeholder
+		StringBuilder result = new StringBuilder("\n");
+		ArrayList<LMSObject> objectsToRead = new ArrayList<LMSObject>();
+		objectsToRead.stream().map(object -> object.getFieldsMap()).forEach(fieldsMap -> {
+			HashMap<String, HashMap<String, Object>> independentFieldsMap = fieldsMap.get(LMS.independent);
+			HashMap<String, HashMap<String, Object>> relationalFieldsMap = fieldsMap.get(LMS.relational);
+			HashMap<String, Object> relationalMonoFieldsMap = relationalFieldsMap.get(LMS.mono);
+			HashMap<String, Object> relationalMultiFieldsMap = relationalFieldsMap.get(LMS.multi);
+			independentFieldsMap.keySet().stream().forEach(independentFieldsSubmapName -> {
+				HashMap<String, Object> independentFieldsSubmap = independentFieldsMap.get(independentFieldsSubmapName);
+				independentFieldsSubmap.keySet().stream().forEach(independentFieldName -> {
+					String independentFieldValue = independentFieldsSubmap.get(independentFieldName) == null ? ""
+							: (String) independentFieldsSubmap.get(independentFieldName);
+					result.append(independentFieldName + ": " + independentFieldValue);
+				});
+			});
+			relationalMonoFieldsMap.keySet().stream().forEach(relationalMonoFieldName -> {
+				LMSObject relationalMonoFieldValue = (LMSObject) relationalMonoFieldsMap.get(relationalMonoFieldName);
+				String relationalMonoFieldValueName = relationalMonoFieldValue.getDisplayName() == null ? ""
+						: relationalMonoFieldValue.getDisplayName();
+				result.append(relationalMonoFieldName + ": " + relationalMonoFieldValueName);
+			});
+			relationalMultiFieldsMap.keySet().stream().forEach(relationalMultiFieldName -> {
+				ArrayList<LMSObject> relationalMultiFieldValues = (ArrayList<LMSObject>) relationalMultiFieldsMap
+						.get(relationalMultiFieldName);
+				String relationalMultiFieldValueNames = relationalMultiFieldValues.stream()
+						.map(relationalMultiFieldValue -> relationalMultiFieldValue.getDisplayName())
+						.reduce((partialResult, nextItem) -> partialResult + ", " + nextItem).get();
+				result.append(relationalMultiFieldName+": "+relationalMultiFieldValueNames);
+			});
+			result.append("\n");
+		});
+		return result.toString(); // placeholder
 	}
 
 	/**
