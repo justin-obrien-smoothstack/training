@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
+import org.omg.CORBA.FieldNameHelper;
+
 import com.ss.training.lms.versiontwo.LMS;
 import com.ss.training.lms.versiontwo.business.AdminService;
 import com.ss.training.lms.versiontwo.business.BorrowerService;
@@ -282,6 +284,14 @@ public class Presentation {
 		}
 	}
 
+	private String[] getChangeOrRemoveOpts(String subject) {
+		return new String[] {cancelOperation, "Change "+subject, "Remove "+subject};
+	}
+	
+	private String[] getAddOrRemoveOpts(String subject) {
+		return new String[] {cancelOperation, "Add "+subject, "Remove "+subject};
+	}
+	
 	/**
 	 * Creates a prompt for when the user wants to do CRUD operations
 	 * 
@@ -291,7 +301,15 @@ public class Presentation {
 	private String getCRUDPrompt(String objectType) {
 		return "What operation do you want to do with " + objectType + "?";
 	}
+	
+	private String getObjectUpdatePrompt(String objectType) {
+		return "Which "+objectType+"do you want to update?";
+	}
 
+	private String getFieldUpdatePrompt(String objectType) {
+		return "What information about this "+objectType+"do you want to update?";
+	}
+	
 	/**
 	 * Creates a prompt for a user to enter a value for a single-string-valued field
 	 * of an object.
@@ -300,8 +318,20 @@ public class Presentation {
 	 * @param fieldName  The name of the field
 	 * @return The prompt
 	 */
-	private String getMonoFieldPrompt(String objectType, String fieldName) {
+	private String getMonoStringFieldPrompt(String objectType, String fieldName) {
 		return "What is the " + fieldName + " of the " + objectType + "? Enter a blank line to cancel the operation.";
+	}
+
+	/**
+	 * Creates a prompt for a user to enter a value for a single-object-valued field
+	 * of an object.
+	 * 
+	 * @param objectType The type of object whose field is to be set
+	 * @param fieldName  The name of the field
+	 * @return The prompt
+	 */
+	private String getMonoObjectFieldPrompt(String objectType, String fieldName) {
+		return "What is the " + fieldName + " of the " + objectType + "?";
 	}
 
 	/**
@@ -314,6 +344,30 @@ public class Presentation {
 	 */
 	private String getMultiFieldPrompt(String objectType, String fieldName) {
 		return "What are the " + fieldName + " of the " + objectType + "? To add multiple " + fieldName
+				+ ", enter the numbers on a single line, separated with spaces.";
+	}
+
+	/**
+	 * Creates a prompt for a user to select values to add for a multi-valued field
+	 * of an object.
+	 * 
+	 * @param fieldName The name of the field
+	 * @return The prompt
+	 */
+	private String getAddMultiFieldPrompt(String fieldName) {
+		return "What " + fieldName + " should be added? To add multiple " + fieldName
+				+ ", enter the numbers on a single line, separated with spaces.";
+	}
+
+	/**
+	 * Creates a prompt for a user to remove values for a multi-valued field of an
+	 * object.
+	 * 
+	 * @param fieldName The name of the field
+	 * @return The prompt
+	 */
+	private String getRemoveMultiFieldPrompt(String fieldName) {
+		return "What " + fieldName + " should be removed? To add multiple " + fieldName
 				+ ", enter the numbers on a single line, separated with spaces.";
 	}
 
@@ -370,15 +424,18 @@ public class Presentation {
 		ArrayList<String> options,
 				yesOrNo = (ArrayList<String>) Arrays.asList(new String[] { cancelOperation, "Yes", "No" });
 		ArrayList<LMSObject> possiblyRelatedObjects = new ArrayList<LMSObject>();
-		HashMap<String, HashMap<String, HashMap<String, Object>>> newObjectFields = newObject.getFieldsMap();
-		HashMap<String, Object> independentRequired = newObjectFields.get(LMS.independent).get(LMS.required);
-		HashMap<String, Object> independentOptional = newObjectFields.get(LMS.independent).get(LMS.optional);
+		HashMap<String, HashMap<String, Object>> newObjectFields = newObject.getFieldsMap();
+		HashMap<String, Object> independentRequired = (HashMap<String, Object>) newObjectFields.get(LMS.independent)
+				.get(LMS.required);
+		HashMap<String, Object> independentOptional = (HashMap<String, Object>) newObjectFields.get(LMS.independent)
+				.get(LMS.optional);
 		HashMap<String, Object> relationalMono = (HashMap<String, Object>) newObjectFields.get(LMS.relational)
 				.get(LMS.mono);
 		HashMap<String, Object> relationalMulti = (HashMap<String, Object>) newObjectFields.get(LMS.relational)
 				.get(LMS.multi);
+		// HashMap<String, Object> composite = newObjectFields.get(LMS.composite);
 		for (String fieldName : independentRequired.keySet()) {
-			System.out.println(getMonoFieldPrompt(objectType, fieldName));
+			System.out.println(getMonoStringFieldPrompt(objectType, fieldName));
 			fieldValue = scanner.nextLine();
 			if (fieldValue.isEmpty())
 				return "";
@@ -389,7 +446,7 @@ public class Presentation {
 			if (selectedOption == 0)
 				return "";
 			if (selectedOption == 1) {
-				System.out.println(getMonoFieldPrompt(objectType, fieldName));
+				System.out.println(getMonoStringFieldPrompt(objectType, fieldName));
 				fieldValue = scanner.nextLine();
 				if (fieldValue.isEmpty())
 					return "";
@@ -407,7 +464,7 @@ public class Presentation {
 						.collect(Collectors.toCollection(ArrayList::new));
 				options.add(0, cancelOperation);
 				possiblyRelatedObjects.add(0, null);
-				selectedOption = getOptionSelection(getMonoFieldPrompt(objectType, fieldName), options);
+				selectedOption = getOptionSelection(getMonoStringFieldPrompt(objectType, fieldName), options);
 				if (selectedOption == 0)
 					return "";
 				relationalMono.put(fieldName, possiblyRelatedObjects.get(selectedOption));
@@ -443,14 +500,17 @@ public class Presentation {
 	 */
 	private String readObjects(String objectType) {
 		StringBuilder result = new StringBuilder("\n");
-		ArrayList<LMSObject> objectsToRead = new ArrayList<LMSObject>();
+		ArrayList<LMSObject> objectsToRead = adminService.getAllObjects(objectType);
 		objectsToRead.stream().map(object -> object.getFieldsMap()).forEach(fieldsMap -> {
-			HashMap<String, HashMap<String, Object>> independentFieldsMap = fieldsMap.get(LMS.independent);
-			HashMap<String, HashMap<String, Object>> relationalFieldsMap = fieldsMap.get(LMS.relational);
-			HashMap<String, Object> relationalMonoFieldsMap = relationalFieldsMap.get(LMS.mono);
-			HashMap<String, Object> relationalMultiFieldsMap = relationalFieldsMap.get(LMS.multi);
+			HashMap<String, Object> independentFieldsMap = fieldsMap.get(LMS.independent);
+			HashMap<String, Object> relationalFieldsMap = fieldsMap.get(LMS.relational);
+			HashMap<String, Object> relationalMonoFieldsMap = (HashMap<String, Object>) relationalFieldsMap
+					.get(LMS.mono);
+			HashMap<String, Object> relationalMultiFieldsMap = (HashMap<String, Object>) relationalFieldsMap
+					.get(LMS.multi);
 			independentFieldsMap.keySet().stream().forEach(independentFieldsSubmapName -> {
-				HashMap<String, Object> independentFieldsSubmap = independentFieldsMap.get(independentFieldsSubmapName);
+				HashMap<String, Object> independentFieldsSubmap = (HashMap<String, Object>) independentFieldsMap
+						.get(independentFieldsSubmapName);
 				independentFieldsSubmap.keySet().stream().forEach(independentFieldName -> {
 					String independentFieldValue = independentFieldsSubmap.get(independentFieldName) == null ? ""
 							: (String) independentFieldsSubmap.get(independentFieldName);
@@ -459,8 +519,9 @@ public class Presentation {
 			});
 			relationalMonoFieldsMap.keySet().stream().forEach(relationalMonoFieldName -> {
 				LMSObject relationalMonoFieldValue = (LMSObject) relationalMonoFieldsMap.get(relationalMonoFieldName);
-				String relationalMonoFieldValueName = relationalMonoFieldValue.getDisplayName() == null ? ""
-						: relationalMonoFieldValue.getDisplayName();
+				String relationalMonoFieldValueName = (relationalMonoFieldValue == null
+						|| relationalMonoFieldValue.getDisplayName() == null) ? ""
+								: relationalMonoFieldValue.getDisplayName();
 				result.append(relationalMonoFieldName + ": " + relationalMonoFieldValueName);
 			});
 			relationalMultiFieldsMap.keySet().stream().forEach(relationalMultiFieldName -> {
@@ -468,12 +529,12 @@ public class Presentation {
 						.get(relationalMultiFieldName);
 				String relationalMultiFieldValueNames = relationalMultiFieldValues.stream()
 						.map(relationalMultiFieldValue -> relationalMultiFieldValue.getDisplayName())
-						.reduce((partialResult, nextItem) -> partialResult + ", " + nextItem).get();
-				result.append(relationalMultiFieldName+": "+relationalMultiFieldValueNames);
+						.reduce((partialResult, nextItem) -> partialResult + ", " + nextItem).orElse("");
+				result.append(relationalMultiFieldName + ": " + relationalMultiFieldValueNames);
 			});
 			result.append("\n");
 		});
-		return result.toString(); // placeholder
+		return result.toString();
 	}
 
 	/**
@@ -483,6 +544,134 @@ public class Presentation {
 	 * @return A string indicating whether the operation succeeded
 	 */
 	private String updateObject(String objectType) {
+		int selectedOption;
+		ArrayList<Integer> selectedOptions;
+		String nameOfFieldToUpdate, newFieldValueString;
+		ArrayList<LMSObject> updateCandidates = adminService.getAllObjects(objectType), possiblyRelatedObjects,
+				valuesOfFieldToUpdate;
+		ArrayList<String> options = updateCandidates.stream().map(object -> object.getDisplayName())
+				.collect(Collectors.toCollection(ArrayList::new));
+		HashMap<String, HashMap<String, Object>> fieldsMap;
+		HashMap<String, Object> independentRequired, independentOptional, relationalMono, relationalMulti;
+		LMSObject objectToUpdate, newFieldValueObject;
+		updateCandidates.add(0, null);
+		options.add(0, goBack);
+		selectedOption = getOptionSelection(getObjectUpdatePrompt(objectType), options);
+		objectToUpdate = updateCandidates.get(selectedOption);
+		fieldsMap = objectToUpdate.getFieldsMap();
+		options.clear();
+		options.add(0, goBack);
+		fieldsMap.keySet().stream().forEach(fieldsMapKey -> {
+			HashMap<String, Object> fieldsSubmap = fieldsMap.get(fieldsMapKey);
+			if (!LMS.composite.equals(fieldsMapKey)) {
+				fieldsSubmap.keySet().stream().forEach(fieldsSubmapKey -> {
+					HashMap<String, Object> fieldsSubsubmap = (HashMap<String, Object>) fieldsSubmap
+							.get(fieldsSubmapKey);
+					fieldsSubsubmap.keySet().stream().forEach(fieldName -> options.add(fieldName));
+				});
+			}
+		});
+		selectedOption = getOptionSelection(getFieldUpdatePrompt(objectType), options);
+		if (selectedOption == 0)
+			return "";
+		nameOfFieldToUpdate = options.get(selectedOption);
+		independentRequired = (HashMap<String, Object>) fieldsMap.get(LMS.independent).get(LMS.required);
+		independentOptional = (HashMap<String, Object>) fieldsMap.get(LMS.independent).get(LMS.optional);
+		relationalMono = (HashMap<String, Object>) fieldsMap.get(LMS.relational).get(LMS.mono);
+		relationalMulti = (HashMap<String, Object>) fieldsMap.get(LMS.relational).get(LMS.multi);
+		if (independentRequired.keySet().contains(nameOfFieldToUpdate)) {
+			System.out.println(getMonoStringFieldPrompt(objectType, nameOfFieldToUpdate));
+			newFieldValueString = scanner.nextLine();
+			if (newFieldValueString.isEmpty())
+				return "";
+			independentRequired.put(nameOfFieldToUpdate, newFieldValueString);
+			objectToUpdate.setFieldsMap(fieldsMap);
+			return adminService.update(objectToUpdate);
+		}
+		if (independentOptional.keySet().contains(nameOfFieldToUpdate)) {
+			if (independentOptional.get(nameOfFieldToUpdate) != null) {
+				resetList(options, getChangeOrRemoveOpts(nameOfFieldToUpdate));
+				selectedOption = getOptionSelection(genericPrompt, options);
+				if (selectedOption == 0)
+					return "";
+				if (selectedOption == 2) {
+					independentOptional.put(nameOfFieldToUpdate, null);
+					objectToUpdate.setFieldsMap(fieldsMap);
+					return adminService.update(objectToUpdate);
+				}
+			}
+			System.out.println(getMonoStringFieldPrompt(objectType, nameOfFieldToUpdate));
+			newFieldValueString = scanner.nextLine();
+			if (newFieldValueString.isEmpty())
+				return "";
+			independentOptional.put(nameOfFieldToUpdate, newFieldValueString);
+			objectToUpdate.setFieldsMap(fieldsMap);
+			return adminService.update(objectToUpdate);
+		}
+		if (relationalMono.keySet().contains(nameOfFieldToUpdate)) {
+			if (relationalMono.get(nameOfFieldToUpdate) != null) {
+				resetList(options, getChangeOrRemoveOpts(nameOfFieldToUpdate));
+				selectedOption = getOptionSelection(genericPrompt, options);
+				if (selectedOption == 0)
+					return "";
+				if (selectedOption == 2) {
+					relationalMono.put(nameOfFieldToUpdate, null);
+					objectToUpdate.setFieldsMap(fieldsMap);
+					return adminService.update(objectToUpdate);
+				}
+			}
+			System.out.println(getMonoStringFieldPrompt(objectType, nameOfFieldToUpdate));
+			possiblyRelatedObjects = adminService.getAllObjects(nameOfFieldToUpdate);
+			possiblyRelatedObjects.add(0, null);
+			options.clear();
+			options.addAll(possiblyRelatedObjects.stream().map(object -> object.getDisplayName())
+					.collect(Collectors.toCollection(ArrayList::new)));
+			selectedOption = getOptionSelection(getMonoObjectFieldPrompt(objectType, nameOfFieldToUpdate), options);
+			if (selectedOption == 0)
+				return "";
+			newFieldValueObject = possiblyRelatedObjects.get(selectedOption);
+			relationalMono.put(nameOfFieldToUpdate, newFieldValueObject);
+			objectToUpdate.setFieldsMap(fieldsMap);
+			return adminService.update(objectToUpdate);
+		}
+		if (relationalMulti.keySet().contains(nameOfFieldToUpdate)) {
+			valuesOfFieldToUpdate = (ArrayList<LMSObject>) relationalMulti.get(nameOfFieldToUpdate);
+			if (valuesOfFieldToUpdate.size() != 0) {
+				resetList(options, getAddOrRemoveOpts(nameOfFieldToUpdate));
+				selectedOption = getOptionSelection(genericPrompt, options);
+				if (selectedOption == 0)
+					return "";
+				if (selectedOption == 2) {
+					options.clear();
+					options.addAll(valuesOfFieldToUpdate.stream().map(object -> object.getDisplayName())
+							.collect(Collectors.toCollection(ArrayList::new)));
+					options.add(0, goBack);
+					valuesOfFieldToUpdate.add(0, null);
+					selectedOptions = getMultiOptionSelection(getRemoveMultiFieldPrompt(nameOfFieldToUpdate), options);
+					if (selectedOptions.contains(0))
+						return "";
+					for (int selectionNumber : selectedOptions)
+						valuesOfFieldToUpdate.remove(selectionNumber);
+					valuesOfFieldToUpdate.remove(null);
+					objectToUpdate.setFieldsMap(fieldsMap);
+					return adminService.update(objectToUpdate);
+				}
+				possiblyRelatedObjects = adminService.getAllObjects(objectType);
+				for (LMSObject objectAlreadyPresent : valuesOfFieldToUpdate)
+						possiblyRelatedObjects.removeIf(object -> object.equals(objectAlreadyPresent));
+				options.clear();
+				options.addAll(possiblyRelatedObjects.stream().map(object -> object.getDisplayName())
+						.collect(Collectors.toCollection(ArrayList::new)));
+				options.add(0, goBack);
+				possiblyRelatedObjects.add(0, null);
+				selectedOptions = getMultiOptionSelection(getAddMultiFieldPrompt(nameOfFieldToUpdate), options);
+				if (selectedOptions.contains(0))
+					return "";
+				selectedOptions.stream().forEach(index -> valuesOfFieldToUpdate.add(possiblyRelatedObjects.get(index)));
+				objectToUpdate.setFieldsMap(fieldsMap);
+				return adminService.update(objectToUpdate);
+			}
+		}
 		return null; // placeholder
 	}
 
@@ -568,6 +757,7 @@ public class Presentation {
 				return;
 			case checkoutBook:
 				cardNumber = (Integer) parameters.get(0);
+				// must change to only show branches with available books
 				branchPk = getBranchSelection(checkoutBranchPrompt);
 				if (branchPk == 0)
 					return;
@@ -581,6 +771,7 @@ public class Presentation {
 				return;
 			case returnBook:
 				cardNumber = (Integer) parameters.get(0);
+				// must change to only show branches with active loans
 				branchPk = getBranchSelection(returnBranchPrompt);
 				if (branchPk == 0)
 					return;
@@ -639,6 +830,7 @@ public class Presentation {
 				System.out.println(deleteObject(objectType));
 				break;
 			case override:
+				// must change to take borrower ID & branch
 				Object[][] loansAndDescriptions = adminService.getOverridableLoansAndDescriptions();
 				Loan loanToOverride;
 				ArrayList<Loan> overridableLoans = new ArrayList<Loan>();
