@@ -1,5 +1,7 @@
 package com.ss.training.lms.versiontwo.business;
 
+import java.util.ArrayList;
+
 /**
  * Provides business logic for LMS functions available to users who are borrowers
  * 
@@ -28,6 +30,13 @@ public class BorrowerService {
 		if (instance == null)
 			instance = new BorrowerService();
 		return instance;
+	}
+	
+	/**
+	 * @return Card numbers of all borrowers
+	 */
+	public ArrayList<Integer> getCardNumbers(){
+		return null; // placeholder
 	}
 	
 	/**

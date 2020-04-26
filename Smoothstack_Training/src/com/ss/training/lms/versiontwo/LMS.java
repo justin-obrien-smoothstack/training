@@ -12,8 +12,12 @@ import com.ss.training.lms.versiontwo.presentation.Presentation;
  */
 public class LMS {
 
-	public static final String branchTable = "tbl_library_branch";
-	public static final String branchPkColumn = "branchId";
+	public static final String book = "book", author = "author", publisher = "publisher", genre = "genre",
+			branch = "branch", borrower = "borrower", loan = "loan", copies = "number of copies";
+	public static final String books = "books", authors = "authors", publishers = "publishers", genres = "genres",
+			branches = "branches", borrowers = "borrowers", loans = "loans", copieses = "numbers of copies";
+	public static final String independent = "independent", relational = "relational", mono = "mono", multi = "Multi",
+			optional = "optional", required = "required";
 
 	public static void main(String[] args) {
 		ArrayList<String> rootMenuOptions = new ArrayList<String>();
