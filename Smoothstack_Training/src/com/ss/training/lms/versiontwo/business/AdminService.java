@@ -1,5 +1,11 @@
 package com.ss.training.lms.versiontwo.business;
 
+import java.util.ArrayList;
+
+import javax.print.attribute.standard.Copies;
+
+import com.ss.training.lms.versionone.entities.Author;
+import com.ss.training.lms.versionone.entities.Publisher;
 import com.ss.training.lms.versiontwo.LMS;
 import com.ss.training.lms.versiontwo.objects.LMSObject;
 
@@ -33,6 +39,10 @@ public class AdminService {
 		return instance;
 	}
 	
+	public String create(LMSObject newObject) {
+		return null; // placeholder
+	}
+	
 	public LMSObject getBlankObject(String objectType) {
 		switch(objectType) {
 		case LMS.book:
@@ -53,6 +63,10 @@ public class AdminService {
 			return new Copies();
 		}
 		return null;
+	}
+	
+	public ArrayList<LMSObject> getAllObjects(String objectType){
+		return null; // placeholder
 	}
 	
 	/**

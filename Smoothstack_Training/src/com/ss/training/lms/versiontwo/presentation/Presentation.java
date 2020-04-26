@@ -100,7 +100,7 @@ public class Presentation {
 				System.out.println(invalidSelection);
 				continue;
 			}
-			if (0 <= selectionNumber && selectionNumber <= options.size())
+			if (0 <= selectionNumber && selectionNumber < options.size())
 				return selectionNumber;
 			System.out.println(invalidSelection);
 		}
@@ -314,7 +314,7 @@ public class Presentation {
 	 */
 	private String getMultiFieldPrompt(String objectType, String fieldName) {
 		return "What are the " + fieldName + " of the " + objectType + "? To add multiple " + fieldName
-				+ ", enter the numbers on a single line, separated with spaces. Enter a blank line to cancel the operation.";
+				+ ", enter the numbers on a single line, separated with spaces.";
 	}
 
 	/**
@@ -325,6 +325,35 @@ public class Presentation {
 	 */
 	private String addFieldPrompt(String fieldName) {
 		return "Add " + fieldName + "?";
+	}
+
+	private ArrayList<Integer> getMultiOptionSelection(String prompt, ArrayList<String> options) {
+		int i, selectionNumber;
+		String[] userInput;
+		ArrayList<Integer> selectedOptions = new ArrayList<Integer>();
+		outerLoop: for (;;) {
+			System.out.println(prompt);
+			for (i = 0; i < options.size(); i++) {
+				System.out.println(i + ") " + options.get(i));
+			}
+			userInput = scanner.nextLine().split(" ");
+			for (String selectedOption : userInput) {
+				try {
+					selectionNumber = Integer.parseInt(selectedOption);
+				} catch (NumberFormatException e) {
+					System.out.println(invalidSelection);
+					selectedOptions.clear();
+					continue outerLoop;
+				}
+				if (selectionNumber < 0 || selectionNumber >= options.size()) {
+					System.out.println(invalidSelection);
+					selectedOptions.clear();
+					continue outerLoop;
+				}
+				selectedOptions.add(selectionNumber);
+			}
+			return selectedOptions;
+		}
 	}
 
 	/**
@@ -372,8 +401,9 @@ public class Presentation {
 			if (selectedOption == 0)
 				return "";
 			if (selectedOption == 1) {
-				possiblyRelatedObjects = adminService.getAllObjects(fieldName);
-				options = possiblyRelatedObjects.stream().map(object -> object.getName())
+				possiblyRelatedObjects.clear();
+				possiblyRelatedObjects.addAll(adminService.getAllObjects(fieldName));
+				options = possiblyRelatedObjects.stream().map(object -> object.getDisplayName())
 						.collect(Collectors.toCollection(ArrayList::new));
 				options.add(0, cancelOperation);
 				possiblyRelatedObjects.add(0, null);
@@ -388,8 +418,9 @@ public class Presentation {
 			if (selectedOption == 0)
 				return "";
 			if (selectedOption == 1) {
-				possiblyRelatedObjects = adminService.getAllObjects(fieldName);
-				options = possiblyRelatedObjects.stream().map(object -> object.getName())
+				possiblyRelatedObjects.clear();
+				possiblyRelatedObjects.addAll(adminService.getAllObjects(fieldName));
+				options = possiblyRelatedObjects.stream().map(object -> object.getDisplayName())
 						.collect(Collectors.toCollection(ArrayList::new));
 				options.add(0, cancelOperation);
 				possiblyRelatedObjects.add(0, null);

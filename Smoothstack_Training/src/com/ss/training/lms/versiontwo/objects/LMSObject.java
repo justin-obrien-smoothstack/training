@@ -13,11 +13,13 @@ public abstract class LMSObject {
 	/**
 	 * @return The object's name, title, etc.
 	 */
-	public abstract String getName();
+	public abstract String getDisplayName();
 
 	/**
 	 * @return Hash map containing object's fields in a format convenient for use by
 	 *         presentation tier
 	 */
-	public abstract HashMap<String, HashMap<String,HashMap<String,Object>>> getFieldsMap();
+	public abstract HashMap<String, HashMap<String, HashMap<String, Object>>> getFieldsMap();
+
+	public abstract void setFieldsMap(HashMap<String, HashMap<String, HashMap<String, Object>>> fieldsMap);
 }
