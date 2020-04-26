@@ -72,6 +72,7 @@ public class Presentation {
 			returnBook = "Return a book", updateBranch = "Update branch information",
 			changeCopies = "Change the number of copies of a book at your branch", create = "Create", read = "Read",
 			update = "Update", delete = "Delete", cancelOperation = "Cancel the operation";
+	private final String operationCancelled = "The operation was cancelled."
 	private final String invalidSelection = "Error: That is not a valid selection.",
 			invalidCard = "Error: That is not a valid card number.",
 			invalidCopies = "Error: That is not a valid number of copies.";
@@ -285,13 +286,13 @@ public class Presentation {
 	}
 
 	private String[] getChangeOrRemoveOpts(String subject) {
-		return new String[] {cancelOperation, "Change "+subject, "Remove "+subject};
+		return new String[] { cancelOperation, "Change " + subject, "Remove " + subject };
 	}
-	
+
 	private String[] getAddOrRemoveOpts(String subject) {
-		return new String[] {cancelOperation, "Add "+subject, "Remove "+subject};
+		return new String[] { cancelOperation, "Add " + subject, "Remove " + subject };
 	}
-	
+
 	/**
 	 * Creates a prompt for when the user wants to do CRUD operations
 	 * 
@@ -301,15 +302,19 @@ public class Presentation {
 	private String getCRUDPrompt(String objectType) {
 		return "What operation do you want to do with " + objectType + "?";
 	}
-	
+
 	private String getObjectUpdatePrompt(String objectType) {
-		return "Which "+objectType+"do you want to update?";
+		return "Which " + objectType + "do you want to update?";
+	}
+
+	private String getObjectDeletionPrompt(String objectType) {
+		return "Which " + objectType + "do you want to delete?";
 	}
 
 	private String getFieldUpdatePrompt(String objectType) {
-		return "What information about this "+objectType+"do you want to update?";
+		return "What information about this " + objectType + "do you want to update?";
 	}
-	
+
 	/**
 	 * Creates a prompt for a user to enter a value for a single-string-valued field
 	 * of an object.
@@ -438,25 +443,25 @@ public class Presentation {
 			System.out.println(getMonoStringFieldPrompt(objectType, fieldName));
 			fieldValue = scanner.nextLine();
 			if (fieldValue.isEmpty())
-				return "";
+				return operationCancelled;
 			independentRequired.put(fieldName, fieldValue);
 		}
 		for (String fieldName : independentOptional.keySet()) {
 			selectedOption = getOptionSelection(addFieldPrompt(fieldName), yesOrNo);
 			if (selectedOption == 0)
-				return "";
+				return operationCancelled;
 			if (selectedOption == 1) {
 				System.out.println(getMonoStringFieldPrompt(objectType, fieldName));
 				fieldValue = scanner.nextLine();
 				if (fieldValue.isEmpty())
-					return "";
+					return operationCancelled;
 				independentOptional.put(fieldName, fieldValue);
 			}
 		}
 		for (String fieldName : relationalMono.keySet()) {
 			selectedOption = getOptionSelection(addFieldPrompt(fieldName), yesOrNo);
 			if (selectedOption == 0)
-				return "";
+				return operationCancelled;
 			if (selectedOption == 1) {
 				possiblyRelatedObjects.clear();
 				possiblyRelatedObjects.addAll(adminService.getAllObjects(fieldName));
@@ -466,14 +471,14 @@ public class Presentation {
 				possiblyRelatedObjects.add(0, null);
 				selectedOption = getOptionSelection(getMonoStringFieldPrompt(objectType, fieldName), options);
 				if (selectedOption == 0)
-					return "";
+					return operationCancelled;
 				relationalMono.put(fieldName, possiblyRelatedObjects.get(selectedOption));
 			}
 		}
 		for (String fieldName : relationalMulti.keySet()) {
 			selectedOption = getOptionSelection(addFieldPrompt(fieldName), yesOrNo);
 			if (selectedOption == 0)
-				return "";
+				return operationCancelled;
 			if (selectedOption == 1) {
 				possiblyRelatedObjects.clear();
 				possiblyRelatedObjects.addAll(adminService.getAllObjects(fieldName));
@@ -483,7 +488,7 @@ public class Presentation {
 				possiblyRelatedObjects.add(0, null);
 				selectedOptions = getMultiOptionSelection(getMultiFieldPrompt(objectType, fieldName), options);
 				if (selectedOptions.contains(0))
-					return "";
+					return operationCancelled;
 				selectedOptions.stream().forEach(option -> ((ArrayList<LMSObject>) relationalMulti.get(fieldName))
 						.add(possiblyRelatedObjects.get(option)));
 			}
@@ -555,12 +560,12 @@ public class Presentation {
 		HashMap<String, Object> independentRequired, independentOptional, relationalMono, relationalMulti;
 		LMSObject objectToUpdate, newFieldValueObject;
 		updateCandidates.add(0, null);
-		options.add(0, goBack);
+		options.add(0, cancelOperation);
 		selectedOption = getOptionSelection(getObjectUpdatePrompt(objectType), options);
 		objectToUpdate = updateCandidates.get(selectedOption);
 		fieldsMap = objectToUpdate.getFieldsMap();
 		options.clear();
-		options.add(0, goBack);
+		options.add(0, cancelOperation);
 		fieldsMap.keySet().stream().forEach(fieldsMapKey -> {
 			HashMap<String, Object> fieldsSubmap = fieldsMap.get(fieldsMapKey);
 			if (!LMS.composite.equals(fieldsMapKey)) {
@@ -573,7 +578,7 @@ public class Presentation {
 		});
 		selectedOption = getOptionSelection(getFieldUpdatePrompt(objectType), options);
 		if (selectedOption == 0)
-			return "";
+			return operationCancelled;
 		nameOfFieldToUpdate = options.get(selectedOption);
 		independentRequired = (HashMap<String, Object>) fieldsMap.get(LMS.independent).get(LMS.required);
 		independentOptional = (HashMap<String, Object>) fieldsMap.get(LMS.independent).get(LMS.optional);
@@ -583,7 +588,7 @@ public class Presentation {
 			System.out.println(getMonoStringFieldPrompt(objectType, nameOfFieldToUpdate));
 			newFieldValueString = scanner.nextLine();
 			if (newFieldValueString.isEmpty())
-				return "";
+				return operationCancelled;
 			independentRequired.put(nameOfFieldToUpdate, newFieldValueString);
 			objectToUpdate.setFieldsMap(fieldsMap);
 			return adminService.update(objectToUpdate);
@@ -593,7 +598,7 @@ public class Presentation {
 				resetList(options, getChangeOrRemoveOpts(nameOfFieldToUpdate));
 				selectedOption = getOptionSelection(genericPrompt, options);
 				if (selectedOption == 0)
-					return "";
+					return operationCancelled;
 				if (selectedOption == 2) {
 					independentOptional.put(nameOfFieldToUpdate, null);
 					objectToUpdate.setFieldsMap(fieldsMap);
@@ -603,7 +608,7 @@ public class Presentation {
 			System.out.println(getMonoStringFieldPrompt(objectType, nameOfFieldToUpdate));
 			newFieldValueString = scanner.nextLine();
 			if (newFieldValueString.isEmpty())
-				return "";
+				return operationCancelled;
 			independentOptional.put(nameOfFieldToUpdate, newFieldValueString);
 			objectToUpdate.setFieldsMap(fieldsMap);
 			return adminService.update(objectToUpdate);
@@ -613,7 +618,7 @@ public class Presentation {
 				resetList(options, getChangeOrRemoveOpts(nameOfFieldToUpdate));
 				selectedOption = getOptionSelection(genericPrompt, options);
 				if (selectedOption == 0)
-					return "";
+					return operationCancelled;
 				if (selectedOption == 2) {
 					relationalMono.put(nameOfFieldToUpdate, null);
 					objectToUpdate.setFieldsMap(fieldsMap);
@@ -628,7 +633,7 @@ public class Presentation {
 					.collect(Collectors.toCollection(ArrayList::new)));
 			selectedOption = getOptionSelection(getMonoObjectFieldPrompt(objectType, nameOfFieldToUpdate), options);
 			if (selectedOption == 0)
-				return "";
+				return operationCancelled;
 			newFieldValueObject = possiblyRelatedObjects.get(selectedOption);
 			relationalMono.put(nameOfFieldToUpdate, newFieldValueObject);
 			objectToUpdate.setFieldsMap(fieldsMap);
@@ -640,16 +645,16 @@ public class Presentation {
 				resetList(options, getAddOrRemoveOpts(nameOfFieldToUpdate));
 				selectedOption = getOptionSelection(genericPrompt, options);
 				if (selectedOption == 0)
-					return "";
+					return operationCancelled;
 				if (selectedOption == 2) {
 					options.clear();
 					options.addAll(valuesOfFieldToUpdate.stream().map(object -> object.getDisplayName())
 							.collect(Collectors.toCollection(ArrayList::new)));
-					options.add(0, goBack);
+					options.add(0, cancelOperation);
 					valuesOfFieldToUpdate.add(0, null);
 					selectedOptions = getMultiOptionSelection(getRemoveMultiFieldPrompt(nameOfFieldToUpdate), options);
 					if (selectedOptions.contains(0))
-						return "";
+						return operationCancelled;
 					for (int selectionNumber : selectedOptions)
 						valuesOfFieldToUpdate.remove(selectionNumber);
 					valuesOfFieldToUpdate.remove(null);
@@ -658,21 +663,21 @@ public class Presentation {
 				}
 				possiblyRelatedObjects = adminService.getAllObjects(objectType);
 				for (LMSObject objectAlreadyPresent : valuesOfFieldToUpdate)
-						possiblyRelatedObjects.removeIf(object -> object.equals(objectAlreadyPresent));
+					possiblyRelatedObjects.removeIf(object -> object.equals(objectAlreadyPresent));
 				options.clear();
 				options.addAll(possiblyRelatedObjects.stream().map(object -> object.getDisplayName())
 						.collect(Collectors.toCollection(ArrayList::new)));
-				options.add(0, goBack);
+				options.add(0, cancelOperation);
 				possiblyRelatedObjects.add(0, null);
 				selectedOptions = getMultiOptionSelection(getAddMultiFieldPrompt(nameOfFieldToUpdate), options);
 				if (selectedOptions.contains(0))
-					return "";
+					return operationCancelled;
 				selectedOptions.stream().forEach(index -> valuesOfFieldToUpdate.add(possiblyRelatedObjects.get(index)));
 				objectToUpdate.setFieldsMap(fieldsMap);
 				return adminService.update(objectToUpdate);
 			}
 		}
-		return null; // placeholder
+		return "Oops, something went wrong.";
 	}
 
 	/**
@@ -682,7 +687,18 @@ public class Presentation {
 	 * @return A string indicating whether the operation succeeded
 	 */
 	private String deleteObject(String objectType) {
-		return null; // placeholder
+		int selectedOption;
+		LMSObject objectToDelete;
+		ArrayList<LMSObject> deletionCandidates = adminService.getAllObjects(objectType);
+		ArrayList<String> options = deletionCandidates.stream().map(object -> object.getDisplayName())
+				.collect(Collectors.toCollection(ArrayList::new));
+		options.add(0, cancelOperation);
+		deletionCandidates.add(null);
+		selectedOption = getOptionSelection(getObjectDeletionPrompt(objectType), options);
+		if (selectedOption == 0)
+			return operationCancelled;
+		objectToDelete = deletionCandidates.get(selectedOption);
+		return (adminService.delete(objectToDelete));
 	}
 
 	/**

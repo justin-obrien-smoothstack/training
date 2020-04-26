@@ -47,6 +47,10 @@ public class AdminService {
 		return null; // placeholder
 	}
 	
+	public String delete(LMSObject newObject) {
+		return null; // placeholder
+	}
+	
 	public LMSObject getBlankObject(String objectType) {
 		switch(objectType) {
 		case LMS.book:
