@@ -8,13 +8,12 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
-import org.omg.CORBA.FieldNameHelper;
-
 import com.ss.training.lms.versiontwo.LMS;
 import com.ss.training.lms.versiontwo.business.AdminService;
 import com.ss.training.lms.versiontwo.business.BorrowerService;
 import com.ss.training.lms.versiontwo.business.LibrarianService;
-import com.ss.training.lms.versiontwo.objects.LMSObject;
+import com.ss.training.lms.versiontwo.object.LMSObject;
+import com.ss.training.lms.versiontwo.object.Loan;
 
 /**
  * Presentation tier of LMS application
@@ -138,6 +137,11 @@ public class Presentation {
 	 * @param newElements The new contents to populate the list
 	 */
 	private void resetList(List<Object> list, Object... newElements) {
+		list.clear();
+		Collections.addAll(list, newElements);
+	}
+
+	private void resetList(List<Loan> list, Loan... newElements) {
 		list.clear();
 		Collections.addAll(list, newElements);
 	}

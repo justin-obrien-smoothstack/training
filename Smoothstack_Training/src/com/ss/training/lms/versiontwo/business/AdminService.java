@@ -7,7 +7,8 @@ import javax.print.attribute.standard.Copies;
 import com.ss.training.lms.versionone.entities.Author;
 import com.ss.training.lms.versionone.entities.Publisher;
 import com.ss.training.lms.versiontwo.LMS;
-import com.ss.training.lms.versiontwo.objects.LMSObject;
+import com.ss.training.lms.versiontwo.object.LMSObject;
+import com.ss.training.lms.versiontwo.object.Loan;
 
 /**
  * Provides business logic for LMS functions available to users who are administrators
@@ -61,6 +62,10 @@ public class AdminService {
 	 */
 	public Object[][] getOverridableLoansAndDescriptions(){
 		return null; // placeholder
+	}
+	
+	public String overrideDueDate(Loan loanToOveride) {
+		return ""; // placeholder
 	}
 	
 }

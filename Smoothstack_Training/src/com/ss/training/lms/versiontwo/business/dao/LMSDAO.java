@@ -33,22 +33,22 @@ public abstract class LMSDAO<T> {
 		pstmt.executeUpdate();
 	}
 
-	public Integer saveWithPK(String sql, Object[] vals) throws ClassNotFoundException, SQLException {
-		PreparedStatement pstmt = conn.prepareStatement(sql, Statement.);
-		if (vals != null) {
-			int index = 1;
-			for (Object o : vals) {
-				pstmt.setObject(index, o);
-				index++;
-			}
-		}
-		pstmt.executeUpdate();
-		ResultSet rs = pstmt.executeQuery();
-		while (rs.next()) {
-			return rs.getInt(1);
-		}
-		return null;
-	}
+//	public Integer saveWithPK(String sql, Object[] vals) throws ClassNotFoundException, SQLException {
+//		PreparedStatement pstmt = conn.prepareStatement(sql, Statement.);
+//		if (vals != null) {
+//			int index = 1;
+//			for (Object o : vals) {
+//				pstmt.setObject(index, o);
+//				index++;
+//			}
+//		}
+//		pstmt.executeUpdate();
+//		ResultSet rs = pstmt.executeQuery();
+//		while (rs.next()) {
+//			return rs.getInt(1);
+//		}
+//		return null;
+//	}
 
 	public List<T> read(String sql, Object[] vals) throws ClassNotFoundException, SQLException {
 		PreparedStatement pstmt = conn.prepareStatement(sql);
