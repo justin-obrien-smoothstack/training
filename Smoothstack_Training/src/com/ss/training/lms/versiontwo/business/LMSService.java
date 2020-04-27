@@ -4,14 +4,16 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Properties;
+
+import com.ss.training.lms.versiontwo.object.LMSObject;
 
 /**
  * @author Justin O'Brien
  */
 public class LMSService {
-	
+
 	protected Connection getConnection() {
 		String propertiesPath = "resources/config/LMS.properties";
 		Connection connection = null;
@@ -32,5 +34,9 @@ public class LMSService {
 			e.printStackTrace();
 		}
 		return connection;
+	}
+
+	public ArrayList<LMSObject> getAllObjects(String objectType) {
+		return new ArrayList<LMSObject>(); // placeholder
 	}
 }

@@ -7,10 +7,14 @@ import java.util.HashMap;
  */
 public class Branch extends LMSObject {
 
+	private int branchId;
+	private String name, address;
+
 	@Override
 	public String getDisplayName() {
-		// TODO Auto-generated method stub
-		return null;
+		if (name == null)
+			return "(name not found)";
+		return name;
 	}
 
 	@Override
@@ -24,5 +28,4 @@ public class Branch extends LMSObject {
 		// TODO Auto-generated method stub
 
 	}
-
 }
