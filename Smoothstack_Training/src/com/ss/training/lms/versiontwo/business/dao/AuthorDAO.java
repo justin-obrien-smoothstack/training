@@ -23,20 +23,14 @@ public class AuthorDAO extends LMSDAO<Author> {
 
 	@Override
 	public ArrayList<Author> extractData(ResultSet resultSet) throws SQLException {
-		 Author author;
-		 ArrayList<Author> authors = new ArrayList<Author>();
-		 ResultSet authorBooksResultSet;
-		 PreparedStatement authorBooksQuery = connection.prepareStatement("SELECT * from tbl_book_authors where authorId = ?");
-		 while(resultSet.next()) {
-			 author = new Author();
-			 author.setId(resultSet.getInt(authorId));
-			 author.setName(resultSet.getString(authorName));
-			 authorBooksQuery.setInt(1, author.getId());
-			 authorBooksResultSet = authorBooksQuery.executeQuery(); 
-			 while(authorBooksResultSet.next()) {
-				 author.getBookIds().add(authorBooksResultSet.getInt(bookId));
-			 }
-		 }
-		 return authors;
+		Author author;
+		ArrayList<Author> authors = new ArrayList<Author>();
+		while (resultSet.next()) {
+			author = new Author();
+			author.setId(resultSet.getInt(authorId));
+			author.setName(resultSet.getString(authorName));
+			author.setBookIds(getRelations(tblAuthor, authorId, bookId, author.getId()));
+		}
+		return authors;
 	}
 }

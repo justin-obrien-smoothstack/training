@@ -10,16 +10,24 @@ import com.ss.training.lms.versiontwo.business.LMSService;
  */
 public class Book extends LMSObject {
 
-	int id, pubId;
+	int id;
+	Integer pubId;
 	String title;
 	ArrayList<Integer> authorIds, genreIds;
 	ArrayList<Copies> copies;
 	ArrayList<Loan> loans;
 
+	public Book() {
+		authorIds = new ArrayList<Integer>();
+		genreIds = new ArrayList<Integer>();
+		copies = new ArrayList<Copies>();
+		loans = new ArrayList<Loan>();
+	}
+	
 	@Override
 	public String getDisplayName() {
 		StringBuilder displayName = new StringBuilder(title);
-		ArrayList<Author> authors = new LMSService().getAuthorsById(authors);
+		ArrayList<Author> authors = new LMSService().getAuthorsById(authorIds);
 		if (authors.size() != 0) {
 			displayName.append(" by " + authors.stream().map(author -> author.getName())
 					.reduce((partialList, nextName) -> partialList + ", " + nextName));

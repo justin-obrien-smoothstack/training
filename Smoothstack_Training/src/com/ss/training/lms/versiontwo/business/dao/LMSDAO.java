@@ -30,6 +30,19 @@ public abstract class LMSDAO<T> {
 			authorName = "authorName", branchAddress = "branchAddress", noOfCopies = "noOfCopies", cardNo = "cardNo",
 			dateOut = "dateOut", dueDate = "dueDate", dateIn = "dateIn";
 
+	protected ArrayList<Integer> getRelations(String table, String selfColumn, String otherColumn, Object selfId)
+			throws SQLException {
+		ArrayList<Integer> relations = new ArrayList<Integer>();
+		PreparedStatement preparedStatement = connection
+				.prepareStatement("SELECT * FROM " + table + " WHERE " + selfColumn + " = ?");
+		ResultSet resultSet;
+		preparedStatement.setObject(1, selfId);
+		resultSet = preparedStatement.executeQuery();
+		while (resultSet.next())
+			relations.add(resultSet.getInt(otherColumn));
+		return relations;
+	}
+
 	public void save(String sqlQuery, Object[] queryArgs) throws ClassNotFoundException, SQLException {
 		PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
 		if (queryArgs != null) {
