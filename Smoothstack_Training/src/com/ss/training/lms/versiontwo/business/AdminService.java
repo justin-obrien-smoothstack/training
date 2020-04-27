@@ -2,13 +2,16 @@ package com.ss.training.lms.versiontwo.business;
 
 import java.util.ArrayList;
 
-import javax.print.attribute.standard.Copies;
-
-import com.ss.training.lms.versionone.entities.Author;
-import com.ss.training.lms.versionone.entities.Publisher;
 import com.ss.training.lms.versiontwo.LMS;
+import com.ss.training.lms.versiontwo.object.Author;
+import com.ss.training.lms.versiontwo.object.Book;
+import com.ss.training.lms.versiontwo.object.Borrower;
+import com.ss.training.lms.versiontwo.object.Branch;
+import com.ss.training.lms.versiontwo.object.Copies;
+import com.ss.training.lms.versiontwo.object.Genre;
 import com.ss.training.lms.versiontwo.object.LMSObject;
 import com.ss.training.lms.versiontwo.object.Loan;
+import com.ss.training.lms.versiontwo.object.Publisher;
 
 /**
  * Provides business logic for LMS functions available to users who are administrators
