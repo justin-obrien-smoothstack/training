@@ -6,7 +6,7 @@ import java.util.HashMap;
 /**
  * @author Justin O'Brien
  */
-public class Branch extends LMSObject {
+public class Branch extends LMSObject implements HasCopiesLoansAndIntegerID{
 
 	private int id;
 	private String name, address;

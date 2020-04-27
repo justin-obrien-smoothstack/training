@@ -6,7 +6,7 @@ import java.util.HashMap;
 /**
  * @author Justin O'Brien
  */
-public class Author extends LMSObject {
+public class Author extends LMSObject implements HasIntegerId {
 
 	private int id;
 	private String name;

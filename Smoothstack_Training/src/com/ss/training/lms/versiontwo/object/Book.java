@@ -8,7 +8,7 @@ import com.ss.training.lms.versiontwo.business.LMSService;
 /**
  * @author Justin O'Brien
  */
-public class Book extends LMSObject {
+public class Book extends LMSObject implements HasCopiesLoansAndIntegerID {
 
 	int id;
 	Integer pubId;
@@ -23,7 +23,7 @@ public class Book extends LMSObject {
 		copies = new ArrayList<Copies>();
 		loans = new ArrayList<Loan>();
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

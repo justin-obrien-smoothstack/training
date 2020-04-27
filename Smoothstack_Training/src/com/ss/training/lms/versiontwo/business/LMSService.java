@@ -19,6 +19,7 @@ import com.ss.training.lms.versiontwo.business.dao.LoanDAO;
 import com.ss.training.lms.versiontwo.object.Author;
 import com.ss.training.lms.versiontwo.object.BookOrBranch;
 import com.ss.training.lms.versiontwo.object.Copies;
+import com.ss.training.lms.versiontwo.object.HasCopiesLoansAndIntegerID;
 import com.ss.training.lms.versiontwo.object.LMSObject;
 import com.ss.training.lms.versiontwo.object.Loan;
 
@@ -53,7 +54,7 @@ public class LMSService {
 		return connection;
 	}
 
-	public ArrayList<BookOrBranch> completeBookOrBranchInfo(ArrayList<BookOrBranch> booksOrBranches) {
+	public ArrayList<HasCopiesLoansAndIntegerID> completeCopiesAndLoansInfo(ArrayList<HasCopiesLoansAndIntegerID> hasCopiesAndLoans) {
 		ArrayList<Copies> copieses = new ArrayList<Copies>();
 		ArrayList<Loan> loans = new ArrayList<Loan>();
 		try (Connection connection = getConnection()) {
@@ -63,13 +64,13 @@ public class LMSService {
 			printRetrievalErrorMessage(LMS.loans + " and " + LMS.copieses + " for a " + LMS.branch);
 			e.printStackTrace();
 		}
-		booksOrBranches.stream().forEach(bookOrBranch -> {
-			copieses.stream().filter(copies -> copies.getBranchId() == bookOrBranch.getId())
-					.forEach(copies -> bookOrBranch.getCopies().add(copies));
-			loans.stream().filter(loan -> loan.getBranchId() == bookOrBranch.getId())
-					.forEach(loan -> bookOrBranch.getLoans().add(loan));
+		hasCopiesAndLoans.stream().forEach(object -> {
+			copieses.stream().filter(copies -> copies.getBranchId() == object.getId())
+					.forEach(copies -> object.getCopies().add(copies));
+			loans.stream().filter(loan -> loan.getBranchId() == object.getId())
+					.forEach(loan -> object.getLoans().add(loan));
 		});
-		return booksOrBranches;
+		return hasCopiesAndLoans;
 	}
 
 	public ArrayList<?> getAllObjects(String objectType) {
@@ -117,7 +118,7 @@ public class LMSService {
 		case LMS.books:
 		case LMS.branch:
 		case LMS.branches:
-			allObjects = completeBookOrBranchInfo(allObjects);
+			allObjects = completeCopiesAndLoansInfo(allObjects);
 			break;
 		}
 		return allObjects;
