@@ -1,5 +1,7 @@
 package com.ss.training.lms.versiontwo.object;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -7,49 +9,106 @@ import java.util.HashMap;
  */
 public class Branch extends LMSObject {
 
-	private int branchId;
+	private int id;
 	private String name, address;
+	private HashMap<Integer, Integer> copies;
+	private HashMap<HashMap<String, Object>, HashMap<String, LocalDateTime>> loans;
+
+	public Branch() {
+		copies = new HashMap<Integer, Integer>();
+		loans = new HashMap<HashMap<String, Object>, HashMap<String, LocalDateTime>>();
+	}
 
 	/**
-	 * @return the name
+	 * @return the branchId
+	 */
+	public int getId() {
+		return id;
+	}
+
+	/**
+	 * @param branchId the branchId to set
+	 */
+	public void setId(int branchId) {
+		this.id = branchId;
+	}
+
+	/**
+	 * @return the branchName
 	 */
 	public String getName() {
 		return name;
 	}
 
 	/**
-	 * @param name the name to set
+	 * @param branchName the branchName to set
 	 */
-	public void setName(String name) {
-		this.name = name;
+	public void setName(String branchName) {
+		this.name = branchName;
 	}
 
 	/**
-	 * @return the address
+	 * @return the branchAddress
 	 */
 	public String getAddress() {
 		return address;
 	}
 
 	/**
-	 * @param address the address to set
+	 * @param branchAddress the branchAddress to set
 	 */
-	public void setAddress(String address) {
-		this.address = address;
+	public void setAddress(String branchAddress) {
+		this.address = branchAddress;
 	}
 
 	/**
-	 * @return the branchId
+	 * @return the bookLoans
 	 */
-	public int getBranchId() {
-		return branchId;
+	public ArrayList<HashMap<String, Object>> getLoans() {
+		return loans;
 	}
-	
+
 	/**
-	 * @return the branchId
+	 * @param bookLoans the bookLoans to set
 	 */
-	public void setBranchId(int branchId) {
-		this.branchId = branchId;
+	public void setLoans(ArrayList<HashMap<String, Object>> bookLoans) {
+		this.loans = bookLoans;
+	}
+
+	/**
+	 * @return the copies
+	 */
+	public HashMap<Integer, Integer> getCopies() {
+		return copies;
+	}
+
+	/**
+	 * @param copies the copies to set
+	 */
+	public void setCopies(HashMap<Integer, Integer> copies) {
+		this.copies = copies;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + id;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Branch other = (Branch) obj;
+		if (id != other.id)
+			return false;
+		return true;
 	}
 
 	@Override

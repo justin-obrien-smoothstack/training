@@ -50,7 +50,7 @@ public class PresUtils {
 	 *         to cancel the update
 	 */
 	protected static String getBranchUpdateInfo(Branch branch, String cancelCode) {
-		return "Updating branch: " + branch.getDisplayName() + " (#+" + branch.getBranchId() + ")\nEnter " + cancelCode
+		return "Updating branch: " + branch.getDisplayName() + " (#+" + branch.getId() + ")\nEnter " + cancelCode
 				+ " at any prompt to cancel the operation.";
 	}
 	

@@ -84,9 +84,6 @@ public class Presentation {
 	protected static final BorrowerService borrowerService = new BorrowerService();
 	protected static final AdminService adminService = new AdminService();
 
-
-	
-
 	/**
 	 * Removes all elements in a list of strings and repopulates the list
 	 * 
@@ -232,8 +229,6 @@ public class Presentation {
 			System.out.println(invalidCard);
 		}
 	}
-
-
 
 	/**
 	 * Gets the new number of copies of a book at a branch from the user
@@ -388,8 +383,6 @@ public class Presentation {
 		}
 	}
 
-
-
 	/**
 	 * Presents a menu to the user and takes action according to user input
 	 * 
@@ -428,7 +421,8 @@ public class Presentation {
 				presentMenu(genericPrompt, options, parameters);
 				break;
 			case manageBranch:
-				branchToManage = (Branch) PresUtils.getLMSObjectSelection(librarianService.getAllBranches(), manageBranchPrompt, goBack);
+				branchToManage = (Branch) PresUtils.getLMSObjectSelection(librarianService.getAllBranches(),
+						manageBranchPrompt, goBack);
 				if (branchToManage == null)
 					return;
 				resetList(options, updateBranch, changeCopies);
@@ -436,18 +430,22 @@ public class Presentation {
 				presentMenu(genericPrompt, options, parameters);
 				break;
 			case updateBranch:
-				// need LibrarianSerive.updateBranch() & LMSService.getAllObjects() for this to work
-				final String noChange = "", newName, newAddress;;
+				// need LibrarianService.updateBranch() & LMSService.getAllObjects() for this to
+				// work
+				final String noChange = "", newName, newAddress;
 				branchToManage = (Branch) parameters.get(0);
 				System.out.println(PresUtils.getBranchUpdateInfo(branchToManage, cancelCode));
 				newName = PresUtils.getStringWithMaxLength(updateBranchNamePrompt, "name", maxStringFieldLength);
 				if (cancelCode.equals(newName))
 					return;
-				if(!noChange.equals(newName)) branchToManage.setName(newName);
-				newAddress = PresUtils.getStringWithMaxLength(updateBranchAddressPrompt, "address", maxStringFieldLength);
+				if (!noChange.equals(newName))
+					branchToManage.setName(newName);
+				newAddress = PresUtils.getStringWithMaxLength(updateBranchAddressPrompt, "address",
+						maxStringFieldLength);
 				if (cancelCode.equals(newAddress))
 					return;
-				if(!noChange.equals(newAddress)) branchToManage.setAddress(newAddress);
+				if (!noChange.equals(newAddress))
+					branchToManage.setAddress(newAddress);
 				System.out.println(librarianService.updateBranch(branchToManage));
 				return;
 			case changeCopies:
@@ -549,7 +547,7 @@ public class Presentation {
 			}
 		}
 	}
-	
+
 	/**
 	 * Creates an object in the database
 	 * 
@@ -766,7 +764,8 @@ public class Presentation {
 			options.clear();
 			options.addAll(possiblyRelatedObjects.stream().map(object -> object.getDisplayName())
 					.collect(Collectors.toCollection(ArrayList::new)));
-			selectedOption = PresUtils.getOptionSelection(getMonoObjectFieldPrompt(objectType, nameOfFieldToUpdate), options);
+			selectedOption = PresUtils.getOptionSelection(getMonoObjectFieldPrompt(objectType, nameOfFieldToUpdate),
+					options);
 			if (selectedOption == 0)
 				return operationCancelled;
 			newFieldValueObject = possiblyRelatedObjects.get(selectedOption);

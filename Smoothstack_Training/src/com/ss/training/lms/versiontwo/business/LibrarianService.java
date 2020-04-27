@@ -2,6 +2,7 @@ package com.ss.training.lms.versiontwo.business;
 
 import java.util.ArrayList;
 
+import com.ss.training.lms.versiontwo.LMS;
 import com.ss.training.lms.versiontwo.object.Branch;
 import com.ss.training.lms.versiontwo.object.LMSObject;
 
@@ -11,10 +12,19 @@ import com.ss.training.lms.versiontwo.object.LMSObject;
  * 
  * @author Justin O'Brien
  */
-public class LibrarianService {
+public class LibrarianService extends LMSService {
 
 	public ArrayList<LMSObject> getAllBranches() {
-		return new ArrayList<LMSObject>(); // placeholder
+		return getAllObjects(LMS.branch);
+	}
+	
+	/**
+	 * Updates the name or address of a branch for a librarian
+	 * 
+	 * @return A message to tell the user whether the operations succeeded
+	 */
+	public String updateBranch(Branch branchToUpdate) {
+		return ""; // placeholder
 	}
 
 	/**
@@ -36,18 +46,7 @@ public class LibrarianService {
 		return null; // placeholder
 	}
 
-	/**
-	 * Updates the name or address of a branch for a librarian
-	 * 
-	 * @param newName    The branch's new name
-	 * @param newAddress The branch's new address
-	 * @param noChange   If newName or newAddress is equal to this, the
-	 *                   corresponding attribute of the branch won't be changed
-	 * @return A message to tell the user whether the operations succeeded
-	 */
-	public String updateBranch(Branch branchToUpdate) {
-		return ""; // placeholder
-	}
+	
 
 	/**
 	 * Gets primary keys, titles, and authors of all books in the database
