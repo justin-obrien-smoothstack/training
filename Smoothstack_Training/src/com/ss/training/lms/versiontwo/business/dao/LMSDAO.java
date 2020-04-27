@@ -24,10 +24,11 @@ public abstract class LMSDAO<T> {
 		this.connection = connnection;
 	}
 
-	protected String tblBranch = "tbl_library_branch", tblCopies = "tbl_book_copies", tblLoans = "tbl_book_loans";
-	protected String bookId = "bookId", branchId = "branchId", branchName = "branchName",
-			branchAddress = "branchAddress", noOfCopies = "noOfCopies", cardNo = "cardNo", dateOut = "dateOut",
-			dueDate = "dueDate", dateIn = "dateIn";
+	protected String tblBranch = "tbl_library_branch", tblCopies = "tbl_book_copies", tblLoans = "tbl_book_loans",
+			tblAuthor = "tbl_author";
+	protected String bookId = "bookId", branchId = "branchId", authorId = "authorId", branchName = "branchName",
+			authorName = "authorName", branchAddress = "branchAddress", noOfCopies = "noOfCopies", cardNo = "cardNo",
+			dateOut = "dateOut", dueDate = "dueDate", dateIn = "dateIn";
 
 	public void save(String sqlQuery, Object[] queryArgs) throws ClassNotFoundException, SQLException {
 		PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
@@ -65,7 +66,7 @@ public abstract class LMSDAO<T> {
 	}
 
 	public ArrayList<T> readAll() throws ClassNotFoundException, SQLException {
-		return read("SELECT * FROM " + nativeTable+";", null);
+		return read("SELECT * FROM " + nativeTable + ";", null);
 	}
 
 	public abstract ArrayList<T> extractData(ResultSet resultSet) throws SQLException;

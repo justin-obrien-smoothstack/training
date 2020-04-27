@@ -4,14 +4,19 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import com.ss.training.lms.versiontwo.LMS;
+import com.ss.training.lms.versiontwo.business.dao.AuthorDAO;
 import com.ss.training.lms.versiontwo.business.dao.BranchDAO;
 import com.ss.training.lms.versiontwo.business.dao.CopiesDAO;
 import com.ss.training.lms.versiontwo.business.dao.LMSDAO;
 import com.ss.training.lms.versiontwo.business.dao.LoanDAO;
+import com.ss.training.lms.versiontwo.object.Author;
 import com.ss.training.lms.versiontwo.object.Branch;
 import com.ss.training.lms.versiontwo.object.Copies;
 import com.ss.training.lms.versiontwo.object.LMSObject;
@@ -48,7 +53,7 @@ public class LMSService {
 		return connection;
 	}
 
-	public void completeBranchInfo(ArrayList<Branch> branches) {
+	public ArrayList<Branch> completeBranchInfo(ArrayList<Branch> branches) {
 		ArrayList<Copies> copieses = new ArrayList<Copies>();
 		ArrayList<Loan> loans = new ArrayList<Loan>();
 		try (Connection connection = getConnection()) {
@@ -64,6 +69,7 @@ public class LMSService {
 			loans.stream().filter(loan -> loan.getBranchId() == branch.getId())
 					.forEach(loan -> branch.getLoans().add(loan));
 		});
+		return branches;
 	}
 
 	public ArrayList<?> getAllObjects(String objectType) {
@@ -99,7 +105,7 @@ public class LMSService {
 			}
 			allObjects = (ArrayList<LMSObject>) dao.readAll();
 		} catch (Exception e) {
-			System.out.println("There was an error while attempting to retrieve objects from database.");
+			printRetrievalErrorMessage(objectType);
 			e.printStackTrace();
 		}
 		switch (objectType) {
@@ -111,9 +117,21 @@ public class LMSService {
 			break;
 		case LMS.branch:
 		case LMS.branches:
-			completeBranchInfo(allObjects);
+			allObjects = completeBranchInfo(allObjects);
 			break;
 		}
 		return allObjects;
+	}
+
+	public ArrayList<Author> getAuthorsById(List<Integer> ids) {
+		ArrayList<Author> authors = new ArrayList<Author>();
+		try (Connection connection = getConnection()) {
+			authors = new AuthorDAO(connection).readAll();
+		} catch (Exception e) {
+			printRetrievalErrorMessage(LMS.authors);
+			e.printStackTrace();
+		}
+		return authors.stream().filter(author -> ids.contains(author.getId()))
+				.collect(Collectors.toCollection(ArrayList::new));
 	}
 }

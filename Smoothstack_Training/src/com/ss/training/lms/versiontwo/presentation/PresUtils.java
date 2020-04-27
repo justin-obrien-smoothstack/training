@@ -43,6 +43,22 @@ public class PresUtils {
 		}
 	}
 	
+	protected static int getNaturalNumber(String prompt, String errorMessage) {
+		int result;
+		for (;;) {
+			System.out.println(prompt);
+			try {
+				result = Integer.parseInt(scanner.nextLine());
+			} catch (NumberFormatException e) {
+				System.out.println(errorMessage);
+				continue;
+			}
+			if (result >= 0)
+				return result;
+			System.out.println(errorMessage);
+		}
+	}
+	
 	/**
 	 * @param branchPk The primary key of the branch being updated
 	 * 

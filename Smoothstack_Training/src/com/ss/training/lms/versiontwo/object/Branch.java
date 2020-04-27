@@ -112,7 +112,7 @@ public class Branch extends LMSObject {
 
 	@Override
 	public String getDisplayName() {
-		return (name == null ? "(name not found)" : name) + (address == null ? " (address not found)" : (", " + address));
+		return (name == null ? "(name not found)" : name) + (address == null ? " (address not found)" : ", " + address);
 	}
 
 	@Override

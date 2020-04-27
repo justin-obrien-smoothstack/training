@@ -12,6 +12,7 @@ import com.ss.training.lms.versiontwo.LMS;
 import com.ss.training.lms.versiontwo.business.AdminService;
 import com.ss.training.lms.versiontwo.business.BorrowerService;
 import com.ss.training.lms.versiontwo.business.LibrarianService;
+import com.ss.training.lms.versiontwo.object.Book;
 import com.ss.training.lms.versiontwo.object.Branch;
 import com.ss.training.lms.versiontwo.object.LMSObject;
 import com.ss.training.lms.versiontwo.object.Loan;
@@ -450,15 +451,13 @@ public class Presentation {
 				continue;
 			case changeCopies:
 				int newNumberOfCopies;
-				branchPk = (Integer) parameters.get(0);
-				bookPksTitlesAndAuthors = librarianService.getAllBookPksTitlesAndAuthors();
-				prepareForIntCrossSelection(options, bookPks, (String[]) bookPksTitlesAndAuthors[1],
-						(Integer[]) bookPksTitlesAndAuthors[0]);
-				bookPk = getIntCrossSelection(changeCopiesBookPrompt, options, bookPks);
-				if (bookPk == 0)
+				branchToManage = (Branch) parameters.get(0);
+				Book bookToChangeCopies = (Book) PresUtils.getLMSObjectSelection(
+						(List<LMSObject>) librarianService.getAllObjects(LMS.book), changeCopiesBookPrompt, goBack);
+				if (bookToChangeCopies == null)
 					continue;
-				newNumberOfCopies = getNewNumberOfCopies(changeCopiesNumberPrompt);
-				System.out.println(librarianService.updateNumberOfCopies(branchPk, bookPk, newNumberOfCopies));
+				newNumberOfCopies = PresUtils.getNaturalNumber(changeCopiesNumberPrompt, invalidCopies);
+				System.out.println(librarianService.updateCopies(branchToManage, bookToChangeCopies, newNumberOfCopies));
 				continue;
 			case checkoutBook:
 				cardNumber = (Integer) parameters.get(0);
