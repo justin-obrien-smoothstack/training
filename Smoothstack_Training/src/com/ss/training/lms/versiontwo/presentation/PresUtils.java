@@ -50,14 +50,14 @@ public class PresUtils {
 	 *         to cancel the update
 	 */
 	protected static String getBranchUpdateInfo(Branch branch, String cancelCode) {
-		return "Updating branch: " + branch.getDisplayName() + " (#+" + branch.getId() + ")\nEnter " + cancelCode
+		return "Updating branch: " + branch.getDisplayName() + " (#" + branch.getId() + ")\nEnter " + cancelCode
 				+ " at any prompt to cancel the operation.";
 	}
 	
 	protected static String getStringWithMaxLength(String prompt, String fieldName, int maxLength) {
 		String result;
 		for (;;) {
-			System.out.println(Presentation.updateBranchNamePrompt);
+			System.out.println(prompt);
 			result = scanner.nextLine();
 			if (result.length() <= maxLength)
 				return result;

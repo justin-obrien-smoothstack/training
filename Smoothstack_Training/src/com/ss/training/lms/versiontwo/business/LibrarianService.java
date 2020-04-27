@@ -21,6 +21,7 @@ public class LibrarianService extends LMSService {
 	public String updateBranch(Branch branch) {
 		try (Connection connection = getConnection()) {
 			new BranchDAO(connection).update(branch);
+			connection.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return "The branch update was unsuccessful.";

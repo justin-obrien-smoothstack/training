@@ -13,7 +13,7 @@ public class BorrowerService {
 	 * @return Card numbers of all borrowers
 	 */
 	public ArrayList<Integer> getCardNumbers(){
-		return null; // placeholder
+		return new ArrayList<Integer>(); // placeholder
 	}
 	
 	/**

@@ -34,5 +34,4 @@ public class CopiesDAO extends LMSDAO<Copies> {
 		}
 		return copieses;
 	}
-
 }

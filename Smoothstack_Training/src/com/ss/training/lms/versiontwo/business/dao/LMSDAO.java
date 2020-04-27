@@ -65,7 +65,7 @@ public abstract class LMSDAO<T> {
 	}
 
 	public ArrayList<T> readAll() throws ClassNotFoundException, SQLException {
-		return read("Select * from " + nativeTable, null);
+		return read("SELECT * FROM " + nativeTable+";", null);
 	}
 
 	public abstract ArrayList<T> extractData(ResultSet resultSet) throws SQLException;

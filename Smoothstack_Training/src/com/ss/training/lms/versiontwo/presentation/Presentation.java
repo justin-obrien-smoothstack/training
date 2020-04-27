@@ -122,6 +122,12 @@ public class Presentation {
 		Collections.addAll(list, newElements);
 	}
 
+	protected static ArrayList<String> newArrayList(String... elements) {
+		ArrayList<String> result = new ArrayList<String>();
+		Collections.addAll(result, elements);
+		return result;
+	}
+
 	/**
 	 * Prepares to select an integer based on the user's selection of string
 	 * 
@@ -224,7 +230,7 @@ public class Presentation {
 				System.out.println(invalidCard);
 				continue;
 			}
-			if (cardNumbers.contains(cardNumber))
+			if (cardNumber == 0 || cardNumbers.contains(cardNumber))
 				return cardNumber;
 			System.out.println(invalidCard);
 		}
@@ -404,34 +410,28 @@ public class Presentation {
 			case goBack:
 				return;
 			case librarian:
-				resetList(options, goBack, manageBranch);
-				presentMenu(genericPrompt, options, parameters);
+				presentMenu(genericPrompt, newArrayList(goBack, manageBranch), parameters);
 				break;
 			case borrower:
 				cardNumber = getCardNumber(cardPrompt);
 				if (cardNumber == 0)
-					return;
+					continue;
 				resetList(parameters, cardNumber);
-				resetList(options, goBack, checkoutBook, returnBook);
-				presentMenu(genericPrompt, options, parameters);
+				presentMenu(genericPrompt, newArrayList(goBack, checkoutBook, returnBook), parameters);
 				break;
 			case admin:
-				resetList(options, goBack, crudBooks, crudAuthors, crudGenres, crudPublishers, crudBranches,
-						crudBorrowers, override);
-				presentMenu(genericPrompt, options, parameters);
+				presentMenu(genericPrompt, newArrayList(goBack, crudBooks, crudAuthors, crudGenres, crudPublishers,
+						crudBranches, crudBorrowers, override), parameters);
 				break;
 			case manageBranch:
-				branchToManage = (Branch) PresUtils.getLMSObjectSelection((List<LMSObject>) librarianService.getAllObjects(LMS.branch),
-						manageBranchPrompt, goBack);
+				branchToManage = (Branch) PresUtils.getLMSObjectSelection(
+						(List<LMSObject>) librarianService.getAllObjects(LMS.branch), manageBranchPrompt, goBack);
 				if (branchToManage == null)
 					return;
-				resetList(options, updateBranch, changeCopies);
 				resetList(parameters, branchToManage);
-				presentMenu(genericPrompt, options, parameters);
+				presentMenu(genericPrompt, newArrayList(goBack, updateBranch, changeCopies), parameters);
 				break;
 			case updateBranch:
-				// need LibrarianService.updateBranch() & LMSService.getAllObjects() for this to
-				// work
 				final String noChange = "", newName, newAddress;
 				branchToManage = (Branch) parameters.get(0);
 				System.out.println(PresUtils.getBranchUpdateInfo(branchToManage, cancelCode));
@@ -447,7 +447,7 @@ public class Presentation {
 				if (!noChange.equals(newAddress))
 					branchToManage.setAddress(newAddress);
 				System.out.println(librarianService.updateBranch(branchToManage));
-				return;
+				continue;
 			case changeCopies:
 				int newNumberOfCopies;
 				branchPk = (Integer) parameters.get(0);
@@ -456,10 +456,10 @@ public class Presentation {
 						(Integer[]) bookPksTitlesAndAuthors[0]);
 				bookPk = getIntCrossSelection(changeCopiesBookPrompt, options, bookPks);
 				if (bookPk == 0)
-					return;
+					continue;
 				newNumberOfCopies = getNewNumberOfCopies(changeCopiesNumberPrompt);
 				System.out.println(librarianService.updateNumberOfCopies(branchPk, bookPk, newNumberOfCopies));
-				return;
+				continue;
 			case checkoutBook:
 				cardNumber = (Integer) parameters.get(0);
 				// must change to only show branches with available books
@@ -490,33 +490,30 @@ public class Presentation {
 				return;
 			case crudBooks:
 				resetList(parameters, LMS.book);
-				resetList(options, goBack, create, read, update, delete);
-				presentMenu(getCRUDPrompt(LMS.books), options, parameters);
+				presentMenu(getCRUDPrompt(LMS.books), newArrayList(goBack, create, read, update, delete), parameters);
 				break;
 			case crudAuthors:
 				resetList(parameters, LMS.author);
-				resetList(options, goBack, create, read, update, delete);
-				presentMenu(getCRUDPrompt(LMS.authors), options, parameters);
+				presentMenu(getCRUDPrompt(LMS.authors), newArrayList(goBack, create, read, update, delete), parameters);
 				break;
 			case crudGenres:
 				resetList(parameters, LMS.genre);
-				resetList(options, goBack, create, read, update, delete);
-				presentMenu(getCRUDPrompt(LMS.genres), options, parameters);
+				presentMenu(getCRUDPrompt(LMS.genres), newArrayList(goBack, create, read, update, delete), parameters);
 				break;
 			case crudPublishers:
 				resetList(parameters, LMS.publisher);
-				resetList(options, goBack, create, read, update, delete);
-				presentMenu(getCRUDPrompt(LMS.publishers), options, parameters);
+				presentMenu(getCRUDPrompt(LMS.publishers), newArrayList(goBack, create, read, update, delete),
+						parameters);
 				break;
 			case crudBranches:
 				resetList(parameters, LMS.branch);
-				resetList(options, goBack, create, read, update, delete);
-				presentMenu(getCRUDPrompt(LMS.branches), options, parameters);
+				presentMenu(getCRUDPrompt(LMS.branches), newArrayList(goBack, create, read, update, delete),
+						parameters);
 				break;
 			case crudBorrowers:
 				resetList(parameters, LMS.borrower);
-				resetList(options, goBack, create, read, update, delete);
-				presentMenu(getCRUDPrompt(LMS.borrowers), options, parameters);
+				presentMenu(getCRUDPrompt(LMS.borrowers), newArrayList(goBack, create, read, update, delete),
+						parameters);
 				break;
 			case create:
 				objectType = (String) parameters.get(0);
@@ -688,7 +685,7 @@ public class Presentation {
 		ArrayList<LMSObject> updateCandidates = adminService.getAllObjects(objectType), possiblyRelatedObjects,
 				valuesOfFieldToUpdate;
 		ArrayList<String> options = updateCandidates.stream().map(object -> object.getDisplayName())
-				.collect(Collectors.toCollection(ArrayList::new));
+				.collect(Collectors.toCollection(ArrayList::new)), tempOptions = new ArrayList<String>();
 		HashMap<String, HashMap<String, Object>> fieldsMap;
 		HashMap<String, Object> independentRequired, independentOptional, relationalMono, relationalMulti;
 		LMSObject objectToUpdate, newFieldValueObject;
@@ -697,15 +694,14 @@ public class Presentation {
 		selectedOption = PresUtils.getOptionSelection(getObjectUpdatePrompt(objectType), options);
 		objectToUpdate = updateCandidates.get(selectedOption);
 		fieldsMap = objectToUpdate.getFieldsMap();
-		options.clear();
-		options.add(0, cancelOperation);
+		tempOptions.add(cancelOperation);
 		fieldsMap.keySet().stream().forEach(fieldsMapKey -> {
 			HashMap<String, Object> fieldsSubmap = fieldsMap.get(fieldsMapKey);
 			if (!LMS.composite.equals(fieldsMapKey)) {
 				fieldsSubmap.keySet().stream().forEach(fieldsSubmapKey -> {
 					HashMap<String, Object> fieldsSubsubmap = (HashMap<String, Object>) fieldsSubmap
 							.get(fieldsSubmapKey);
-					fieldsSubsubmap.keySet().stream().forEach(fieldName -> options.add(fieldName));
+					fieldsSubsubmap.keySet().stream().forEach(fieldName -> tempOptions.add(fieldName));
 				});
 			}
 		});
@@ -728,7 +724,7 @@ public class Presentation {
 		}
 		if (independentOptional.keySet().contains(nameOfFieldToUpdate)) {
 			if (independentOptional.get(nameOfFieldToUpdate) != null) {
-				resetList(options, getChangeOrRemoveOpts(nameOfFieldToUpdate));
+				options = newArrayList(getChangeOrRemoveOpts(nameOfFieldToUpdate));
 				selectedOption = PresUtils.getOptionSelection(genericPrompt, options);
 				if (selectedOption == 0)
 					return operationCancelled;
@@ -748,7 +744,7 @@ public class Presentation {
 		}
 		if (relationalMono.keySet().contains(nameOfFieldToUpdate)) {
 			if (relationalMono.get(nameOfFieldToUpdate) != null) {
-				resetList(options, getChangeOrRemoveOpts(nameOfFieldToUpdate));
+				options = newArrayList(getChangeOrRemoveOpts(nameOfFieldToUpdate));
 				selectedOption = PresUtils.getOptionSelection(genericPrompt, options);
 				if (selectedOption == 0)
 					return operationCancelled;
@@ -776,7 +772,7 @@ public class Presentation {
 		if (relationalMulti.keySet().contains(nameOfFieldToUpdate)) {
 			valuesOfFieldToUpdate = (ArrayList<LMSObject>) relationalMulti.get(nameOfFieldToUpdate);
 			if (valuesOfFieldToUpdate.size() != 0) {
-				resetList(options, getAddOrRemoveOpts(nameOfFieldToUpdate));
+				options = newArrayList(getAddOrRemoveOpts(nameOfFieldToUpdate));
 				selectedOption = PresUtils.getOptionSelection(genericPrompt, options);
 				if (selectedOption == 0)
 					return operationCancelled;

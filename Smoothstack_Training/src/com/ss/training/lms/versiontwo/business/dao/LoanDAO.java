@@ -3,6 +3,7 @@ package com.ss.training.lms.versiontwo.business.dao;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import com.ss.training.lms.versiontwo.object.Loan;
@@ -17,21 +18,24 @@ public class LoanDAO extends LMSDAO<Loan> {
 	 */
 	public LoanDAO(Connection connnection) {
 		super(connnection);
-		// TODO Auto-generated constructor stub
+		nativeTable = tblLoans;
 	}
 
 	@Override
 	public ArrayList<Loan> extractData(ResultSet resultSet) throws SQLException {
 		Loan loan;
+		Timestamp dateInResult, dueDateResult;
 		ArrayList<Loan> loans = new ArrayList<Loan>();
-		while(resultSet.next()) {
+		while (resultSet.next()) {
 			loan = new Loan();
 			loan.setBookId(resultSet.getInt(bookId));
 			loan.setBranchId(resultSet.getInt(branchId));
 			loan.setCardNo(resultSet.getInt(cardNo));
 			loan.setDateOut(resultSet.getTimestamp(dateOut).toLocalDateTime());
-			loan.setDateIn(resultSet.getTimestamp(dateIn).toLocalDateTime());
-			loan.setDueDate(resultSet.getTimestamp(dueDate).toLocalDateTime());
+			dueDateResult = resultSet.getTimestamp(dueDate);
+			dateInResult = resultSet.getTimestamp(dateIn);
+			loan.setDueDate(dueDateResult == null ? null : dueDateResult.toLocalDateTime());
+			loan.setDateIn(dateInResult == null ? null : dateInResult.toLocalDateTime());
 			loans.add(loan);
 		}
 		return loans;
