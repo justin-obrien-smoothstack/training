@@ -12,6 +12,7 @@ import com.ss.training.lms.versiontwo.LMS;
 import com.ss.training.lms.versiontwo.business.AdminService;
 import com.ss.training.lms.versiontwo.business.BorrowerService;
 import com.ss.training.lms.versiontwo.business.LibrarianService;
+import com.ss.training.lms.versiontwo.object.Branch;
 import com.ss.training.lms.versiontwo.object.LMSObject;
 import com.ss.training.lms.versiontwo.object.Loan;
 
@@ -45,6 +46,7 @@ public class Presentation {
 		return instance;
 	}
 
+	private static final int maxStringFieldLength = 45;
 	/**
 	 * Text shown to the user in menus
 	 */
@@ -83,16 +85,7 @@ public class Presentation {
 	protected static final AdminService adminService = new AdminService();
 
 
-	protected static String getStringWithMaxLength(String prompt, String fieldName, int maxLength) {
-		String result;
-		for (;;) {
-			System.out.println(updateBranchNamePrompt);
-			result = scanner.nextLine();
-			if (result.length() <= maxLength)
-				return result;
-			System.out.println("Error: Maximum " + fieldName + " length is " + maxLength + "characters.");
-		}
-	}
+	
 
 	/**
 	 * Removes all elements in a list of strings and repopulates the list
@@ -240,17 +233,7 @@ public class Presentation {
 		}
 	}
 
-	/**
-	 * @param branchPk The primary key of the branch being updated
-	 * 
-	 * @return String stating which branch is being updated and telling the user how
-	 *         to cancel the update
-	 */
-	protected static String branchUpdateInfo(int branchPk) {
-		final String branchName = librarianService.getBranchName(branchPk);
-		return "Updating branch: " + branchName + " (#+" + branchPk + ")\nEnter " + cancelCode
-				+ " at any prompt to cancel the operation.";
-	}
+
 
 	/**
 	 * Gets the new number of copies of a book at a branch from the user
@@ -276,11 +259,11 @@ public class Presentation {
 	}
 
 	protected static String[] getChangeOrRemoveOpts(String subject) {
-		return new String[] { cancelOperation, "Change " + subject, "Remove " + subject };
+		return new String[] { cancelCode, "Change " + subject, "Remove " + subject };
 	}
 
 	protected static String[] getAddOrRemoveOpts(String subject) {
-		return new String[] { cancelOperation, "Add " + subject, "Remove " + subject };
+		return new String[] { cancelCode, "Add " + subject, "Remove " + subject };
 	}
 
 	/**
@@ -420,6 +403,7 @@ public class Presentation {
 		String objectType;
 		Object[][] bookPksTitlesAndAuthors;
 		ArrayList<Integer> bookPks = new ArrayList<Integer>();
+		Branch branchToManage;
 		for (;;) {
 			selectedOption = PresUtils.getOptionSelection(prompt, options);
 			switch (options.get(selectedOption)) {
@@ -444,25 +428,27 @@ public class Presentation {
 				presentMenu(genericPrompt, options, parameters);
 				break;
 			case manageBranch:
-				branchPk = getBranchSelection(manageBranchPrompt);
-				if (branchPk == 0)
+				branchToManage = (Branch) PresUtils.getLMSObjectSelection(librarianService.getAllBranches(), manageBranchPrompt, goBack);
+				if (branchToManage == null)
 					return;
 				resetList(options, updateBranch, changeCopies);
-				resetList(parameters, branchPk);
+				resetList(parameters, branchToManage);
 				presentMenu(genericPrompt, options, parameters);
 				break;
 			case updateBranch:
-				final String cancelOperation = "0", noChange = "";
-				String newName, newAddress;
-				branchPk = (Integer) parameters.get(0);
-				System.out.println(branchUpdateInfo(branchPk));
-				newName = getStringWithMaxLength(updateBranchNamePrompt, "name", 45);
-				if (cancelOperation.equals(newName))
+				// need LibrarianSerive.updateBranch() & LMSService.getAllObjects() for this to work
+				final String noChange = "", newName, newAddress;;
+				branchToManage = (Branch) parameters.get(0);
+				System.out.println(PresUtils.getBranchUpdateInfo(branchToManage, cancelCode));
+				newName = PresUtils.getStringWithMaxLength(updateBranchNamePrompt, "name", maxStringFieldLength);
+				if (cancelCode.equals(newName))
 					return;
-				newAddress = getStringWithMaxLength(updateBranchAddressPrompt, "name", 45);
-				if (cancelOperation.equals(newAddress))
+				if(!noChange.equals(newName)) branchToManage.setName(newName);
+				newAddress = PresUtils.getStringWithMaxLength(updateBranchAddressPrompt, "address", maxStringFieldLength);
+				if (cancelCode.equals(newAddress))
 					return;
-				System.out.println(librarianService.updateBranch(branchPk, newName, newAddress, noChange));
+				if(!noChange.equals(newAddress)) branchToManage.setAddress(newAddress);
+				System.out.println(librarianService.updateBranch(branchToManage));
 				return;
 			case changeCopies:
 				int newNumberOfCopies;

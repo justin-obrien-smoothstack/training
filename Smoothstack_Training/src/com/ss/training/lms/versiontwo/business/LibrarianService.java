@@ -1,11 +1,21 @@
 package com.ss.training.lms.versiontwo.business;
 
+import java.util.ArrayList;
+
+import com.ss.training.lms.versiontwo.object.Branch;
+import com.ss.training.lms.versiontwo.object.LMSObject;
+
 /**
- * Provides business logic for LMS functions available to users who are librarians
+ * Provides business logic for LMS functions available to users who are
+ * librarians
  * 
  * @author Justin O'Brien
  */
 public class LibrarianService {
+
+	public ArrayList<LMSObject> getAllBranches() {
+		return new ArrayList<LMSObject>(); // placeholder
+	}
 
 	/**
 	 * Gets primary keys and names of all library branches
@@ -15,7 +25,7 @@ public class LibrarianService {
 	public Object[][] getBranchPksAndNames() {
 		return null; // placeholder
 	}
-	
+
 	/**
 	 * Gets the name of a branch given its primary key
 	 * 
@@ -25,7 +35,7 @@ public class LibrarianService {
 	public String getBranchName(int branchPk) {
 		return null; // placeholder
 	}
-	
+
 	/**
 	 * Updates the name or address of a branch for a librarian
 	 * 
@@ -35,10 +45,10 @@ public class LibrarianService {
 	 *                   corresponding attribute of the branch won't be changed
 	 * @return A message to tell the user whether the operations succeeded
 	 */
-	public String updateBranch(String newName, String newAddress, String noChange) {
-		return null; // placeholder
+	public String updateBranch(Branch branchToUpdate) {
+		return ""; // placeholder
 	}
-	
+
 	/**
 	 * Gets primary keys, titles, and authors of all books in the database
 	 * 
@@ -48,7 +58,7 @@ public class LibrarianService {
 	public Object[][] getAllBookPksTitlesAndAuthors() {
 		return null; // placeholder
 	}
-	
+
 	/**
 	 * Updates the number of copies of a book at a library branch
 	 * 
@@ -60,5 +70,5 @@ public class LibrarianService {
 	public String updateNumberOfCopies(int branchPk, int bookPk, int newNumberOfCopies) {
 		return null; // placeholder
 	}
-	
+
 }

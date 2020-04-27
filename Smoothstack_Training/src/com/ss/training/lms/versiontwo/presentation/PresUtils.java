@@ -6,6 +6,7 @@ import java.util.Scanner;
 import java.util.stream.Collectors;
 
 import com.ss.training.lms.versiontwo.business.LMSService;
+import com.ss.training.lms.versiontwo.object.Branch;
 import com.ss.training.lms.versiontwo.object.LMSObject;
 
 /**
@@ -42,11 +43,34 @@ public class PresUtils {
 		}
 	}
 	
-	public static LMSObject getLMSObjectSelection(String objectType, String prompt, String negativeOption) {
-		ArrayList<LMSObject> lmsObjects = lmsService.getAllObjects(objectType);
+	/**
+	 * @param branchPk The primary key of the branch being updated
+	 * 
+	 * @return String stating which branch is being updated and telling the user how
+	 *         to cancel the update
+	 */
+	protected static String getBranchUpdateInfo(Branch branch, String cancelCode) {
+		return "Updating branch: " + branch.getDisplayName() + " (#+" + branch.getBranchId() + ")\nEnter " + cancelCode
+				+ " at any prompt to cancel the operation.";
+	}
+	
+	protected static String getStringWithMaxLength(String prompt, String fieldName, int maxLength) {
+		String result;
+		for (;;) {
+			System.out.println(Presentation.updateBranchNamePrompt);
+			result = scanner.nextLine();
+			if (result.length() <= maxLength)
+				return result;
+			System.out.println("Error: Maximum " + fieldName + " length is " + maxLength + "characters.");
+		}
+	}
+	
+	protected static LMSObject getLMSObjectSelection(List<LMSObject> lmsObjects, String prompt, String negativeOption) {
+		int selectedOption;
 		ArrayList<String> options = lmsObjects.stream().map(object -> object.getDisplayName()).collect(Collectors.toCollection(ArrayList::new));
 		lmsObjects.add(0, null);
 		options.add(0, negativeOption);
-		selectedOption = getOptionSelection
+		selectedOption = getOptionSelection(prompt, options);
+		return lmsObjects.get(selectedOption);
 	}
 }
