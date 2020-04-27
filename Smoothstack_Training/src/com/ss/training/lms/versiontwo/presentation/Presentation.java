@@ -72,16 +72,16 @@ public class Presentation {
 			returnBook = "Return a book", updateBranch = "Update branch information",
 			changeCopies = "Change the number of copies of a book at your branch", create = "Create", read = "Read",
 			update = "Update", delete = "Delete", cancelOperation = "Cancel the operation";
-	private final String operationCancelled = "The operation was cancelled."
+	private final String operationCancelled = "The operation was cancelled.";
 	private final String invalidSelection = "Error: That is not a valid selection.",
 			invalidCard = "Error: That is not a valid card number.",
 			invalidCopies = "Error: That is not a valid number of copies.";
 
 	private final Scanner scanner = new Scanner(System.in);
 
-	private final LibrarianService librarianService = LibrarianService.getInstance();
-	private final BorrowerService borrowerService = BorrowerService.getInstance();
-	private final AdminService adminService = AdminService.getInstance();
+	private final LibrarianService librarianService = new LibrarianService();
+	private final BorrowerService borrowerService = new BorrowerService();
+	private final AdminService adminService = new AdminService();
 
 	/**
 	 * Gets a menu option selection from the user

@@ -8,29 +8,6 @@ package com.ss.training.lms.versiontwo.business;
 public class LibrarianService {
 
 	/**
-	 * The single instance of this class
-	 */
-	static LibrarianService instance = null;
-
-	/**
-	 * Private constructor to make this class a singleton
-	 */
-	private LibrarianService() {
-
-	}
-
-	/**
-	 * Gets the single instance of this class
-	 * 
-	 * @return The single instance of this class
-	 */
-	public static LibrarianService getInstance() {
-		if (instance == null)
-			instance = new LibrarianService();
-		return instance;
-	}
-	
-	/**
 	 * Gets primary keys and names of all library branches
 	 * 
 	 * @return Primary keys (first row) and names (second row) of branches

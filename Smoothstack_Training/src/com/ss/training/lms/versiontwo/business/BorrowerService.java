@@ -10,29 +10,6 @@ import java.util.ArrayList;
 public class BorrowerService {
 
 	/**
-	 * The single instance of this class
-	 */
-	static BorrowerService instance = null;
-
-	/**
-	 * Private constructor to make this class a singleton
-	 */
-	private BorrowerService() {
-
-	}
-
-	/**
-	 * Gets the single instance of this class
-	 * 
-	 * @return The single instance of this class
-	 */
-	public static BorrowerService getInstance() {
-		if (instance == null)
-			instance = new BorrowerService();
-		return instance;
-	}
-	
-	/**
 	 * @return Card numbers of all borrowers
 	 */
 	public ArrayList<Integer> getCardNumbers(){

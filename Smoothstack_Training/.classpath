@@ -6,5 +6,6 @@
 	<classpathentry kind="lib" path="C:/jar/junit-4.13.jar"/>
 	<classpathentry kind="lib" path="C:/jar/system-rules-1.19.0.jar"/>
 	<classpathentry kind="lib" path="C:/jar/spring-context-4.2.4.RELEASE.jar"/>
+	<classpathentry kind="lib" path="C:/jar/mysql-connector-java-8.0.19.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

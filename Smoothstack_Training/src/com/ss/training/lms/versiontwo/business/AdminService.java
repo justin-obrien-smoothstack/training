@@ -16,29 +16,6 @@ import com.ss.training.lms.versiontwo.objects.LMSObject;
  */
 public class AdminService {
 
-	/**
-	 * The single instance of this class
-	 */
-	static AdminService instance = null;
-
-	/**
-	 * Private constructor to make this class a singleton
-	 */
-	private AdminService() {
-
-	}
-
-	/**
-	 * Gets the single instance of this class
-	 * 
-	 * @return The single instance of this class
-	 */
-	public static AdminService getInstance() {
-		if (instance == null)
-			instance = new AdminService();
-		return instance;
-	}
-	
 	public String create(LMSObject newObject) {
 		return null; // placeholder
 	}
