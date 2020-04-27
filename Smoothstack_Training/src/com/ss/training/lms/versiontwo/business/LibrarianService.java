@@ -71,22 +71,33 @@ public class LibrarianService extends LMSService {
 	 * @return A string indicating whether the operation succeeded
 	 */
 	public String updateCopies(Branch branch, Book book, int numCopies) {
-		Copies copies = new Copies();
+		Copies copies = new Copies(), previousCopies = null;
 		copies.setBranchId(branch.getId());
 		copies.setBookId(book.getId());
 		copies.setCopies(numCopies);
+		for (Copies thisCopies : branch.getCopies())
+			if (thisCopies.getBookId() == book.getId()) {
+				previousCopies = thisCopies;
+				break;
+			}
 		try (Connection connection = getConnection()) {
-			new CopiesDAO(connection).update(copies);
+			if (previousCopies == null)
+				new CopiesDAO(connection).create(copies);
+			else
+				new CopiesDAO(connection).update(copies);
 			connection.commit();
 		} catch (Exception e) {
 			System.out.println("There was an error while attempting to update the number of book copies.");
 			e.printStackTrace();
 			return "The number of book copies was not successfully changed.";
 		}
-		branch.getCopies().stream().forEach(thisCopies -> {
-			if (thisCopies.getBookId() == book.getId())
-				thisCopies.setCopies(numCopies);
-		});
+		if (previousCopies == null)
+			branch.getCopies().add(copies);
+		else
+			branch.getCopies().stream().forEach(thisCopies -> {
+				if (thisCopies.getBookId() == book.getId())
+					thisCopies.setCopies(numCopies);
+			});
 		return "The number of book copies was successfully changed.";
 	}
 }

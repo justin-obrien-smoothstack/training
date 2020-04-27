@@ -61,7 +61,7 @@ public class PresUtils {
 
 	protected static String changeCopiesNumberPrompt(int currentNumberOfCopies) {
 		return "Our records indicate that you currently have " + currentNumberOfCopies
-				+ " copies of this book. What is the new number of copies?";
+				+ (currentNumberOfCopies == 1 ? " copy" : " copies") + " of this book. What is the new number of copies?";
 	}
 
 	/**

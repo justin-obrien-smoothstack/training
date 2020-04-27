@@ -5,7 +5,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import com.ss.training.lms.versiontwo.object.Branch;
 import com.ss.training.lms.versiontwo.object.Copies;
 
 /**
@@ -19,6 +18,12 @@ public class CopiesDAO extends LMSDAO<Copies> {
 	public CopiesDAO(Connection connnection) {
 		super(connnection);
 		nativeTable = tblCopies;
+	}
+
+	public void create(Copies copies) throws ClassNotFoundException, SQLException {
+		Object[] queryArgs = { copies.getCopies(), copies.getBranchId(), copies.getBookId() };
+		save("INSERT INTO " + nativeTable + "(" + noOfCopies + ", " + branchId + ", " + bookId + ") VALUES (?, ?, ?)",
+				queryArgs);
 	}
 
 	public void update(Copies copies) throws ClassNotFoundException, SQLException {

@@ -76,7 +76,7 @@ public class Presentation {
 			changeCopies = "Change the number of copies of a book at your branch", create = "Create", read = "Read",
 			update = "Update", delete = "Delete", cancelOperation = "Cancel the operation";
 	protected static final String operationCancelled = "The operation was cancelled.",
-			operationFailed = "The operation";
+			noChangesMade = "No changes have been made.";
 	protected static final String invalidSelection = "Error: That is not a valid selection.",
 			invalidCard = "Error: That is not a valid card number.",
 			invalidCopies = "Error: That is not a valid number of copies.";
@@ -440,13 +440,13 @@ public class Presentation {
 				System.out.println(PresUtils.getBranchUpdateInfo(branchToManage, cancelCode));
 				newName = PresUtils.getStringWithMaxLength(updateBranchNamePrompt, "name", maxStringFieldLength);
 				if (cancelCode.equals(newName))
-					return;
+					continue;
 				if (!noChange.equals(newName))
 					branchToManage.setName(newName);
 				newAddress = PresUtils.getStringWithMaxLength(updateBranchAddressPrompt, "address",
 						maxStringFieldLength);
 				if (cancelCode.equals(newAddress))
-					return;
+					continue;
 				if (!noChange.equals(newAddress))
 					branchToManage.setAddress(newAddress);
 				System.out.println(librarianService.updateBranch(branchToManage));
@@ -463,7 +463,12 @@ public class Presentation {
 						currentNumberOfCopies = copies.getCopies();
 						break;
 					}
-				newNumberOfCopies = PresUtils.getNaturalNumber(PresUtils.changeCopiesNumberPrompt(currentNumberOfCopies), invalidCopies);
+				newNumberOfCopies = PresUtils
+						.getNaturalNumber(PresUtils.changeCopiesNumberPrompt(currentNumberOfCopies), invalidCopies);
+				if (newNumberOfCopies == currentNumberOfCopies) {
+					System.out.println(noChangesMade);
+					continue;
+				}
 				System.out
 						.println(librarianService.updateCopies(branchToManage, bookToChangeCopies, newNumberOfCopies));
 				continue;
