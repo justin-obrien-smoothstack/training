@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import com.ss.training.lms.versiontwo.object.Branch;
 import com.ss.training.lms.versiontwo.object.Copies;
 
 /**
@@ -12,8 +13,6 @@ import com.ss.training.lms.versiontwo.object.Copies;
  */
 public class CopiesDAO extends LMSDAO<Copies> {
 
-	
-	
 	/**
 	 * @param connnection
 	 */
@@ -24,8 +23,16 @@ public class CopiesDAO extends LMSDAO<Copies> {
 
 	@Override
 	public ArrayList<Copies> extractData(ResultSet resultSet) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		Copies copies;
+		ArrayList<Copies> copieses = new ArrayList<Copies>();
+		while (resultSet.next()) {
+			copies = new Copies();
+			copies.setBranchId(resultSet.getInt(branchId));
+			copies.setBookId(resultSet.getInt(bookId));
+			copies.setCopies(resultSet.getInt(noOfCopies));
+			copieses.add(copies);
+		}
+		return copieses;
 	}
 
 }

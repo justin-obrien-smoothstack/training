@@ -421,7 +421,7 @@ public class Presentation {
 				presentMenu(genericPrompt, options, parameters);
 				break;
 			case manageBranch:
-				branchToManage = (Branch) PresUtils.getLMSObjectSelection(librarianService.getAllBranches(),
+				branchToManage = (Branch) PresUtils.getLMSObjectSelection((List<LMSObject>) librarianService.getAllObjects(LMS.branch),
 						manageBranchPrompt, goBack);
 				if (branchToManage == null)
 					return;

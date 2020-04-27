@@ -29,22 +29,22 @@ public abstract class LMSDAO<T> {
 			branchAddress = "branchAddress", noOfCopies = "noOfCopies", cardNo = "cardNo", dateOut = "dateOut",
 			dueDate = "dueDate", dateIn = "dateIn";
 
-	public void save(String sqlQuery, List<Object> queryArgs) throws ClassNotFoundException, SQLException {
+	public void save(String sqlQuery, Object[] queryArgs) throws ClassNotFoundException, SQLException {
 		PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
 		if (queryArgs != null) {
-			for (int i = 1; i < queryArgs.size(); i++) {
-				preparedStatement.setObject(i, queryArgs.get(i));
+			for (int i = 0; i < queryArgs.length; i++) {
+				preparedStatement.setObject(i + 1, queryArgs[i]);
 			}
 		}
 		preparedStatement.executeUpdate();
 	}
 
-	public Integer saveWithPk(String sqlQuery, List<Object> queryArgs) throws ClassNotFoundException, SQLException {
+	public Integer saveWithPk(String sqlQuery, Object[] queryArgs) throws ClassNotFoundException, SQLException {
 		PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery,
 				PreparedStatement.RETURN_GENERATED_KEYS);
 		if (queryArgs != null) {
-			for (int i = 1; i < queryArgs.size(); i++) {
-				preparedStatement.setObject(i, queryArgs.get(i));
+			for (int i = 0; i < queryArgs.length; i++) {
+				preparedStatement.setObject(i + 1, queryArgs[i]);
 			}
 		}
 		preparedStatement.executeUpdate();
@@ -54,11 +54,11 @@ public abstract class LMSDAO<T> {
 		return null;
 	}
 
-	public ArrayList<T> read(String sqlQuery, List<Object> queryArgs) throws ClassNotFoundException, SQLException {
+	public ArrayList<T> read(String sqlQuery, Object[] queryArgs) throws ClassNotFoundException, SQLException {
 		PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
 		if (queryArgs != null) {
-			for (int i = 1; i < queryArgs.size(); i++) {
-				preparedStatement.setObject(i, queryArgs.get(i));
+			for (int i = 0; i < queryArgs.length; i++) {
+				preparedStatement.setObject(i + 1, queryArgs[i]);
 			}
 		}
 		return extractData(preparedStatement.executeQuery());

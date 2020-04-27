@@ -1,6 +1,5 @@
 package com.ss.training.lms.versiontwo.object;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -11,12 +10,12 @@ public class Branch extends LMSObject {
 
 	private int id;
 	private String name, address;
-	private HashMap<Integer, Integer> copies;
-	private HashMap<HashMap<String, Object>, HashMap<String, LocalDateTime>> loans;
+	private ArrayList<Copies> copies;
+	private ArrayList<Loan> loans;
 
 	public Branch() {
-		copies = new HashMap<Integer, Integer>();
-		loans = new HashMap<HashMap<String, Object>, HashMap<String, LocalDateTime>>();
+		copies = new ArrayList<Copies>();
+		loans = new ArrayList<Loan>();
 	}
 
 	/**
@@ -61,32 +60,34 @@ public class Branch extends LMSObject {
 		this.address = branchAddress;
 	}
 
-	/**
-	 * @return the bookLoans
-	 */
-	public ArrayList<HashMap<String, Object>> getLoans() {
-		return loans;
-	}
 
-	/**
-	 * @param bookLoans the bookLoans to set
-	 */
-	public void setLoans(ArrayList<HashMap<String, Object>> bookLoans) {
-		this.loans = bookLoans;
-	}
 
 	/**
 	 * @return the copies
 	 */
-	public HashMap<Integer, Integer> getCopies() {
+	public ArrayList<Copies> getCopies() {
 		return copies;
 	}
 
 	/**
 	 * @param copies the copies to set
 	 */
-	public void setCopies(HashMap<Integer, Integer> copies) {
+	public void setCopies(ArrayList<Copies> copies) {
 		this.copies = copies;
+	}
+
+	/**
+	 * @return the loans
+	 */
+	public ArrayList<Loan> getLoans() {
+		return loans;
+	}
+
+	/**
+	 * @param loans the loans to set
+	 */
+	public void setLoans(ArrayList<Loan> loans) {
+		this.loans = loans;
 	}
 
 	@Override

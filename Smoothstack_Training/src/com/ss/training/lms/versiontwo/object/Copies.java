@@ -14,10 +14,8 @@ public class Copies extends LMSObject {
 	 * @param branchId
 	 * @param copies
 	 */
-	public Copies(int bookId, int branchId, int copies) {
-		this.bookId = bookId;
-		this.branchId = branchId;
-		this.copies = copies;
+	public Copies() {
+
 	}
 
 	@Override

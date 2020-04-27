@@ -1,10 +1,9 @@
 package com.ss.training.lms.versiontwo.business;
 
-import java.util.ArrayList;
+import java.sql.Connection;
 
-import com.ss.training.lms.versiontwo.LMS;
+import com.ss.training.lms.versiontwo.business.dao.BranchDAO;
 import com.ss.training.lms.versiontwo.object.Branch;
-import com.ss.training.lms.versiontwo.object.LMSObject;
 
 /**
  * Provides business logic for LMS functions available to users who are
@@ -14,17 +13,19 @@ import com.ss.training.lms.versiontwo.object.LMSObject;
  */
 public class LibrarianService extends LMSService {
 
-	public ArrayList<LMSObject> getAllBranches() {
-		return getAllObjects(LMS.branch);
-	}
-	
 	/**
 	 * Updates the name or address of a branch for a librarian
 	 * 
 	 * @return A message to tell the user whether the operations succeeded
 	 */
-	public String updateBranch(Branch branchToUpdate) {
-		return ""; // placeholder
+	public String updateBranch(Branch branch) {
+		try (Connection connection = getConnection()) {
+			new BranchDAO(connection).update(branch);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "The branch update was unsuccessful.";
+		}
+		return "The branch update succeeded.";
 	}
 
 	/**
@@ -45,8 +46,6 @@ public class LibrarianService extends LMSService {
 	public String getBranchName(int branchPk) {
 		return null; // placeholder
 	}
-
-	
 
 	/**
 	 * Gets primary keys, titles, and authors of all books in the database
