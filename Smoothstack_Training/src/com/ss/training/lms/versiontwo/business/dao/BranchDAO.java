@@ -21,8 +21,9 @@ public class BranchDAO extends LMSDAO<Branch> {
 	}
 
 	public void update(Branch branch) throws ClassNotFoundException, SQLException {
-		Object[] queryArgs = {branch.getName(), branch.getAddress(), branch.getId()};
-		save("UPDATE tbl_library_branch SET branchName = ?, branchAddress = ? WHERE branchId = ?", queryArgs);
+		Object[] queryArgs = { branch.getName(), branch.getAddress(), branch.getId() };
+		save("UPDATE " + nativeTable + " SET " + branchName + " = ?, " + branchAddress + " = ? WHERE " + branchId
+				+ " = ?", queryArgs);
 	}
 
 	@Override

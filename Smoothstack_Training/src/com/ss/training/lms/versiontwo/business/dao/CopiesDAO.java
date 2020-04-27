@@ -21,6 +21,12 @@ public class CopiesDAO extends LMSDAO<Copies> {
 		nativeTable = tblCopies;
 	}
 
+	public void update(Copies copies) throws ClassNotFoundException, SQLException {
+		Object[] queryArgs = { copies.getCopies(), copies.getBranchId(), copies.getBookId() };
+		save("UPDATE " + nativeTable + " SET " + noOfCopies + " = ? WHERE " + branchId + " = ? AND " + bookId + " = ?",
+				queryArgs);
+	}
+
 	@Override
 	public ArrayList<Copies> extractData(ResultSet resultSet) throws SQLException {
 		Copies copies;

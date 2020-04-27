@@ -1,9 +1,13 @@
 package com.ss.training.lms.versiontwo.business;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 
 import com.ss.training.lms.versiontwo.business.dao.BranchDAO;
+import com.ss.training.lms.versiontwo.business.dao.CopiesDAO;
+import com.ss.training.lms.versiontwo.object.Book;
 import com.ss.training.lms.versiontwo.object.Branch;
+import com.ss.training.lms.versiontwo.object.Copies;
 
 /**
  * Provides business logic for LMS functions available to users who are
@@ -66,8 +70,19 @@ public class LibrarianService extends LMSService {
 	 * @param newNumberOfCopies The new number of copies of the book at the branch
 	 * @return A string indicating whether the operation succeeded
 	 */
-	public String updateNumberOfCopies(int branchPk, int bookPk, int newNumberOfCopies) {
-		return null; // placeholder
+	public String updateCopies(Branch branch, Book book, int numCopies) {
+		Copies copies = new Copies();
+		copies.setBranchId(branch.getId());
+		copies.setBookId(book.getId());
+		copies.setCopies(numCopies);
+		try (Connection connection = getConnection()) {
+			new CopiesDAO(connection).update(copies);
+			connection.commit();
+		} catch (Exception e) {
+			System.out.println("There was an error while attempting to update the number of book copies.");
+			e.printStackTrace();
+			return "The number of book copies was not successfully changed.";
+		}
+		return "The number of book copies was successfully changed.";
 	}
-
 }

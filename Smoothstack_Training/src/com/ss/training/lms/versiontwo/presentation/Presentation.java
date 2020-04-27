@@ -74,7 +74,7 @@ public class Presentation {
 			returnBook = "Return a book", updateBranch = "Update branch information",
 			changeCopies = "Change the number of copies of a book at your branch", create = "Create", read = "Read",
 			update = "Update", delete = "Delete", cancelOperation = "Cancel the operation";
-	protected static final String operationCancelled = "The operation was cancelled.";
+	protected static final String operationCancelled = "The operation was cancelled.", operationFailed = "The operation";
 	protected static final String invalidSelection = "Error: That is not a valid selection.",
 			invalidCard = "Error: That is not a valid card number.",
 			invalidCopies = "Error: That is not a valid number of copies.";
