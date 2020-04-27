@@ -465,29 +465,29 @@ public class Presentation {
 				// must change to only show branches with available books
 				branchPk = getBranchSelection(checkoutBranchPrompt);
 				if (branchPk == 0)
-					return;
+					continue;
 				bookPksTitlesAndAuthors = borrowerService.getAvailableBookPksTitlesAndAuthors(branchPk);
 				prepareForIntCrossSelection(options, bookPks, (String[]) bookPksTitlesAndAuthors[1],
 						(Integer[]) bookPksTitlesAndAuthors[0]);
 				bookPk = getIntCrossSelection(checkoutBookPrompt, options, bookPks);
 				if (bookPk == 0)
-					return;
+					continue;
 				System.out.println(borrowerService.checkoutBook(cardNumber, branchPk, bookPk));
-				return;
+				continue;
 			case returnBook:
 				cardNumber = (Integer) parameters.get(0);
 				// must change to only show branches with active loans
 				branchPk = getBranchSelection(returnBranchPrompt);
 				if (branchPk == 0)
-					return;
+					continue;
 				bookPksTitlesAndAuthors = borrowerService.getReturnableBookPksTitlesAndAuthors(cardNumber, branchPk);
 				prepareForIntCrossSelection(options, bookPks, (String[]) bookPksTitlesAndAuthors[1],
 						(Integer[]) bookPksTitlesAndAuthors[0]);
 				bookPk = getIntCrossSelection(returnBookPrompt, options, bookPks);
 				if (bookPk == 0)
-					return;
+					continue;
 				System.out.println(borrowerService.returnBook(cardNumber, branchPk, bookPk));
-				return;
+				continue;
 			case crudBooks:
 				resetList(parameters, LMS.book);
 				presentMenu(getCRUDPrompt(LMS.books), newArrayList(goBack, create, read, update, delete), parameters);

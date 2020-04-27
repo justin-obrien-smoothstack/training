@@ -33,6 +33,7 @@ public class BranchDAO extends LMSDAO<Branch> {
 			branch = new Branch();
 			branch.setId(resultSet.getInt(branchId));
 			branch.setName(resultSet.getString(branchName));
+			branch.setAddress(resultSet.getString(branchAddress));
 			branches.add(branch);
 		}
 		return branches;

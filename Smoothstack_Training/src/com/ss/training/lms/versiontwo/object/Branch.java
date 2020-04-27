@@ -42,8 +42,8 @@ public class Branch extends LMSObject {
 	/**
 	 * @param branchName the branchName to set
 	 */
-	public void setName(String branchName) {
-		this.name = branchName;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	/**
@@ -56,11 +56,9 @@ public class Branch extends LMSObject {
 	/**
 	 * @param branchAddress the branchAddress to set
 	 */
-	public void setAddress(String branchAddress) {
-		this.address = branchAddress;
+	public void setAddress(String address) {
+		this.address = address;
 	}
-
-
 
 	/**
 	 * @return the copies
@@ -114,9 +112,7 @@ public class Branch extends LMSObject {
 
 	@Override
 	public String getDisplayName() {
-		if (name == null)
-			return "(name not found)";
-		return name;
+		return (name == null ? "(name not found)" : name) + (address == null ? " (address not found)" : (", " + address));
 	}
 
 	@Override
