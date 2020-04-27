@@ -1,7 +1,6 @@
 package com.ss.training.lms.versiontwo.business.dao;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -29,7 +28,7 @@ public class AuthorDAO extends LMSDAO<Author> {
 			author = new Author();
 			author.setId(resultSet.getInt(authorId));
 			author.setName(resultSet.getString(authorName));
-			author.setBookIds(getRelations(tblAuthor, authorId, bookId, author.getId()));
+			author.setBookIds(getRelations(tblBookAuthor, authorId, bookId, author.getId()));
 		}
 		return authors;
 	}

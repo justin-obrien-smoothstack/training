@@ -4,7 +4,6 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -12,12 +11,13 @@ import java.util.stream.Collectors;
 
 import com.ss.training.lms.versiontwo.LMS;
 import com.ss.training.lms.versiontwo.business.dao.AuthorDAO;
+import com.ss.training.lms.versiontwo.business.dao.BookDAO;
 import com.ss.training.lms.versiontwo.business.dao.BranchDAO;
 import com.ss.training.lms.versiontwo.business.dao.CopiesDAO;
 import com.ss.training.lms.versiontwo.business.dao.LMSDAO;
 import com.ss.training.lms.versiontwo.business.dao.LoanDAO;
 import com.ss.training.lms.versiontwo.object.Author;
-import com.ss.training.lms.versiontwo.object.Branch;
+import com.ss.training.lms.versiontwo.object.BookOrBranch;
 import com.ss.training.lms.versiontwo.object.Copies;
 import com.ss.training.lms.versiontwo.object.LMSObject;
 import com.ss.training.lms.versiontwo.object.Loan;
@@ -53,7 +53,7 @@ public class LMSService {
 		return connection;
 	}
 
-	public ArrayList<Branch> completeBranchInfo(ArrayList<Branch> branches) {
+	public ArrayList<BookOrBranch> completeBookOrBranchInfo(ArrayList<BookOrBranch> booksOrBranches) {
 		ArrayList<Copies> copieses = new ArrayList<Copies>();
 		ArrayList<Loan> loans = new ArrayList<Loan>();
 		try (Connection connection = getConnection()) {
@@ -63,13 +63,13 @@ public class LMSService {
 			printRetrievalErrorMessage(LMS.loans + " and " + LMS.copieses + " for a " + LMS.branch);
 			e.printStackTrace();
 		}
-		branches.stream().forEach(branch -> {
-			copieses.stream().filter(copies -> copies.getBranchId() == branch.getId())
-					.forEach(copies -> branch.getCopies().add(copies));
-			loans.stream().filter(loan -> loan.getBranchId() == branch.getId())
-					.forEach(loan -> branch.getLoans().add(loan));
+		booksOrBranches.stream().forEach(bookOrBranch -> {
+			copieses.stream().filter(copies -> copies.getBranchId() == bookOrBranch.getId())
+					.forEach(copies -> bookOrBranch.getCopies().add(copies));
+			loans.stream().filter(loan -> loan.getBranchId() == bookOrBranch.getId())
+					.forEach(loan -> bookOrBranch.getLoans().add(loan));
 		});
-		return branches;
+		return booksOrBranches;
 	}
 
 	public ArrayList<?> getAllObjects(String objectType) {
@@ -82,6 +82,7 @@ public class LMSService {
 				break;
 			case LMS.book:
 			case LMS.books:
+				dao = new BookDAO(connection);
 				break;
 			case LMS.borrower:
 			case LMS.borrowers:
@@ -109,15 +110,14 @@ public class LMSService {
 			e.printStackTrace();
 		}
 		switch (objectType) {
-		case LMS.book:
-		case LMS.books:
-			break;
 		case LMS.borrower:
 		case LMS.borrowers:
 			break;
+		case LMS.book:
+		case LMS.books:
 		case LMS.branch:
 		case LMS.branches:
-			allObjects = completeBranchInfo(allObjects);
+			allObjects = completeBookOrBranchInfo(allObjects);
 			break;
 		}
 		return allObjects;

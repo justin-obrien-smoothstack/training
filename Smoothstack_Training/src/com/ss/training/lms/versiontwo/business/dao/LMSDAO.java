@@ -25,10 +25,10 @@ public abstract class LMSDAO<T> {
 	}
 
 	protected String tblBranch = "tbl_library_branch", tblCopies = "tbl_book_copies", tblLoans = "tbl_book_loans",
-			tblAuthor = "tbl_author";
-	protected String bookId = "bookId", branchId = "branchId", authorId = "authorId", branchName = "branchName",
-			authorName = "authorName", branchAddress = "branchAddress", noOfCopies = "noOfCopies", cardNo = "cardNo",
-			dateOut = "dateOut", dueDate = "dueDate", dateIn = "dateIn";
+			tblBook = "tbl_book", tblAuthor = "tbl_author", tblBookAuthor = "tbl_book_authors", tblBookGenre = "tbl_book_genres";
+	protected String bookId = "bookId", branchId = "branchId", authorId = "authorId", genreId = "genre_id", pubId = "pubId", branchName = "branchName",
+			title = "title", authorName = "authorName", branchAddress = "branchAddress", noOfCopies = "noOfCopies",
+			cardNo = "cardNo", dateOut = "dateOut", dueDate = "dueDate", dateIn = "dateIn";
 
 	protected ArrayList<Integer> getRelations(String table, String selfColumn, String otherColumn, Object selfId)
 			throws SQLException {
