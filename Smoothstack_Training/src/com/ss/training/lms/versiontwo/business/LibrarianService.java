@@ -83,6 +83,10 @@ public class LibrarianService extends LMSService {
 			e.printStackTrace();
 			return "The number of book copies was not successfully changed.";
 		}
+		branch.getCopies().stream().forEach(thisCopies -> {
+			if (thisCopies.getBookId() == book.getId())
+				thisCopies.setCopies(numCopies);
+		});
 		return "The number of book copies was successfully changed.";
 	}
 }

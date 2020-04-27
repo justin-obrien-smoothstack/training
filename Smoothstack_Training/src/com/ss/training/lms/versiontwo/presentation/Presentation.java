@@ -14,6 +14,7 @@ import com.ss.training.lms.versiontwo.business.BorrowerService;
 import com.ss.training.lms.versiontwo.business.LibrarianService;
 import com.ss.training.lms.versiontwo.object.Book;
 import com.ss.training.lms.versiontwo.object.Branch;
+import com.ss.training.lms.versiontwo.object.Copies;
 import com.ss.training.lms.versiontwo.object.LMSObject;
 import com.ss.training.lms.versiontwo.object.Loan;
 
@@ -74,7 +75,8 @@ public class Presentation {
 			returnBook = "Return a book", updateBranch = "Update branch information",
 			changeCopies = "Change the number of copies of a book at your branch", create = "Create", read = "Read",
 			update = "Update", delete = "Delete", cancelOperation = "Cancel the operation";
-	protected static final String operationCancelled = "The operation was cancelled.", operationFailed = "The operation";
+	protected static final String operationCancelled = "The operation was cancelled.",
+			operationFailed = "The operation";
 	protected static final String invalidSelection = "Error: That is not a valid selection.",
 			invalidCard = "Error: That is not a valid card number.",
 			invalidCopies = "Error: That is not a valid number of copies.";
@@ -450,14 +452,20 @@ public class Presentation {
 				System.out.println(librarianService.updateBranch(branchToManage));
 				continue;
 			case changeCopies:
-				int newNumberOfCopies;
+				int newNumberOfCopies, currentNumberOfCopies = 0;
 				branchToManage = (Branch) parameters.get(0);
 				Book bookToChangeCopies = (Book) PresUtils.getLMSObjectSelection(
 						(List<LMSObject>) librarianService.getAllObjects(LMS.book), changeCopiesBookPrompt, goBack);
 				if (bookToChangeCopies == null)
 					continue;
-				newNumberOfCopies = PresUtils.getNaturalNumber(changeCopiesNumberPrompt, invalidCopies);
-				System.out.println(librarianService.updateCopies(branchToManage, bookToChangeCopies, newNumberOfCopies));
+				for (Copies copies : branchToManage.getCopies())
+					if (copies.getBookId() == bookToChangeCopies.getId()) {
+						currentNumberOfCopies = copies.getCopies();
+						break;
+					}
+				newNumberOfCopies = PresUtils.getNaturalNumber(PresUtils.changeCopiesNumberPrompt(currentNumberOfCopies), invalidCopies);
+				System.out
+						.println(librarianService.updateCopies(branchToManage, bookToChangeCopies, newNumberOfCopies));
 				continue;
 			case checkoutBook:
 				cardNumber = (Integer) parameters.get(0);

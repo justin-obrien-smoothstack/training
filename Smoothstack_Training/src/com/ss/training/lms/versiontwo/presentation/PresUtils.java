@@ -13,10 +13,10 @@ import com.ss.training.lms.versiontwo.object.LMSObject;
  * @author Justin O'Brien
  */
 public class PresUtils {
-	
+
 	private static LMSService lmsService = new LMSService();
 	private static final Scanner scanner = new Scanner(System.in);
-	
+
 	/**
 	 * Gets a menu option selection from the user
 	 * 
@@ -42,7 +42,7 @@ public class PresUtils {
 			System.out.println(Presentation.invalidSelection);
 		}
 	}
-	
+
 	protected static int getNaturalNumber(String prompt, String errorMessage) {
 		int result;
 		for (;;) {
@@ -58,7 +58,12 @@ public class PresUtils {
 			System.out.println(errorMessage);
 		}
 	}
-	
+
+	protected static String changeCopiesNumberPrompt(int currentNumberOfCopies) {
+		return "Our records indicate that you currently have " + currentNumberOfCopies
+				+ " copies of this book. What is the new number of copies?";
+	}
+
 	/**
 	 * @param branchPk The primary key of the branch being updated
 	 * 
@@ -69,7 +74,7 @@ public class PresUtils {
 		return "Updating branch: " + branch.getDisplayName() + " (#" + branch.getId() + ")\nEnter " + cancelCode
 				+ " at any prompt to cancel the operation.";
 	}
-	
+
 	protected static String getStringWithMaxLength(String prompt, String fieldName, int maxLength) {
 		String result;
 		for (;;) {
@@ -80,10 +85,11 @@ public class PresUtils {
 			System.out.println("Error: Maximum " + fieldName + " length is " + maxLength + "characters.");
 		}
 	}
-	
+
 	protected static LMSObject getLMSObjectSelection(List<LMSObject> lmsObjects, String prompt, String negativeOption) {
 		int selectedOption;
-		ArrayList<String> options = lmsObjects.stream().map(object -> object.getDisplayName()).collect(Collectors.toCollection(ArrayList::new));
+		ArrayList<String> options = lmsObjects.stream().map(object -> object.getDisplayName())
+				.collect(Collectors.toCollection(ArrayList::new));
 		lmsObjects.add(0, null);
 		options.add(0, negativeOption);
 		selectedOption = getOptionSelection(prompt, options);
