@@ -129,6 +129,76 @@ public class AdminService extends LMSService {
 		return presentation.operationSucceeded;
 	}
 
+	public String readAuthors() {
+		StringBuilder output = new StringBuilder("\n");
+		ArrayList<Author> authors = (ArrayList<Author>) getAllObjects(LMS.author);
+		authors.stream().forEach(author -> {
+			output.append("\nID number: " + author.getId());
+			output.append("\nName: " + author.getName());
+			output.append("\nBooks: ");
+			getObjectsById(LMS.book, author.getBookIds()).stream()
+					.forEach(book -> output.append("\n\t" + ((Book) book).getDisplayName()));
+		});
+		output.append("\n");
+		return output.toString();
+	}
+
+	public String readBooks() {
+		StringBuilder output = new StringBuilder();
+		ArrayList<Book> books = (ArrayList<Book>) getAllObjects(LMS.book);
+		books.stream().forEach(book -> {
+			output.append("\nID number: " + book.getId());
+			output.append("\nTitle: " + book.getTitle());
+			output.append("\nAuthors: ");
+			getObjectsById(LMS.author, book.getAuthorIds()).stream()
+					.forEach(author -> output.append("\n\t" + ((Author) author).getDisplayName()));
+			output.append("\nGenres: ");
+			getObjectsById(LMS.genre, book.getGenreIds()).stream()
+					.forEach(genre -> output.append("\n\t" + ((Genre) genre).getDisplayName()));
+			output.append("\nPublisher: ");
+			if (book.getPubId() != null)
+				output.append(((Publisher) getObjectById(LMS.publisher, book.getPubId())).getName());
+			output.append("\nBranches with copies: ");
+			book.getCopies().stream().forEach(copies -> output.append("\n\t" + copies.getDisplayName()));
+			output.append("\nLoans: ");
+			book.getLoans().stream().forEach(loan -> output.append("\n\t" + loan.getDisplayName()));
+		});
+		output.append("\n");
+		return output.toString();
+	}
+
+	public String read() {
+		StringBuilder output = new StringBuilder("\n");
+		ArrayList<> = getAllObjects(LMS.);
+		
+		output.append("\n");
+		return output.toString();
+	}
+
+	public String read() {
+		StringBuilder output = new StringBuilder("\n");
+		ArrayList<> = getAllObjects(LMS.);
+		
+		output.append("\n");
+		return output.toString();
+	}
+
+	public String read() {
+		StringBuilder output = new StringBuilder("\n");
+		ArrayList<> = getAllObjects(LMS.);
+		
+		output.append("\n");
+		return output.toString();
+	}
+
+	public String read() {
+		StringBuilder output = new StringBuilder("\n");
+		ArrayList<> = getAllObjects(LMS.);
+		
+		output.append("\n");
+		return output.toString();
+	}
+
 	public String updateAuthor(Author author) {
 		try (Connection connection = getConnection()) {
 			new AuthorDAO(connection).update(author);
@@ -292,6 +362,10 @@ public class AdminService extends LMSService {
 			return presentation.operationFailed;
 		}
 		return presentation.operationSucceeded;
+	}
+
+	private void appendIfNotNull(StringBuilder stringBuilder, String string) {
+		stringBuilder.append(string == null ? "" : string);
 	}
 
 	private void completeBookUpdate(Book book, CopiesDAO copiesDAO, LoanDAO loanDAO)
