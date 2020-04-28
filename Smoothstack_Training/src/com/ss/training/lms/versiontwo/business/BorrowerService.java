@@ -1,21 +1,36 @@
 package com.ss.training.lms.versiontwo.business;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
+
+import com.ss.training.lms.versiontwo.LMS;
+import com.ss.training.lms.versiontwo.object.Branch;
+import com.ss.training.lms.versiontwo.object.Copies;
 
 /**
- * Provides business logic for LMS functions available to users who are borrowers
+ * Provides business logic for LMS functions available to users who are
+ * borrowers
  * 
  * @author Justin O'Brien
  */
-public class BorrowerService extends LMSService{
+public class BorrowerService extends LMSService {
+
+	public ArrayList<Branch> getBranchesWithBooks() {
+		return ((ArrayList<Branch>) getAllObjects(LMS.branch)).stream().filter(branch -> {
+			for (Copies copies : branch.getCopies())
+				if (copies.getCopies() != 0)
+					return true;
+			return false;
+		}).collect(Collectors.toCollection(ArrayList::new));
+	}
 
 	/**
 	 * @return Card numbers of all borrowers
 	 */
-	public ArrayList<Integer> getCardNumbers(){
+	public ArrayList<Integer> getCardNumbers() {
 		return new ArrayList<Integer>(); // placeholder
 	}
-	
+
 	/**
 	 * Gets primary keys, titles, and authors of all books available for checkout at
 	 * a library branch
@@ -64,5 +79,5 @@ public class BorrowerService extends LMSService{
 	public String returnBook(int cardNumber, int branchPk, int bookPk) {
 		return null; // placeholder
 	}
-	
+
 }

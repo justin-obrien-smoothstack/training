@@ -357,7 +357,7 @@ public class Presentation {
 		String objectType;
 		Object[][] bookPksTitlesAndAuthors;
 		ArrayList<Integer> bookPks = new ArrayList<Integer>();
-		Branch branchToManage;
+		Branch currentBranch;
 		Borrower currentBorrower;
 		for (;;) {
 			selectedOption = PresUtils.getOptionSelection(prompt, options);
@@ -372,7 +372,7 @@ public class Presentation {
 				currentBorrower = PresUtils.getBorrowerByCardNumber(cardPrompt);
 				if (currentBorrower == null)
 					continue;
-				//resetList(parameters, cardNumber);
+				resetList(parameters, currentBorrower);
 				presentMenu(genericPrompt, newArrayList(goBack, checkoutBook, returnBook), parameters);
 				break;
 			case admin:
@@ -380,38 +380,38 @@ public class Presentation {
 						crudBranches, crudBorrowers, override), parameters);
 				break;
 			case manageBranch:
-				branchToManage = (Branch) PresUtils.getLMSObjectSelection(
+				currentBranch = (Branch) PresUtils.getLMSObjectSelection(
 						(List<LMSObject>) librarianService.getAllObjects(LMS.branch), manageBranchPrompt, goBack);
-				if (branchToManage == null)
+				if (currentBranch == null)
 					return;
-				resetList(parameters, branchToManage);
+				resetList(parameters, currentBranch);
 				presentMenu(genericPrompt, newArrayList(goBack, updateBranch, changeCopies), parameters);
 				break;
 			case updateBranch:
 				final String noChange = "", newName, newAddress;
-				branchToManage = (Branch) parameters.get(0);
-				System.out.println(PresUtils.getBranchUpdateInfo(branchToManage, cancelCode));
+				currentBranch = (Branch) parameters.get(0);
+				System.out.println(PresUtils.getBranchUpdateInfo(currentBranch, cancelCode));
 				newName = PresUtils.getStringWithMaxLength(updateBranchNamePrompt, "name", maxStringFieldLength);
 				if (cancelCode.equals(newName))
 					continue;
 				if (!noChange.equals(newName))
-					branchToManage.setName(newName);
+					currentBranch.setName(newName);
 				newAddress = PresUtils.getStringWithMaxLength(updateBranchAddressPrompt, "address",
 						maxStringFieldLength);
 				if (cancelCode.equals(newAddress))
 					continue;
 				if (!noChange.equals(newAddress))
-					branchToManage.setAddress(newAddress);
-				System.out.println(librarianService.updateBranch(branchToManage));
+					currentBranch.setAddress(newAddress);
+				System.out.println(librarianService.updateBranch(currentBranch));
 				continue;
 			case changeCopies:
 				int newNumberOfCopies, currentNumberOfCopies = 0;
-				branchToManage = (Branch) parameters.get(0);
+				currentBranch = (Branch) parameters.get(0);
 				Book bookToChangeCopies = (Book) PresUtils.getLMSObjectSelection(
 						(List<LMSObject>) librarianService.getAllObjects(LMS.book), changeCopiesBookPrompt, goBack);
 				if (bookToChangeCopies == null)
 					continue;
-				for (Copies copies : branchToManage.getCopies())
+				for (Copies copies : currentBranch.getCopies())
 					if (copies.getBookId() == bookToChangeCopies.getId()) {
 						currentNumberOfCopies = copies.getCopies();
 						break;
@@ -423,14 +423,10 @@ public class Presentation {
 					continue;
 				}
 				System.out
-						.println(librarianService.updateCopies(branchToManage, bookToChangeCopies, newNumberOfCopies));
+						.println(librarianService.updateCopies(currentBranch, bookToChangeCopies, newNumberOfCopies));
 				continue;
 			case checkoutBook:
-				cardNumber = (Integer) parameters.get(0);
-				// must change to only show branches with available books
-				branchPk = getBranchSelection(checkoutBranchPrompt);
-				if (branchPk == 0)
-					continue;
+				currentBranch = PresUtils.getLMSObjectSelection(borrowerService.getBranchesWithBooks(), checkoutBookPrompt, goBack);
 				bookPksTitlesAndAuthors = borrowerService.getAvailableBookPksTitlesAndAuthors(branchPk);
 				prepareForIntCrossSelection(options, bookPks, (String[]) bookPksTitlesAndAuthors[1],
 						(Integer[]) bookPksTitlesAndAuthors[0]);
