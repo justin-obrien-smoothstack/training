@@ -29,6 +29,7 @@ public class AuthorDAO extends LMSDAO<Author> {
 			author.setId(resultSet.getInt(authorId));
 			author.setName(resultSet.getString(authorName));
 			author.setBookIds(getRelations(tblBookAuthor, authorId, bookId, author.getId()));
+			authors.add(author);
 		}
 		return authors;
 	}

@@ -52,7 +52,7 @@ public class Book extends LMSObject implements HasCopiesLoansAndIntegerId {
 		ArrayList<Author> authors = (ArrayList<Author>) new LMSService().getObjectsById(LMS.author, authorIds);
 		if (authors.size() != 0) {
 			displayName.append(" by " + authors.stream().map(author -> author.getName())
-					.reduce((partialList, nextName) -> partialList + ", " + nextName));
+					.reduce((partialList, nextName) -> partialList + ", " + nextName).get());
 		}
 		return displayName.toString();
 	}
