@@ -1,5 +1,7 @@
 package com.ss.training.lms.versiontwo.object;
 
+import java.util.ArrayList;
+
 /**
  * @author Justin O'Brien
  */
@@ -7,6 +9,11 @@ public class Publisher extends LMSObject {
 
 	private int id;
 	private String name, phone, address;
+	private ArrayList<Integer> bookIds;
+	
+	public Publisher() {
+		bookIds = new ArrayList<Integer>(); 
+	}
 	
 	@Override
 	public String getDisplayName() {
@@ -67,6 +74,20 @@ public class Publisher extends LMSObject {
 	 */
 	public void setAddress(String address) {
 		this.address = address;
+	}
+
+	/**
+	 * @return the bookIds
+	 */
+	public ArrayList<Integer> getBookIds() {
+		return bookIds;
+	}
+
+	/**
+	 * @param bookIds the bookIds to set
+	 */
+	public void setBookIds(ArrayList<Integer> bookIds) {
+		this.bookIds = bookIds;
 	}
 
 	@Override

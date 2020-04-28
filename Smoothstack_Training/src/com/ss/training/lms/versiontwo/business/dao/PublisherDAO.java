@@ -5,35 +5,47 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import com.ss.training.lms.versiontwo.object.Borrower;
+import com.ss.training.lms.versiontwo.object.Publisher;
+
 /**
  * @author Justin O'Brien
  */
-public class PublisherDAO extends LMSDAO {
+public class PublisherDAO extends LMSDAO<Publisher> {
 
 	/**
 	 * @param connnection
 	 */
 	public PublisherDAO(Connection connnection) {
 		super(connnection);
-		// TODO Auto-generated constructor stub
+		nativeTable = tblPublisher;
 	}
-	
-public void create() {
-		
+
+	public void create(Publisher publisher) {
+
 	}
-	
-	public void update() {
-		
+
+	public void update(Publisher publisher) {
+
 	}
-	
-	public void delete() {
-		
+
+	public void delete(Publisher publisher) {
+
 	}
 
 	@Override
-	public ArrayList extractData(ResultSet resultSet) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+	public ArrayList<Publisher> extractData(ResultSet resultSet) throws SQLException {
+		Publisher publisher;
+		ArrayList<Publisher> publishers = new ArrayList<Publisher>();
+		while (resultSet.next()) {
+			publisher = new Publisher();
+			publisher.setId(resultSet.getInt(publisherId));
+			publisher.setName(resultSet.getString(publisherName));
+			publisher.setAddress(resultSet.getString(publisherAddress));
+			publisher.setPhone(resultSet.getString(publisherPhone));
+			publishers.add(publisher);
+		}
+		return publishers;
 	}
 
 }
