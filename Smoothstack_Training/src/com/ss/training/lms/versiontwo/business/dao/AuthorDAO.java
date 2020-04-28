@@ -28,12 +28,8 @@ public class AuthorDAO extends LMSDAO<Author> {
 
 	public void update(Author author) throws ClassNotFoundException, SQLException {
 		Object[] queryArgs = { author.getName(), author.getId() };
-		ArrayList<Integer> bookIds = getRelations(tblBookAuthor, authorId, bookId, author.getId());
 		save("UPDATE" + nativeTable + " SET " + authorName + " = ? WHERE " + authorId + " = ?", queryArgs);
-		for (int thisBookId : bookIds) {
-			queryArgs = new Object[] { thisBookId, author.getId() };
-			save("INSERT INTO" + tblBookAuthor + "(" + bookId + ", " + authorId + ") VALUES (?, ?)", queryArgs);
-		}
+		updateRelations(author.getBookIds(), tblBookAuthor, authorId, bookId, author.getId());
 	}
 
 	public void delete(Author author) throws ClassNotFoundException, SQLException {
