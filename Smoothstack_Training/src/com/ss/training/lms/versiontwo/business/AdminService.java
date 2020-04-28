@@ -59,40 +59,31 @@ public class AdminService extends LMSService {
 		return null;
 	}
 
-	public void addNewPublisherToBooks(Publisher publisher, BookDAO bookDao) {
+	public void addNewPublisherToBooks(Publisher publisher, BookDAO bookDao) throws ClassNotFoundException, SQLException {
 		ArrayList<Book> books = (ArrayList<Book>) getAllObjects(LMS.book);
 		books = books.stream().filter(book -> publisher.getBookIds().contains(book.getId()))
 				.collect(Collectors.toCollection(ArrayList::new));
 		books.forEach(book -> book.setPubId(publisher.getId()));
-		try {
-			for (Book book : books)
-				bookDao.update(book);
-		} catch (Exception e) {
-			System.out.println("There was an error while updating the publisher's books.");
-			e.printStackTrace();
-		}
+		for (Book book : books)
+			bookDao.update(book);
 	}
 
-	public void updatePublisherBooks(Publisher oldPublisher, Publisher newPublisher, BookDAO bookDao) {
+	public void updatePublisherBooks(Publisher oldPublisher, Publisher newPublisher, BookDAO bookDao)
+			throws ClassNotFoundException, SQLException {
 		ArrayList<Integer> bookIdsToAdd = new ArrayList<Integer>(), bookIdsToRemove = new ArrayList<Integer>();
 		ArrayList<Book> booksToAdd, booksToRemove;
 		oldPublisher.getBookIds().stream().filter(oldBookId -> !newPublisher.getBookIds().contains(oldBookId))
 				.forEach(oldBookId -> bookIdsToRemove.add(oldBookId));
 		newPublisher.getBookIds().stream().filter(newBookId -> !oldPublisher.getBookIds().contains(newBookId))
-		.forEach(newBookId -> bookIdsToAdd.add(newBookId));
+				.forEach(newBookId -> bookIdsToAdd.add(newBookId));
 		booksToAdd = (ArrayList<Book>) getObjectsById(LMS.book, bookIdsToAdd);
 		booksToRemove = (ArrayList<Book>) getObjectsById(LMS.book, bookIdsToRemove);
 		booksToAdd.stream().forEach(book -> book.setPubId(newPublisher.getId()));
 		booksToRemove.stream().forEach(book -> book.setPubId(null));
-		try {
 		for (Book book : booksToAdd)
 			bookDao.update(book);
 		for (Book book : booksToRemove)
 			bookDao.update(book);
-		} catch (Exception e) {
-			System.out.println("An error occurred while updating the publisher's books.");
-		}
-		
 	}
 
 	/**
