@@ -21,17 +21,24 @@ public class BookDAO extends LMSDAO<Book> {
 		nativeTable = tblBook;
 	}
 
-	public void create() {
-
+	public void create(Book book) throws ClassNotFoundException, SQLException {
+		Object[] queryArgs = { book.getTitle(), book.getPubId() };
+		int thisBookId = saveWithPk("INSERT INTO" + nativeTable + "(" + title + ", " + pubId + ") VALUES (?,?)",
+				queryArgs);
+		createRelations(book.getAuthorIds(), tblBookAuthor, bookId, authorId, thisBookId);
+		createRelations(book.getGenreIds(), tblBookGenre, bookId, genreId, thisBookId);
 	}
 
-	public void update() {
-
+	public void update(Book book) throws ClassNotFoundException, SQLException {
+		Object[] queryArgs = { book.getTitle(), book.getPubId(), book.getId() };
+		save("UPDATE" + nativeTable + " SET " + title + " = ?, " + pubId + " = ? WHERE " + bookId + " = ?", queryArgs);
+		updateRelations(book.getAuthorIds(), tblBookAuthor, bookId, authorId, book.getId());
+		updateRelations(book.getGenreIds(), tblBookGenre, bookId, genreId, book.getId());
 	}
 
-	public void delete()
-	{
-
+	public void delete(Book book) throws ClassNotFoundException, SQLException {
+		Object[] queryArgs = { book.getId() };
+		save("DELETE FROM " + tblBook + " WHERE " + bookId + " = ?", queryArgs);
 	}
 
 	@Override
