@@ -20,17 +20,25 @@ public class LoanDAO extends LMSDAO<Loan> {
 		super(connnection);
 		nativeTable = tblLoans;
 	}
-	
-	public void create() {
-		
+
+	public void create(Loan loan) throws ClassNotFoundException, SQLException {
+		Object[] queryArgs = { loan.getBranchId(), loan.getBookId(), loan.getCardNo(), loan.getDateOut(),
+				loan.getDueDate(), loan.getDateIn() };
+		save("INSERT INTO " + nativeTable + " (" + branchId + ", " + bookId + cardNo + ", " + dateOut + ", " + dueDate
+				+ ", " + dateIn + ") VALUES (?, ?, ?, ?, ?, ?)", queryArgs);
 	}
-	
-	public void update() {
-		
+
+	public void update(Loan loan) throws ClassNotFoundException, SQLException {
+		Object[] queryArgs = { loan.getBranchId(), loan.getBookId(), loan.getCardNo(), loan.getDateOut(),
+				loan.getDueDate(), loan.getDateIn() };
+		save("UPDATE " + nativeTable + " SET " + dueDate + " = ?, " + dateIn + " = ? WHERE " + branchId + " = ? AND "
+				+ bookId + " = ? AND " + cardNo + " = ? AND " + dateOut + " = ?", queryArgs);
 	}
-	
-	public void delete() {
-		
+
+	public void delete(Loan loan) throws ClassNotFoundException, SQLException {
+		Object[] queryArgs = { loan.getBranchId(), loan.getBookId(), loan.getCardNo(), loan.getDateOut() };
+		save("DELETE FROM " + nativeTable + " WHERE " + branchId + " = ? AND " + bookId + " = ? AND " + cardNo
+				+ " = ? AND " + dateOut + " = ?", queryArgs);
 	}
 
 	@Override

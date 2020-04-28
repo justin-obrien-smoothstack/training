@@ -22,7 +22,7 @@ public class CopiesDAO extends LMSDAO<Copies> {
 
 	public void create(Copies copies) throws ClassNotFoundException, SQLException {
 		Object[] queryArgs = { copies.getCopies(), copies.getBranchId(), copies.getBookId() };
-		save("INSERT INTO " + nativeTable + "(" + noOfCopies + ", " + branchId + ", " + bookId + ") VALUES (?, ?, ?)",
+		save("INSERT INTO " + nativeTable + " (" + noOfCopies + ", " + branchId + ", " + bookId + ") VALUES (?, ?, ?)",
 				queryArgs);
 	}
 
