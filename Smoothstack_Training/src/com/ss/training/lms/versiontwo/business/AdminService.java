@@ -2,7 +2,6 @@ package com.ss.training.lms.versiontwo.business;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.stream.Collectors;
 
 import com.ss.training.lms.versiontwo.LMS;
@@ -59,7 +58,8 @@ public class AdminService extends LMSService {
 		return null;
 	}
 
-	public void addNewPublisherToBooks(Publisher publisher, BookDAO bookDao) throws ClassNotFoundException, SQLException {
+	public void addNewPublisherToBooks(Publisher publisher, BookDAO bookDao)
+			throws ClassNotFoundException, SQLException {
 		ArrayList<Book> books = (ArrayList<Book>) getAllObjects(LMS.book);
 		books = books.stream().filter(book -> publisher.getBookIds().contains(book.getId()))
 				.collect(Collectors.toCollection(ArrayList::new));

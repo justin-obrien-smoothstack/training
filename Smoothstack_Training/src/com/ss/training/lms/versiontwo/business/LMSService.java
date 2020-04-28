@@ -23,6 +23,7 @@ import com.ss.training.lms.versiontwo.object.Copies;
 import com.ss.training.lms.versiontwo.object.HasIntegerId;
 import com.ss.training.lms.versiontwo.object.LMSObject;
 import com.ss.training.lms.versiontwo.object.Loan;
+import com.ss.training.lms.versiontwo.object.Publisher;
 
 /**
  * @author Justin O'Brien
@@ -95,7 +96,7 @@ public class LMSService {
 		return branches;
 	}
 
-	public ArrayList<Borrower> completeBorrowerInfo(ArrayList<Borrower> borrowers) {
+	public ArrayList<Borrower> addLoansToBorrowers(ArrayList<Borrower> borrowers) {
 		ArrayList<Loan> loans = new ArrayList<Loan>();
 		try (Connection connection = getConnection()) {
 			loans.addAll(new LoanDAO(connection).readAll());
@@ -108,6 +109,15 @@ public class LMSService {
 					.forEach(loan -> borrower.getLoans().add(loan));
 		});
 		return borrowers;
+	}
+	
+	public ArrayList<Publisher> addBooksToPublishers(ArrayList<Publisher> publishers) {
+		ArrayList<Book> books = (ArrayList<Book>) getAllObjects(LMS.book);
+		publishers.stream().forEach(publisher -> {
+			books.stream().filter(book -> book.getPubId() == publisher.getId())
+					.forEach(book -> publisher.getBookIds().add(book.getId()));
+		});
+		return publishers;
 	}
 
 	public ArrayList<?> getAllObjects(String objectType) {
@@ -151,12 +161,18 @@ public class LMSService {
 		switch (objectType) {
 		case LMS.borrower:
 		case LMS.borrowers:
+			allObjects = addLoansToBorrowers(allObjects);
 			break;
 		case LMS.book:
 		case LMS.books:
+			allObjects = completeBookInfo(allObjects);
 		case LMS.branch:
 		case LMS.branches:
 			allObjects = completeBranchInfo(allObjects);
+			break;
+		case LMS.publisher:
+		case LMS.publishers:
+			allObjects = addBooksToPublishers(allObjects);
 			break;
 		}
 		return allObjects;
