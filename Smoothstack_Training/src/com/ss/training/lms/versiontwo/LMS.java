@@ -22,9 +22,8 @@ public class LMS {
 	public static void main(String[] args) {
 		ArrayList<String> rootMenuOptions = new ArrayList<String>();
 		ArrayList<Object> rootMenuParameters = new ArrayList<Object>();
-		Presentation presentation = Presentation.getInstance();
 		rootMenuOptions.addAll(Arrays.asList(
-				new String[] { presentation.exit, presentation.librarian, presentation.borrower, presentation.admin }));
-		presentation.presentMenu(presentation.rootMenuPrompt, rootMenuOptions, rootMenuParameters);
+				new String[] { Presentation.exit, Presentation.librarian, Presentation.borrower, Presentation.admin }));
+		new Presentation().presentMenu(Presentation.rootMenuPrompt, rootMenuOptions, rootMenuParameters);
 	}
 }

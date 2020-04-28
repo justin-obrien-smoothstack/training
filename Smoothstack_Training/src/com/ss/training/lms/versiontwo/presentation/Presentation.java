@@ -1,18 +1,16 @@
 package com.ss.training.lms.versiontwo.presentation;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
-import java.util.stream.Collectors;
 
 import com.ss.training.lms.versiontwo.LMS;
 import com.ss.training.lms.versiontwo.business.AdminService;
 import com.ss.training.lms.versiontwo.business.BorrowerService;
 import com.ss.training.lms.versiontwo.business.LibrarianService;
 import com.ss.training.lms.versiontwo.object.Book;
+import com.ss.training.lms.versiontwo.object.Borrower;
 import com.ss.training.lms.versiontwo.object.Branch;
 import com.ss.training.lms.versiontwo.object.Copies;
 import com.ss.training.lms.versiontwo.object.LMSObject;
@@ -25,38 +23,15 @@ import com.ss.training.lms.versiontwo.object.Loan;
  */
 public class Presentation {
 
-	/**
-	 * The single instance of this class
-	 */
-	static Presentation instance = null;
-
-	/**
-	 * Private constructor to make this class a singleton
-	 */
-	private Presentation() {
-
-	}
-
-	/**
-	 * Gets the single instance of this class
-	 * 
-	 * @return The single instance of this class
-	 */
-	public static Presentation getInstance() {
-		if (instance == null)
-			instance = new Presentation();
-		return instance;
-	}
-
 	private final int maxStringFieldLength = 45;
 	/**
 	 * Text shown to the user in menus
 	 */
-	public final String exit = "Exit", librarian = "Librarian", admin = "Administrator", borrower = "Borrower",
+	public static final String exit = "Exit", librarian = "Librarian", admin = "Administrator", borrower = "Borrower",
 			rootMenuPrompt = "Welcome to the library management system. Please indicate what type of user you are.",
 			operationFailed = "The operation did not succeed.", operationSucceeded = "The operation was successful.";
-	protected final String cancelCode = "0";
-	protected final String genericPrompt = "What would you like to do?",
+	protected static final String cancelCode = "0";
+	protected static final String genericPrompt = "What would you like to do?",
 			cardPrompt = "Enter your library card number, or enter " + cancelCode + " to go back.",
 			manageBranchPrompt = "Which branch do you manage?",
 			updateBranchNamePrompt = "What is the branch's new name? Enter a blank line if it hasn't changed.",
@@ -68,7 +43,7 @@ public class Presentation {
 			returnBranchPrompt = "Which branch would you like to return a book to?",
 			returnBookPrompt = "Which book would you like to return?",
 			overridePrompt = "Which loan would you like to override the due date of?";
-	protected final String goBack = "Return to the previous menu", manageBranch = "Manage your branch",
+	protected static final String goBack = "Return to the previous menu", manageBranch = "Manage your branch",
 			crud = "Create/Read/Update/Delete ", crudBooks = crud + "books", crudAuthors = crud + "authors",
 			crudGenres = crud + "genres", crudPublishers = crud + "publishers",
 			crudBranches = crud + "library branches", crudBorrowers = crud + "borrowers",
@@ -76,13 +51,13 @@ public class Presentation {
 			returnBook = "Return a book", updateBranch = "Update branch information",
 			changeCopies = "Change the number of copies of a book at your branch", create = "Create", read = "Read",
 			update = "Update", delete = "Delete", cancelOperation = "Cancel the operation";
-	protected final String operationCancelled = "The operation was cancelled.",
+	protected static final String operationCancelled = "The operation was cancelled.",
 			noChangesMade = "No changes have been made.";
-	protected final String invalidSelection = "Error: That is not a valid selection.",
+	protected static final String invalidSelection = "Error: That is not a valid selection.",
 			invalidCard = "Error: That is not a valid card number.",
 			invalidCopies = "Error: That is not a valid number of copies.";
 
-	protected final Scanner scanner = new Scanner(System.in);
+	protected static final Scanner scanner = new Scanner(System.in);
 
 	protected final LibrarianService librarianService = new LibrarianService();
 	protected final BorrowerService borrowerService = new BorrowerService();
@@ -214,30 +189,6 @@ public class Presentation {
 		prepareForIntCrossSelection(options, branchPks, (String[]) branchPksAndNames[1],
 				(Integer[]) branchPksAndNames[0]);
 		return getIntCrossSelection(prompt, options, branchPks);
-	}
-
-	/**
-	 * Gets the user's card number
-	 * 
-	 * @param prompt The prompt to show the user
-	 * @return The card number input by the user, or 0 if the user wants to go back
-	 *         to the previous menu
-	 */
-	protected int getCardNumber(String prompt) {
-		int cardNumber;
-		List<Integer> cardNumbers = borrowerService.getCardNumbers();
-		for (;;) {
-			System.out.println(prompt);
-			try {
-				cardNumber = Integer.parseInt(scanner.nextLine());
-			} catch (NumberFormatException e) {
-				System.out.println(invalidCard);
-				continue;
-			}
-			if (cardNumber == 0 || cardNumbers.contains(cardNumber))
-				return cardNumber;
-			System.out.println(invalidCard);
-		}
 	}
 
 	/**
@@ -407,6 +358,7 @@ public class Presentation {
 		Object[][] bookPksTitlesAndAuthors;
 		ArrayList<Integer> bookPks = new ArrayList<Integer>();
 		Branch branchToManage;
+		Borrower currentBorrower;
 		for (;;) {
 			selectedOption = PresUtils.getOptionSelection(prompt, options);
 			switch (options.get(selectedOption)) {
@@ -417,10 +369,10 @@ public class Presentation {
 				presentMenu(genericPrompt, newArrayList(goBack, manageBranch), parameters);
 				break;
 			case borrower:
-				cardNumber = getCardNumber(cardPrompt);
-				if (cardNumber == 0)
+				currentBorrower = PresUtils.getBorrowerByCardNumber(cardPrompt);
+				if (currentBorrower == null)
 					continue;
-				resetList(parameters, cardNumber);
+				//resetList(parameters, cardNumber);
 				presentMenu(genericPrompt, newArrayList(goBack, checkoutBook, returnBook), parameters);
 				break;
 			case admin:

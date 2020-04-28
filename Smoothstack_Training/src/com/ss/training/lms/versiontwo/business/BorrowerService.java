@@ -7,7 +7,7 @@ import java.util.ArrayList;
  * 
  * @author Justin O'Brien
  */
-public class BorrowerService {
+public class BorrowerService extends LMSService{
 
 	/**
 	 * @return Card numbers of all borrowers

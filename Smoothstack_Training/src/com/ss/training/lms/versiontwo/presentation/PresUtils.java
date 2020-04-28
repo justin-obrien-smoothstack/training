@@ -2,10 +2,11 @@ package com.ss.training.lms.versiontwo.presentation;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 import java.util.stream.Collectors;
 
-import com.ss.training.lms.versiontwo.business.LMSService;
+import com.ss.training.lms.versiontwo.LMS;
+import com.ss.training.lms.versiontwo.business.BorrowerService;
+import com.ss.training.lms.versiontwo.object.Borrower;
 import com.ss.training.lms.versiontwo.object.Branch;
 import com.ss.training.lms.versiontwo.object.LMSObject;
 
@@ -13,8 +14,6 @@ import com.ss.training.lms.versiontwo.object.LMSObject;
  * @author Justin O'Brien
  */
 public class PresUtils {
-
-	private static final Presentation presentation = Presentation.getInstance();
 
 	/**
 	 * Gets a menu option selection from the user
@@ -31,14 +30,14 @@ public class PresUtils {
 				System.out.println(i + ") " + options.get(i));
 			}
 			try {
-				selectionNumber = Integer.parseInt(presentation.scanner.nextLine());
+				selectionNumber = Integer.parseInt(Presentation.scanner.nextLine());
 			} catch (NumberFormatException e) {
-				System.out.println(presentation.invalidSelection);
+				System.out.println(Presentation.invalidSelection);
 				continue;
 			}
 			if (0 <= selectionNumber && selectionNumber < options.size())
 				return selectionNumber;
-			System.out.println(presentation.invalidSelection);
+			System.out.println(Presentation.invalidSelection);
 		}
 	}
 
@@ -47,7 +46,7 @@ public class PresUtils {
 		for (;;) {
 			System.out.println(prompt);
 			try {
-				result = Integer.parseInt(presentation.scanner.nextLine());
+				result = Integer.parseInt(Presentation.scanner.nextLine());
 			} catch (NumberFormatException e) {
 				System.out.println(errorMessage);
 				continue;
@@ -60,7 +59,8 @@ public class PresUtils {
 
 	protected static String changeCopiesNumberPrompt(int currentNumberOfCopies) {
 		return "Our records indicate that you currently have " + currentNumberOfCopies
-				+ (currentNumberOfCopies == 1 ? " copy" : " copies") + " of this book. What is the new number of copies?";
+				+ (currentNumberOfCopies == 1 ? " copy" : " copies")
+				+ " of this book. What is the new number of copies?";
 	}
 
 	/**
@@ -78,7 +78,7 @@ public class PresUtils {
 		String result;
 		for (;;) {
 			System.out.println(prompt);
-			result = presentation.scanner.nextLine();
+			result = Presentation.scanner.nextLine();
 			if (result.length() <= maxLength)
 				return result;
 			System.out.println("Error: Maximum " + fieldName + " length is " + maxLength + "characters.");
@@ -93,5 +93,32 @@ public class PresUtils {
 		options.add(0, negativeOption);
 		selectedOption = getOptionSelection(prompt, options);
 		return lmsObjects.get(selectedOption);
+	}
+
+	/**
+	 * Gets the user's card number
+	 * 
+	 * @param prompt The prompt to show the user
+	 * @return The card number input by the user, or 0 if the user wants to go back
+	 *         to the previous menu
+	 */
+	protected static Borrower getBorrowerByCardNumber(String prompt) {
+		int cardNumber;
+		ArrayList<Borrower> borrowers = (ArrayList<Borrower>) new BorrowerService().getAllObjects(LMS.borrower);
+		for (;;) {
+			System.out.println(prompt);
+			try {
+				cardNumber = Integer.parseInt(Presentation.scanner.nextLine());
+			} catch (NumberFormatException e) {
+				System.out.println(Presentation.invalidCard);
+				continue;
+			}
+			if (cardNumber == 0)
+				return null;
+			for (Borrower borrower : borrowers)
+				if (cardNumber == borrower.getCardNo())
+					return borrower;
+			System.out.println(Presentation.invalidCard);
+		}
 	}
 }

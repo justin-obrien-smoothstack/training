@@ -23,6 +23,7 @@ import com.ss.training.lms.versiontwo.object.Genre;
 import com.ss.training.lms.versiontwo.object.LMSObject;
 import com.ss.training.lms.versiontwo.object.Loan;
 import com.ss.training.lms.versiontwo.object.Publisher;
+import com.ss.training.lms.versiontwo.presentation.Presentation;
 
 /**
  * Provides business logic for LMS functions available to users who are
@@ -38,9 +39,9 @@ public class AdminService extends LMSService {
 			connection.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return presentation.operationFailed;
+			return Presentation.operationFailed;
 		}
-		return presentation.operationSucceeded;
+		return Presentation.operationSucceeded;
 	}
 
 	public String createBook(Book book) {
@@ -60,9 +61,9 @@ public class AdminService extends LMSService {
 			connection.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return presentation.operationFailed;
+			return Presentation.operationFailed;
 		}
-		return presentation.operationSucceeded;
+		return Presentation.operationSucceeded;
 	}
 
 	public String createBorrower(Borrower borrower) {
@@ -77,9 +78,9 @@ public class AdminService extends LMSService {
 			connection.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return presentation.operationFailed;
+			return Presentation.operationFailed;
 		}
-		return presentation.operationSucceeded;
+		return Presentation.operationSucceeded;
 	}
 
 	public String createBranch(Branch branch) {
@@ -99,9 +100,9 @@ public class AdminService extends LMSService {
 			connection.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return presentation.operationFailed;
+			return Presentation.operationFailed;
 		}
-		return presentation.operationSucceeded;
+		return Presentation.operationSucceeded;
 	}
 
 	public String createGenre(Genre genre) {
@@ -110,9 +111,9 @@ public class AdminService extends LMSService {
 			connection.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return presentation.operationFailed;
+			return Presentation.operationFailed;
 		}
-		return presentation.operationSucceeded;
+		return Presentation.operationSucceeded;
 	}
 
 	public String createPublisher(Publisher publisher) {
@@ -124,9 +125,9 @@ public class AdminService extends LMSService {
 			connection.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return presentation.operationFailed;
+			return Presentation.operationFailed;
 		}
-		return presentation.operationSucceeded;
+		return Presentation.operationSucceeded;
 	}
 
 	public String readAuthors() {
@@ -241,9 +242,9 @@ public class AdminService extends LMSService {
 			connection.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return presentation.operationFailed;
+			return Presentation.operationFailed;
 		}
-		return presentation.operationSucceeded;
+		return Presentation.operationSucceeded;
 	}
 
 	public String updateBook(Book book) {
@@ -257,9 +258,9 @@ public class AdminService extends LMSService {
 			connection.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return presentation.operationFailed;
+			return Presentation.operationFailed;
 		}
-		return presentation.operationSucceeded;
+		return Presentation.operationSucceeded;
 	}
 
 	public String updateBorrower(Borrower borrower) {
@@ -271,9 +272,9 @@ public class AdminService extends LMSService {
 			connection.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return presentation.operationFailed;
+			return Presentation.operationFailed;
 		}
-		return presentation.operationSucceeded;
+		return Presentation.operationSucceeded;
 	}
 
 	public String updateBranch(Branch branch) {
@@ -287,9 +288,9 @@ public class AdminService extends LMSService {
 			connection.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return presentation.operationFailed;
+			return Presentation.operationFailed;
 		}
-		return presentation.operationSucceeded;
+		return Presentation.operationSucceeded;
 	}
 
 	public String updateGenre(Genre genre) {
@@ -298,9 +299,9 @@ public class AdminService extends LMSService {
 			connection.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return presentation.operationFailed;
+			return Presentation.operationFailed;
 		}
-		return presentation.operationSucceeded;
+		return Presentation.operationSucceeded;
 	}
 
 	public String updatePublisher(Publisher publisher) {
@@ -310,9 +311,9 @@ public class AdminService extends LMSService {
 			connection.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return presentation.operationFailed;
+			return Presentation.operationFailed;
 		}
-		return presentation.operationSucceeded;
+		return Presentation.operationSucceeded;
 	}
 
 	public String deleteAuthor(Author author) {
@@ -321,9 +322,9 @@ public class AdminService extends LMSService {
 			connection.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return presentation.operationFailed;
+			return Presentation.operationFailed;
 		}
-		return presentation.operationSucceeded;
+		return Presentation.operationSucceeded;
 	}
 
 	public String deleteBook(Book book) {
@@ -340,9 +341,9 @@ public class AdminService extends LMSService {
 			connection.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return presentation.operationFailed;
+			return Presentation.operationFailed;
 		}
-		return presentation.operationSucceeded;
+		return Presentation.operationSucceeded;
 	}
 
 	public String deleteBorrower(Borrower borrower) {
@@ -355,9 +356,9 @@ public class AdminService extends LMSService {
 			connection.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return presentation.operationFailed;
+			return Presentation.operationFailed;
 		}
-		return presentation.operationSucceeded;
+		return Presentation.operationSucceeded;
 	}
 
 	public String deleteBranch(Branch branch) {
@@ -373,9 +374,9 @@ public class AdminService extends LMSService {
 			connection.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return presentation.operationFailed;
+			return Presentation.operationFailed;
 		}
-		return presentation.operationSucceeded;
+		return Presentation.operationSucceeded;
 	}
 
 	public String deleteGenre(Genre genre) {
@@ -384,9 +385,9 @@ public class AdminService extends LMSService {
 			connection.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return presentation.operationFailed;
+			return Presentation.operationFailed;
 		}
-		return presentation.operationSucceeded;
+		return Presentation.operationSucceeded;
 	}
 
 	public String deletePublisher(Publisher publisher) {
@@ -395,9 +396,9 @@ public class AdminService extends LMSService {
 			connection.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return presentation.operationFailed;
+			return Presentation.operationFailed;
 		}
-		return presentation.operationSucceeded;
+		return Presentation.operationSucceeded;
 	}
 
 	private void appendIfNotNull(StringBuilder stringBuilder, String string) {
