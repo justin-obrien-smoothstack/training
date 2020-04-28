@@ -21,13 +21,13 @@ public class CopiesDAO extends LMSDAO<Copies> {
 	}
 
 	public void create(Copies copies) throws ClassNotFoundException, SQLException {
-		Object[] queryArgs = { copies.getCopies(), copies.getBranchId(), copies.getBookId() };
+		Object[] queryArgs = { copies.getCopies(), copies.getBookId(), copies.getBookId() };
 		save("INSERT INTO " + nativeTable + "(" + noOfCopies + ", " + branchId + ", " + bookId + ") VALUES (?, ?, ?)",
 				queryArgs);
 	}
 
 	public void update(Copies copies) throws ClassNotFoundException, SQLException {
-		Object[] queryArgs = { copies.getCopies(), copies.getBranchId(), copies.getBookId() };
+		Object[] queryArgs = { copies.getCopies(), copies.getBookId(), copies.getBookId() };
 		save("UPDATE " + nativeTable + " SET " + noOfCopies + " = ? WHERE " + branchId + " = ? AND " + bookId + " = ?",
 				queryArgs);
 	}

@@ -1,5 +1,7 @@
 package com.ss.training.lms.versiontwo.object;
 
+import java.util.ArrayList;
+
 /**
  * @author Justin O'Brien
  */
@@ -7,6 +9,11 @@ public class Borrower extends LMSObject implements HasIntegerId {
 
 	private int cardNo;
 	private String name, address, phone;
+	private ArrayList<Loan> loans;
+	
+	public Borrower(){
+		loans = new ArrayList<Loan>();
+	}
 	
 	/**
 	 * @return the cardNo
@@ -72,6 +79,20 @@ public class Borrower extends LMSObject implements HasIntegerId {
 		setCardNo(id);
 	}
 	
+	/**
+	 * @return the loans
+	 */
+	public ArrayList<Loan> getLoans() {
+		return loans;
+	}
+
+	/**
+	 * @param loans the loans to set
+	 */
+	public void setLoans(ArrayList<Loan> loans) {
+		this.loans = loans;
+	}
+
 	@Override
 	public String getDisplayName() {
 		return name == null ? "(name not found)" : getName();
@@ -98,7 +119,4 @@ public class Borrower extends LMSObject implements HasIntegerId {
 			return false;
 		return true;
 	}
-	
-	
-
 }

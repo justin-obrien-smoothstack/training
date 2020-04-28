@@ -16,9 +16,10 @@ import com.ss.training.lms.versiontwo.business.dao.BranchDAO;
 import com.ss.training.lms.versiontwo.business.dao.CopiesDAO;
 import com.ss.training.lms.versiontwo.business.dao.LMSDAO;
 import com.ss.training.lms.versiontwo.business.dao.LoanDAO;
-import com.ss.training.lms.versiontwo.object.Author;
+import com.ss.training.lms.versiontwo.object.Book;
+import com.ss.training.lms.versiontwo.object.Borrower;
+import com.ss.training.lms.versiontwo.object.Branch;
 import com.ss.training.lms.versiontwo.object.Copies;
-import com.ss.training.lms.versiontwo.object.HasCopiesLoansAndIntegerId;
 import com.ss.training.lms.versiontwo.object.HasIntegerId;
 import com.ss.training.lms.versiontwo.object.LMSObject;
 import com.ss.training.lms.versiontwo.object.Loan;
@@ -54,8 +55,8 @@ public class LMSService {
 		return connection;
 	}
 
-	public ArrayList<HasCopiesLoansAndIntegerId> completeCopiesAndLoansInfo(
-			ArrayList<HasCopiesLoansAndIntegerId> hasCopiesAndLoans) {
+	public ArrayList<Book> completeBookInfo(
+			ArrayList<Book> books) {
 		ArrayList<Copies> copieses = new ArrayList<Copies>();
 		ArrayList<Loan> loans = new ArrayList<Loan>();
 		try (Connection connection = getConnection()) {
@@ -65,13 +66,48 @@ public class LMSService {
 			printRetrievalErrorMessage(LMS.loans + " and " + LMS.copieses + " for a " + LMS.branch);
 			e.printStackTrace();
 		}
-		hasCopiesAndLoans.stream().forEach(object -> {
-			copieses.stream().filter(copies -> copies.getBranchId() == object.getId())
-					.forEach(copies -> object.getCopies().add(copies));
-			loans.stream().filter(loan -> loan.getBranchId() == object.getId())
-					.forEach(loan -> object.getLoans().add(loan));
+		books.stream().forEach(book -> {
+			copieses.stream().filter(copies -> copies.getBookId() == book.getId())
+					.forEach(copies -> book.getCopies().add(copies));
+			loans.stream().filter(loan -> loan.getBookId() == book.getId())
+					.forEach(loan -> book.getLoans().add(loan));
 		});
-		return hasCopiesAndLoans;
+		return books;
+	}
+	
+	public ArrayList<Branch> completeBranchInfo(
+			ArrayList<Branch> branches) {
+		ArrayList<Copies> copieses = new ArrayList<Copies>();
+		ArrayList<Loan> loans = new ArrayList<Loan>();
+		try (Connection connection = getConnection()) {
+			copieses.addAll(new CopiesDAO(connection).readAll());
+			loans.addAll(new LoanDAO(connection).readAll());
+		} catch (Exception e) {
+			printRetrievalErrorMessage(LMS.loans + " and " + LMS.copieses + " for a " + LMS.branch);
+			e.printStackTrace();
+		}
+		branches.stream().forEach(branch -> {
+			copieses.stream().filter(copies -> copies.getBookId() == branch.getId())
+					.forEach(copies -> branch.getCopies().add(copies));
+			loans.stream().filter(loan -> loan.getBranchId() == branch.getId())
+					.forEach(loan -> branch.getLoans().add(loan));
+		});
+		return branches;
+	}
+
+	public ArrayList<Borrower> completeBorrowerInfo(ArrayList<Borrower> borrowers) {
+		ArrayList<Loan> loans = new ArrayList<Loan>();
+		try (Connection connection = getConnection()) {
+			loans.addAll(new LoanDAO(connection).readAll());
+		} catch (Exception e) {
+			printRetrievalErrorMessage(LMS.loans + " for a " + LMS.borrower);
+			e.printStackTrace();
+		}
+		borrowers.stream().forEach(borrower -> {
+			loans.stream().filter(loan -> loan.getCardNo() == borrower.getCardNo())
+					.forEach(loan -> borrower.getLoans().add(loan));
+		});
+		return borrowers;
 	}
 
 	public ArrayList<?> getAllObjects(String objectType) {
@@ -120,7 +156,7 @@ public class LMSService {
 		case LMS.books:
 		case LMS.branch:
 		case LMS.branches:
-			allObjects = completeCopiesAndLoansInfo(allObjects);
+			allObjects = completeBranchInfo(allObjects);
 			break;
 		}
 		return allObjects;

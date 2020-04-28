@@ -61,7 +61,7 @@ public class Copies extends LMSObject {
 	/**
 	 * @return the branchId
 	 */
-	public int getBranchId() {
+	public int getBookId() {
 		return branchId;
 	}
 

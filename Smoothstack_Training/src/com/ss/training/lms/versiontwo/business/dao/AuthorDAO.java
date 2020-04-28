@@ -22,7 +22,7 @@ public class AuthorDAO extends LMSDAO<Author> {
 
 	public void create(Author author) throws ClassNotFoundException, SQLException {
 		Object[] queryArgs = { author.getName() };
-		int thisAuthorId = saveWithPk("INSERT INTO" + nativeTable + "(" + authorName + ") VALUES (?)", queryArgs);
+		int thisAuthorId = saveWithPk("INSERT INTO " + nativeTable + " (" + authorName + ") VALUES (?)", queryArgs);
 		createRelations(author.getBookIds(), tblBookAuthor, authorId, bookId, thisAuthorId);
 	}
 
@@ -34,7 +34,7 @@ public class AuthorDAO extends LMSDAO<Author> {
 
 	public void delete(Author author) throws ClassNotFoundException, SQLException {
 		Object[] queryArgs = { author.getId() };
-		save("DELETE FROM " + tblAuthor + " WHERE " + authorId + " = ?", queryArgs);
+		save("DELETE FROM " + nativeTable + " WHERE " + authorId + " = ?", queryArgs);
 	}
 
 	@Override
