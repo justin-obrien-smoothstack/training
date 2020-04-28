@@ -71,7 +71,6 @@ public class AdminService extends LMSService {
 		try (Connection connection = getConnection()) {
 			loanDAO = new LoanDAO(connection);
 			cardNo = new BorrowerDAO(connection).create(borrower);
-			new BorrowerDAO(connection).create(borrower);
 			borrower.getLoans().stream().forEach(loan -> loan.setCardNo(cardNo));
 			for (Loan loan : borrower.getLoans())
 				loanDAO.create(loan);
@@ -148,12 +147,7 @@ public class AdminService extends LMSService {
 			copiesDAO = new CopiesDAO(connection);
 			loanDAO = new LoanDAO(connection);
 			new BookDAO(connection).update(book);
-			book.getCopies().stream().forEach(copies -> copies.setBookId(bookId));
-			book.getLoans().stream().forEach(loan -> loan.setBookId(bookId));
-			for (Copies copies : book.getCopies())
-				copiesDAO.update(copies);
-			for (Loan loan : book.getLoans())
-				loanDAO.update(loan);
+			completeBookUpdate(book, copiesDAO, loanDAO);
 			connection.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -163,15 +157,11 @@ public class AdminService extends LMSService {
 	}
 
 	public String updateBorrower(Borrower borrower) {
-		int cardNo;
 		LoanDAO loanDAO;
 		try (Connection connection = getConnection()) {
 			loanDAO = new LoanDAO(connection);
-			cardNo = new BorrowerDAO(connection).update(borrower);
 			new BorrowerDAO(connection).update(borrower);
-			borrower.getLoans().stream().forEach(loan -> loan.setCardNo(cardNo));
-			for (Loan loan : borrower.getLoans())
-				loanDAO.update(loan);
+			completeBorrowerUpdate(borrower, loanDAO);
 			connection.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -181,19 +171,13 @@ public class AdminService extends LMSService {
 	}
 
 	public String updateBranch(Branch branch) {
-		int branchId;
 		CopiesDAO copiesDAO;
 		LoanDAO loanDAO;
 		try (Connection connection = getConnection()) {
 			copiesDAO = new CopiesDAO(connection);
 			loanDAO = new LoanDAO(connection);
-			branchId = new BranchDAO(connection).update(branch);
-			branch.getCopies().stream().forEach(copies -> copies.setBranchId(branchId));
-			branch.getLoans().stream().forEach(loan -> loan.setBranchId(branchId));
-			for (Copies copies : branch.getCopies())
-				copiesDAO.update(copies);
-			for (Loan loan : branch.getLoans())
-				loanDAO.update(loan);
+			new BranchDAO(connection).update(branch);
+			completeBranchUpdate(branch, copiesDAO, loanDAO);
 			connection.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -214,11 +198,9 @@ public class AdminService extends LMSService {
 	}
 
 	public String updatePublisher(Publisher publisher) {
-		BookDAO bookDAO;
 		try (Connection connection = getConnection()) {
-			bookDAO = new BookDAO(connection);
-			publisher.setId(new PublisherDAO(connection).update(publisher));
-			addNewPublisherToBooks(publisher, bookDAO);
+			updatePublisherBooks(publisher, new BookDAO(connection));
+			new PublisherDAO(connection).update(publisher);
 			connection.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -338,6 +320,48 @@ public class AdminService extends LMSService {
 				loanDAO.delete(loan);
 	}
 
+	private void completeBorrowerUpdate(Borrower borrower, LoanDAO loanDAO)
+			throws ClassNotFoundException, SQLException {
+		ArrayList<Loan> oldLoans = loanDAO.readAll().stream().filter(loan -> loan.getCardNo() == borrower.getCardNo())
+				.collect(Collectors.toCollection(ArrayList::new));
+		for (Loan loan : borrower.getLoans()) {
+			if (oldLoans.contains(loan))
+				loanDAO.update(loan);
+			else
+				loanDAO.create(loan);
+		}
+		for (Loan loan : oldLoans)
+			if (!borrower.getLoans().contains(loan))
+				loanDAO.delete(loan);
+	}
+
+	private void completeBranchUpdate(Branch branch, CopiesDAO copiesDAO, LoanDAO loanDAO)
+			throws ClassNotFoundException, SQLException {
+		ArrayList<Copies> oldCopies = copiesDAO.readAll().stream()
+				.filter(copies -> copies.getBranchId() == branch.getId())
+				.collect(Collectors.toCollection(ArrayList::new));
+		ArrayList<Loan> oldLoans = loanDAO.readAll().stream().filter(loan -> loan.getBranchId() == branch.getId())
+				.collect(Collectors.toCollection(ArrayList::new));
+		for (Copies copies : branch.getCopies()) {
+			if (oldCopies.contains(copies))
+				copiesDAO.update(copies);
+			else
+				copiesDAO.create(copies);
+		}
+		for (Copies copies : oldCopies)
+			if (!branch.getCopies().contains(copies))
+				copiesDAO.delete(copies);
+		for (Loan loan : branch.getLoans()) {
+			if (oldLoans.contains(loan))
+				loanDAO.update(loan);
+			else
+				loanDAO.create(loan);
+		}
+		for (Loan loan : oldLoans)
+			if (!branch.getLoans().contains(loan))
+				loanDAO.delete(loan);
+	}
+
 	public LMSObject getBlankObject(String objectType) {
 		switch (objectType) {
 		case LMS.book:
@@ -370,8 +394,9 @@ public class AdminService extends LMSService {
 			bookDAO.update(book);
 	}
 
-	public void updatePublisherBooks(Publisher oldPublisher, Publisher newPublisher, BookDAO bookDao)
+	public void updatePublisherBooks(Publisher newPublisher, BookDAO bookDAO)
 			throws ClassNotFoundException, SQLException {
+		Publisher oldPublisher = (Publisher) getObjectById(LMS.publisher, newPublisher.getId());
 		ArrayList<Integer> bookIdsToAdd = new ArrayList<Integer>(), bookIdsToRemove = new ArrayList<Integer>();
 		ArrayList<Book> booksToAdd, booksToRemove;
 		oldPublisher.getBookIds().stream().filter(oldBookId -> !newPublisher.getBookIds().contains(oldBookId))
@@ -383,9 +408,9 @@ public class AdminService extends LMSService {
 		booksToAdd.stream().forEach(book -> book.setPubId(newPublisher.getId()));
 		booksToRemove.stream().forEach(book -> book.setPubId(null));
 		for (Book book : booksToAdd)
-			bookDao.update(book);
+			bookDAO.update(book);
 		for (Book book : booksToRemove)
-			bookDao.update(book);
+			bookDAO.update(book);
 	}
 
 	/**
