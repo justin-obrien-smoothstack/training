@@ -21,16 +21,21 @@ public class PublisherDAO extends LMSDAO<Publisher> {
 		nativeTable = tblPublisher;
 	}
 
-	public void create(Publisher publisher) {
-
+	public int create(Publisher publisher) throws ClassNotFoundException, SQLException {
+		Object[] queryArgs = { publisher.getName(), publisher.getAddress(), publisher.getPhone() };
+		return saveWithPk("INSERT INTO " + nativeTable + " (" + publisherName + ", " + publisherAddress + ", "
+				+ publisherPhone + ") VALUES (?, ?, ?)", queryArgs);
 	}
 
-	public void update(Publisher publisher) {
-
+	public void update(Publisher publisher) throws ClassNotFoundException, SQLException {
+		Object[] queryArgs = { publisher.getName(), publisher.getAddress(), publisher.getPhone(), publisher.getId() };
+		save("UPDATE " + nativeTable + " SET " + publisherName + " = ?, " + publisherAddress + " = ?, " + publisherPhone
+				+ " = ? WHERE " + publisherId + " = ?", queryArgs);
 	}
 
-	public void delete(Publisher publisher) {
-
+	public void delete(Publisher publisher) throws ClassNotFoundException, SQLException {
+		Object[] queryArgs = { publisher.getId() };
+		save("DELETE FROM " + nativeTable + " WHERE " + publisherId + " = ?", queryArgs);
 	}
 
 	@Override
