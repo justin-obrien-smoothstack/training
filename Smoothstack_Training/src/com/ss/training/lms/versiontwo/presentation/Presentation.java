@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import com.ss.training.lms.versiontwo.LMS;
 import com.ss.training.lms.versiontwo.business.AdminService;
@@ -42,7 +43,8 @@ public class Presentation {
 			checkoutBookPrompt = "Which book would you like to check out?",
 			returnBranchPrompt = "Which branch would you like to return a book to?",
 			returnBookPrompt = "Which book would you like to return?",
-			overridePrompt = "Which loan would you like to override the due date of?";
+			overridePrompt = "Which loan would you like to override the due date of?",
+			adminCardPrompt = "Enter the borrower's card number, or enter " + cancelCode + " to go back.";
 	protected static final String goBack = "Return to the previous menu", manageBranch = "Manage your branch",
 			crud = "Create/Read/Update/Delete ", crudBooks = crud + "books", crudAuthors = crud + "authors",
 			crudGenres = crud + "genres", crudPublishers = crud + "publishers",
@@ -105,90 +107,6 @@ public class Presentation {
 		ArrayList<String> result = new ArrayList<String>();
 		Collections.addAll(result, elements);
 		return result;
-	}
-
-	/**
-	 * Prepares to select an integer based on the user's selection of string
-	 * 
-	 * @param userOptions      The list that will contain the options to be
-	 *                         presented to the user
-	 * @param crossOptions     The list that will contain the integers that can be
-	 *                         selected based on the user's choice
-	 * @param userOptionArray  The options to be presented to the user, other than
-	 *                         returning to the previous menu
-	 * @param crossOptionArray The integers that can be selected based on the user's
-	 *                         choice, other than that corresponding to returning to
-	 *                         the previous menu
-	 */
-	protected void prepareForIntCrossSelection(List<String> userOptions, List<Integer> crossOptions,
-			String[] userOptionArray, Integer[] crossOptionArray) {
-		resetList(userOptions, userOptionArray);
-		resetList(crossOptions, crossOptionArray);
-		userOptions.add(0, goBack);
-		crossOptions.add(0, 0);
-	}
-
-	/**
-	 * Prepares to select an integer based on the user's selection of string
-	 * 
-	 * @param userOptions      The list that will contain the options to be
-	 *                         presented to the user
-	 * @param crossOptions     The list that will contain the integers that can be
-	 *                         selected based on the user's choice
-	 * @param userOptionArray  The options to be presented to the user, other than
-	 *                         returning to the previous menu
-	 * @param crossOptionArray The integers that can be selected based on the user's
-	 *                         choice, other than that corresponding to returning to
-	 *                         the previous menu
-	 */
-	protected void prepareForLoanCrossSelection(List<String> userOptions, List<Loan> crossOptions,
-			String[] userOptionArray, Loan[] crossOptionArray) {
-		resetList(userOptions, userOptionArray);
-		resetList(crossOptions, crossOptionArray);
-		userOptions.add(0, goBack);
-		crossOptions.add(0, null);
-	}
-
-	/**
-	 * Gets a selection from the user and chooses a corresponding integer
-	 * 
-	 * @param prompt       The prompt to show the user
-	 * @param userOptions  The options presented to the user
-	 * @param crossOptions The integers that can be selected based on the user's
-	 *                     choice
-	 * @return The integer corresponding to the option chosen by the user
-	 */
-	protected int getIntCrossSelection(String prompt, List<String> userOptions, List<Integer> crossOptions) {
-		return crossOptions.get(PresUtils.getOptionSelection(prompt, userOptions));
-	}
-
-	/**
-	 * Gets a selection from the user and chooses a corresponding book loan
-	 * 
-	 * @param prompt       The prompt to show the user
-	 * @param userOptions  The options presented to the user
-	 * @param crossOptions The book loans that can be selected based on the user's
-	 *                     choice
-	 * @return The book loan corresponding to the option chosen by the user
-	 */
-	protected Loan getLoanCrossSelection(String prompt, List<String> userOptions, List<Loan> crossOptions) {
-		return crossOptions.get(PresUtils.getOptionSelection(prompt, userOptions));
-	}
-
-	/**
-	 * Gets a library branch selection from the user
-	 * 
-	 * @param prompt The prompt to show the user
-	 * @return Primary key of the selected branch, or 0 if the user wants to go back
-	 *         to the previous menu
-	 */
-	protected int getBranchSelection(String prompt) {
-		ArrayList<String> options = new ArrayList<String>();
-		ArrayList<Integer> branchPks = new ArrayList<Integer>();
-		Object[][] branchPksAndNames = librarianService.getBranchPksAndNames();
-		prepareForIntCrossSelection(options, branchPks, (String[]) branchPksAndNames[1],
-				(Integer[]) branchPksAndNames[0]);
-		return getIntCrossSelection(prompt, options, branchPks);
 	}
 
 	/**
@@ -423,30 +341,29 @@ public class Presentation {
 					System.out.println(noChangesMade);
 					continue;
 				}
-				System.out
-						.println(librarianService.updateCopies(currentBranch, bookToChangeCopies, newNumberOfCopies));
+				System.out.println(librarianService.updateCopies(currentBranch, bookToChangeCopies, newNumberOfCopies));
 				continue;
 			case checkoutBook:
 				currentBorrower = (Borrower) parameters.get(0);
 				currentBranch = (Branch) PresUtils.getLMSObjectSelection(borrowerService.getBranchesWithBooks(),
 						checkoutBranchPrompt, goBack);
-				if(currentBranch == null)
+				if (currentBranch == null)
 					continue;
 				currentBook = (Book) PresUtils.getLMSObjectSelection(borrowerService.getAvailableBooks(currentBranch),
 						checkoutBookPrompt, goBack);
-				if(currentBook == null)
+				if (currentBook == null)
 					continue;
 				System.out.println(borrowerService.checkoutBook(currentBorrower, currentBranch, currentBook));
 				continue;
 			case returnBook:
 				currentBorrower = (Borrower) parameters.get(0);
-				currentBranch = (Branch) PresUtils.getLMSObjectSelection(borrowerService.getBranchesWithLoans(currentBorrower),
-						checkoutBranchPrompt, goBack);
-				if(currentBranch == null)
+				currentBranch = (Branch) PresUtils.getLMSObjectSelection(
+						borrowerService.getBranchesWithLoans(currentBorrower), checkoutBranchPrompt, goBack);
+				if (currentBranch == null)
 					continue;
-				currentBook = (Book) PresUtils.getLMSObjectSelection(borrowerService.getReturnableBooks(currentBorrower, currentBranch),
-						returnBookPrompt, goBack);
-				if(currentBook == null)
+				currentBook = (Book) PresUtils.getLMSObjectSelection(
+						borrowerService.getReturnableBooks(currentBorrower, currentBranch), returnBookPrompt, goBack);
+				if (currentBook == null)
 					continue;
 				System.out.println(borrowerService.returnBook(currentBorrower, currentBranch, currentBook));
 				continue;
@@ -494,15 +411,29 @@ public class Presentation {
 //				System.out.println(deleteObject(objectType));
 				break;
 			case override:
-				// must change to take borrower ID & branch
-				Object[][] loansAndDescriptions = adminService.getOverridableLoansAndDescriptions();
 				Loan loanToOverride;
-				ArrayList<Loan> overridableLoans = new ArrayList<Loan>();
-				prepareForLoanCrossSelection(options, overridableLoans, (String[]) loansAndDescriptions[1],
-						(Loan[]) loansAndDescriptions[0]);
-				loanToOverride = getLoanCrossSelection(overridePrompt, options, overridableLoans);
-				System.out.println(adminService.overrideDueDate(loanToOverride));
-				break;
+				ArrayList<Loan> allBorrowerLoans;
+				currentBorrower = (Borrower) PresUtils.getBorrowerByCardNumber(adminCardPrompt);
+				allBorrowerLoans = (ArrayList<Loan>) currentBorrower.getLoans().clone();
+				currentBorrower.setLoans(currentBorrower.getLoans().stream()
+						.filter(loan -> loan.getDateIn() == null || loan.getDateIn().isAfter(loan.getDueDate()))
+						.collect(Collectors.toCollection(ArrayList::new)));
+				if (currentBorrower.getLoans().size() == 0) {
+					System.out.println("This borrower has no loans with overridable due dates.");
+					continue;
+				}
+				currentBranch = (Branch) PresUtils.getLMSObjectSelection(
+						adminService.getBranchesWithLoans(currentBorrower), checkoutBranchPrompt, goBack);
+				if (currentBranch == null)
+					continue;
+				loanToOverride = (Loan) PresUtils.getLMSObjectSelection(currentBorrower.getLoans(), overridePrompt,
+						cancelOperation);
+				if (loanToOverride == null)
+					continue;
+				currentBorrower.setLoans(allBorrowerLoans);
+				
+				System.out.println(adminService.overrideDueDate(currentBorrower, loanToOverride));
+				continue;
 			}
 		}
 	}

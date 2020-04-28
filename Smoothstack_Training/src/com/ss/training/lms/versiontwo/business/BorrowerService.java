@@ -29,15 +29,6 @@ public class BorrowerService extends LMSService {
 		}).collect(Collectors.toCollection(ArrayList::new));
 	}
 
-	public ArrayList<LMSObject> getBranchesWithLoans(Borrower borrower) {
-		return ((ArrayList<LMSObject>) getAllObjects(LMS.branch)).stream().filter(branch -> {
-			for (Loan loan : ((Branch) branch).getLoans())
-				if (loan.getCardNo() == borrower.getCardNo())
-					return true;
-			return false;
-		}).collect(Collectors.toCollection(ArrayList::new));
-	}
-
 	public ArrayList<LMSObject> getAvailableBooks(Branch branch) {
 		ArrayList<Integer> availableBookIds = new ArrayList<Integer>();
 		branch.getCopies().stream().filter(copies -> copies.getCopies() != 0)

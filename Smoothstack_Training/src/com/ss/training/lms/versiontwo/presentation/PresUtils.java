@@ -9,6 +9,7 @@ import com.ss.training.lms.versiontwo.business.BorrowerService;
 import com.ss.training.lms.versiontwo.object.Borrower;
 import com.ss.training.lms.versiontwo.object.Branch;
 import com.ss.training.lms.versiontwo.object.LMSObject;
+import com.ss.training.lms.versiontwo.object.Loan;
 
 /**
  * @author Justin O'Brien
@@ -120,5 +121,15 @@ public class PresUtils {
 					return borrower;
 			System.out.println(Presentation.invalidCard);
 		}
+	}
+
+	public static Loan getLMSObjectSelection(ArrayList<Loan> loans, String prompt, String negativeOption) {
+		int selectedOption;
+		ArrayList<String> options = loans.stream().map(object -> object.getDisplayName())
+				.collect(Collectors.toCollection(ArrayList::new));
+		loans.add(0, null);
+		options.add(0, negativeOption);
+		selectedOption = getOptionSelection(prompt, options);
+		return loans.get(selectedOption);
 	}
 }

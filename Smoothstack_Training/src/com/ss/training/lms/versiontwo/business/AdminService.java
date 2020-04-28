@@ -481,18 +481,13 @@ public class AdminService extends LMSService {
 			bookDAO.update(book);
 	}
 
-	/**
-	 * Gets objects and descriptions of all loans for which the date in is null or
-	 * later than the due date
-	 * 
-	 * @return Loan objects (row 0) and strings describing them (row 1)
-	 */
-	public Object[][] getOverridableLoansAndDescriptions() {
-		return null; // placeholder
-	}
-
-	public String overrideDueDate(Loan loanToOveride) {
-		return ""; // placeholder
+	public String overrideDueDate(Borrower borrower, Loan loan) {
+		loan.setDueDate(loan.getDueDate().plusDays(7));
+		borrower.getLoans().stream().forEach(thisLoan -> {
+			if (thisLoan.equals(loan))
+				thisLoan.setDueDate(loan.getDueDate());
+		});
+		return updateBorrower(borrower);
 	}
 
 }
