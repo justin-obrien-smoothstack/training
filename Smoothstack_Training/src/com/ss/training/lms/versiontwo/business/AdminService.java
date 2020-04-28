@@ -167,10 +167,20 @@ public class AdminService extends LMSService {
 		return output.toString();
 	}
 
-	public String read() {
-		StringBuilder output = new StringBuilder("\n");
-		ArrayList<> = getAllObjects(LMS.);
-		
+	public String readBorrowrs() {
+		StringBuilder output = new StringBuilder();
+		ArrayList<Borrower> borrowers = (ArrayList<Borrower>) getAllObjects(LMS.borrower);
+		borrowers.stream().forEach(borrower -> {
+			output.append("\nCard number: " + borrower.getCardNo());
+			output.append("\nName: ");
+			appendIfNotNull(output, borrower.getName());
+			output.append("\nAddress: ");
+			appendIfNotNull(output, borrower.getAddress());
+			output.append("\nPhone: ");
+			appendIfNotNull(output, borrower.getPhone());
+			output.append("\nLoans: ");
+			borrower.getLoans().stream().forEach(loan -> output.append("\n\t" + loan.getDisplayName()));
+		});
 		output.append("\n");
 		return output.toString();
 	}
