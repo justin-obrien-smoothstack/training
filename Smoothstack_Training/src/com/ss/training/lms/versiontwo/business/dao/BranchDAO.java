@@ -20,20 +20,20 @@ public class BranchDAO extends LMSDAO<Branch> {
 		nativeTable = tblBranch;
 	}
 
-	public void create() {
-
+	public void create(Branch branch) {
+		Object[] queryArgs = { branch.getName(), branch.getAddress() };
+		save("INSERT INTO " + nativeTable + " (" + branchName + ", " + branchAddress + ") VALUES (?, ?)", queryArgs);
 	}
 
-	
-	
 	public void update(Branch branch) throws ClassNotFoundException, SQLException {
 		Object[] queryArgs = { branch.getName(), branch.getAddress(), branch.getId() };
 		save("UPDATE " + nativeTable + " SET " + branchName + " = ?, " + branchAddress + " = ? WHERE " + branchId
 				+ " = ?", queryArgs);
 	}
-	public void delete()
-	{
 
+	public void delete(Branch branch) {
+		Object[] queryArgs = {  branch.getId() };
+		save("DELETE FROM " + nativeTable + " WHERE " + branchId + " = ?", queryArgs);
 	}
 
 	@Override
