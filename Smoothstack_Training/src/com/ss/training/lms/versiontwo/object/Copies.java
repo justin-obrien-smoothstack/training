@@ -10,15 +10,6 @@ public class Copies extends LMSObject {
 
 	private int bookId, branchId, copies;
 
-	/**
-	 * @param bookId
-	 * @param branchId
-	 * @param copies
-	 */
-	public Copies() {
-
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -61,7 +52,7 @@ public class Copies extends LMSObject {
 	/**
 	 * @return the branchId
 	 */
-	public int getBookId() {
+	public int getBranchId() {
 		return branchId;
 	}
 
