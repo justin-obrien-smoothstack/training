@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 import com.ss.training.lms.versiontwo.LMS;
-import com.ss.training.lms.versiontwo.business.dao.CopiesDAO;
-import com.ss.training.lms.versiontwo.business.dao.LoanDAO;
 import com.ss.training.lms.versiontwo.object.Book;
 import com.ss.training.lms.versiontwo.object.Borrower;
 import com.ss.training.lms.versiontwo.object.Branch;
@@ -31,11 +29,29 @@ public class BorrowerService extends LMSService {
 		}).collect(Collectors.toCollection(ArrayList::new));
 	}
 
+	public ArrayList<LMSObject> getBranchesWithLoans(Borrower borrower) {
+		return ((ArrayList<LMSObject>) getAllObjects(LMS.branch)).stream().filter(branch -> {
+			for (Loan loan : ((Branch) branch).getLoans())
+				if (loan.getCardNo() == borrower.getCardNo())
+					return true;
+			return false;
+		}).collect(Collectors.toCollection(ArrayList::new));
+	}
+
 	public ArrayList<LMSObject> getAvailableBooks(Branch branch) {
 		ArrayList<Integer> availableBookIds = new ArrayList<Integer>();
 		branch.getCopies().stream().filter(copies -> copies.getCopies() != 0)
 				.forEach(copies -> availableBookIds.add(copies.getBookId()));
 		return (ArrayList<LMSObject>) getObjectsById(LMS.book, availableBookIds);
+	}
+
+	public ArrayList<LMSObject> getReturnableBooks(Borrower borrower, Branch branch) {
+		ArrayList<Integer> returnableBookIds = new ArrayList<Integer>();
+		branch.getLoans().stream()
+				.filter(loan -> loan.getCardNo() == borrower.getCardNo()
+						&& (loan.getDateIn() == null || loan.getDateIn().isAfter(LocalDateTime.now())))
+				.forEach(loan -> returnableBookIds.add(loan.getBookId()));
+		return (ArrayList<LMSObject>) getObjectsById(LMS.book, returnableBookIds);
 	}
 
 	/**
@@ -50,10 +66,36 @@ public class BorrowerService extends LMSService {
 		loan.setBookId(book.getId());
 		loan.setDateOut(LocalDateTime.now());
 		loan.setDueDate(loan.getDateOut().plusDays(7));
+		borrower.getLoans().add(loan);
+		branch.getLoans().add(loan);
 		branch.getCopies().stream().filter(copies -> copies.getBookId() == book.getId())
 				.forEach(copies -> copies.setCopies(copies.getCopies() - 1));
+		return (updateBranch(branch));
+	}
+
+	/**
+	 * Returns a book to a library branch from a borrower
+	 * 
+	 * @return A message to tell the user whether the transaction succeeded
+	 */
+	public String returnBook(Borrower borrower, Branch branch, Book book) {
+		Loan loan = borrower.getLoans().stream()
+				.filter(thisLoan -> branch.getLoans().contains(thisLoan) && book.getLoans().contains(thisLoan))
+				.sorted((loanOne, loanTwo) -> {
+					if (loanOne.getDueDate().isBefore(loanTwo.getDueDate()))
+						return -1;
+					if (loanOne.getDueDate().isAfter(loanTwo.getDueDate()))
+						return 1;
+					return 0;
+				}).findFirst().get();
+		loan.setDateIn(LocalDateTime.now());
+		borrower.getLoans().remove(loan);
+		borrower.getLoans().add(loan);
+		branch.getLoans().remove(loan);
 		branch.getLoans().add(loan);
-		return(updateBranch(branch));
+		branch.getCopies().stream().filter(copies -> copies.getBookId() == book.getId())
+		.forEach(copies -> copies.setCopies(copies.getCopies() + 1));
+		return (updateBranch(branch));
 	}
 
 	/**
@@ -85,18 +127,6 @@ public class BorrowerService extends LMSService {
 	 *         containing their titles and authors (row 1)
 	 */
 	public Object[][] getReturnableBookPksTitlesAndAuthors(int cardNumber, int branchPk) {
-		return null; // placeholder
-	}
-
-	/**
-	 * Returns a book to a library branch from a borrower
-	 * 
-	 * @param cardNumber The borrower's card number
-	 * @param branchPk   The primary key of the branch
-	 * @param bookPk     The primary key of the book
-	 * @return A message to tell the user whether the transaction succeeded
-	 */
-	public String returnBook(int cardNumber, int branchPk, int bookPk) {
 		return null; // placeholder
 	}
 

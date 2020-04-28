@@ -439,18 +439,16 @@ public class Presentation {
 				System.out.println(borrowerService.checkoutBook(currentBorrower, currentBranch, currentBook));
 				continue;
 			case returnBook:
-				cardNumber = (Integer) parameters.get(0);
-				// must change to only show branches with active loans
-				branchPk = getBranchSelection(returnBranchPrompt);
-				if (branchPk == 0)
+				currentBorrower = (Borrower) parameters.get(0);
+				currentBranch = (Branch) PresUtils.getLMSObjectSelection(borrowerService.getBranchesWithLoans(currentBorrower),
+						checkoutBranchPrompt, goBack);
+				if(currentBranch == null)
 					continue;
-				bookPksTitlesAndAuthors = borrowerService.getReturnableBookPksTitlesAndAuthors(cardNumber, branchPk);
-				prepareForIntCrossSelection(options, bookPks, (String[]) bookPksTitlesAndAuthors[1],
-						(Integer[]) bookPksTitlesAndAuthors[0]);
-				bookPk = getIntCrossSelection(returnBookPrompt, options, bookPks);
-				if (bookPk == 0)
+				currentBook = (Book) PresUtils.getLMSObjectSelection(borrowerService.getReturnableBooks(currentBorrower, currentBranch),
+						returnBookPrompt, goBack);
+				if(currentBook == null)
 					continue;
-				System.out.println(borrowerService.returnBook(cardNumber, branchPk, bookPk));
+				System.out.println(borrowerService.returnBook(currentBorrower, currentBranch, currentBook));
 				continue;
 			case crudBooks:
 				resetList(parameters, LMS.book);
