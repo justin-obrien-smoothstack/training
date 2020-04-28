@@ -167,7 +167,7 @@ public class AdminService extends LMSService {
 		return output.toString();
 	}
 
-	public String readBorrowrs() {
+	public String readBorrowers() {
 		StringBuilder output = new StringBuilder();
 		ArrayList<Borrower> borrowers = (ArrayList<Borrower>) getAllObjects(LMS.borrower);
 		borrowers.stream().forEach(borrower -> {
@@ -184,22 +184,40 @@ public class AdminService extends LMSService {
 		output.append("\n");
 		return output.toString();
 	}
-
-	public String read() {
-		StringBuilder output = new StringBuilder("\n");
-		ArrayList<> = getAllObjects(LMS.);
-		
+	
+	public String readBranches() {
+		StringBuilder output = new StringBuilder();
+		ArrayList<Branch> branchs = (ArrayList<Branch>) getAllObjects(LMS.branch);
+		branchs.stream().forEach(branch -> {
+			output.append("\nID number: " + branch.getId());
+			output.append("\nName: ");
+			appendIfNotNull(output, branch.getName());
+			output.append("\nAddress: ");
+			appendIfNotNull(output, branch.getAddress());
+			output.append("\nBooks: ");
+			branch.getCopies().stream().forEach(copies -> output.append("\n\t" + copies.getDisplayName()));
+			output.append("\nLoans: ");
+			branch.getLoans().stream().forEach(loan -> output.append("\n\t" + loan.getDisplayName()));
+		});
 		output.append("\n");
 		return output.toString();
 	}
 
-	public String read() {
+	public String readGenres() {
 		StringBuilder output = new StringBuilder("\n");
-		ArrayList<> = getAllObjects(LMS.);
-		
+		ArrayList<Genre> genres = (ArrayList<Genre>) getAllObjects(LMS.genre);
+		genres.stream().forEach(genre -> {
+			output.append("\nID number: " + genre.getId());
+			output.append("\nName: " + genre.getName());
+			output.append("\nBooks: ");
+			getObjectsById(LMS.book, genre.getBookIds()).stream()
+					.forEach(book -> output.append("\n\t" + ((Book) book).getDisplayName()));
+		});
 		output.append("\n");
 		return output.toString();
 	}
+
+	
 
 	public String read() {
 		StringBuilder output = new StringBuilder("\n");
