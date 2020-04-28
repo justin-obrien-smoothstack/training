@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -12,10 +13,13 @@ import java.util.stream.Collectors;
 import com.ss.training.lms.versiontwo.LMS;
 import com.ss.training.lms.versiontwo.business.dao.AuthorDAO;
 import com.ss.training.lms.versiontwo.business.dao.BookDAO;
+import com.ss.training.lms.versiontwo.business.dao.BorrowerDAO;
 import com.ss.training.lms.versiontwo.business.dao.BranchDAO;
 import com.ss.training.lms.versiontwo.business.dao.CopiesDAO;
+import com.ss.training.lms.versiontwo.business.dao.GenreDAO;
 import com.ss.training.lms.versiontwo.business.dao.LMSDAO;
 import com.ss.training.lms.versiontwo.business.dao.LoanDAO;
+import com.ss.training.lms.versiontwo.business.dao.PublisherDAO;
 import com.ss.training.lms.versiontwo.object.Book;
 import com.ss.training.lms.versiontwo.object.Borrower;
 import com.ss.training.lms.versiontwo.object.Branch;
@@ -56,8 +60,37 @@ public class LMSService {
 		return connection;
 	}
 
-	public ArrayList<Book> completeBookInfo(
-			ArrayList<Book> books) {
+	protected LMSDAO<?> getDAO(Connection connection, String objectType) throws SQLException {
+		switch (objectType) {
+		case LMS.author:
+		case LMS.authors:
+			return new AuthorDAO(connection);
+		case LMS.book:
+		case LMS.books:
+			return new BookDAO(connection);
+		case LMS.borrower:
+		case LMS.borrowers:
+			return new BorrowerDAO(connection);
+		case LMS.branch:
+		case LMS.branches:
+			return new BranchDAO(connection);
+		case LMS.copies:
+		case LMS.copieses:
+			return new CopiesDAO(connection);
+		case LMS.genre:
+		case LMS.genres:
+			return new GenreDAO(connection);
+		case LMS.loan:
+		case LMS.loans:
+			return new LoanDAO(connection);
+		case LMS.publisher:
+		case LMS.publishers:
+			return new PublisherDAO(connection);
+		}
+		return null;
+	}
+
+	private ArrayList<Book> completeBookInfo(ArrayList<Book> books) {
 		ArrayList<Copies> copieses = new ArrayList<Copies>();
 		ArrayList<Loan> loans = new ArrayList<Loan>();
 		try (Connection connection = getConnection()) {
@@ -70,14 +103,12 @@ public class LMSService {
 		books.stream().forEach(book -> {
 			copieses.stream().filter(copies -> copies.getBookId() == book.getId())
 					.forEach(copies -> book.getCopies().add(copies));
-			loans.stream().filter(loan -> loan.getBookId() == book.getId())
-					.forEach(loan -> book.getLoans().add(loan));
+			loans.stream().filter(loan -> loan.getBookId() == book.getId()).forEach(loan -> book.getLoans().add(loan));
 		});
 		return books;
 	}
-	
-	public ArrayList<Branch> completeBranchInfo(
-			ArrayList<Branch> branches) {
+
+	private ArrayList<Branch> completeBranchInfo(ArrayList<Branch> branches) {
 		ArrayList<Copies> copieses = new ArrayList<Copies>();
 		ArrayList<Loan> loans = new ArrayList<Loan>();
 		try (Connection connection = getConnection()) {
@@ -96,7 +127,7 @@ public class LMSService {
 		return branches;
 	}
 
-	public ArrayList<Borrower> addLoansToBorrowers(ArrayList<Borrower> borrowers) {
+	private ArrayList<Borrower> addLoansToBorrowers(ArrayList<Borrower> borrowers) {
 		ArrayList<Loan> loans = new ArrayList<Loan>();
 		try (Connection connection = getConnection()) {
 			loans.addAll(new LoanDAO(connection).readAll());
@@ -110,8 +141,8 @@ public class LMSService {
 		});
 		return borrowers;
 	}
-	
-	public ArrayList<Publisher> addBooksToPublishers(ArrayList<Publisher> publishers) {
+
+	private ArrayList<Publisher> addBooksToPublishers(ArrayList<Publisher> publishers) {
 		ArrayList<Book> books = (ArrayList<Book>) getAllObjects(LMS.book);
 		publishers.stream().forEach(publisher -> {
 			books.stream().filter(book -> book.getPubId() == publisher.getId())
@@ -124,56 +155,28 @@ public class LMSService {
 		LMSDAO<?> dao = null;
 		ArrayList allObjects = new ArrayList();
 		try (Connection connection = getConnection()) {
+			dao = getDAO(connection, objectType);
+			allObjects = (ArrayList<LMSObject>) dao.readAll();
 			switch (objectType) {
-			case LMS.author:
-			case LMS.authors:
-				dao = new AuthorDAO(connection);
+			case LMS.borrower:
+			case LMS.borrowers:
+				allObjects = addLoansToBorrowers(allObjects);
 				break;
 			case LMS.book:
 			case LMS.books:
-				dao = new BookDAO(connection);
-				break;
-			case LMS.borrower:
-			case LMS.borrowers:
-				break;
+				allObjects = completeBookInfo(allObjects);
 			case LMS.branch:
 			case LMS.branches:
-				dao = new BranchDAO(connection);
-				break;
-			case LMS.copies:
-			case LMS.copieses:
-				break;
-			case LMS.genre:
-			case LMS.genres:
-				break;
-			case LMS.loan:
-			case LMS.loans:
+				allObjects = completeBranchInfo(allObjects);
 				break;
 			case LMS.publisher:
 			case LMS.publishers:
+				allObjects = addBooksToPublishers(allObjects);
 				break;
 			}
-			allObjects = (ArrayList<LMSObject>) dao.readAll();
 		} catch (Exception e) {
 			printRetrievalErrorMessage(objectType);
 			e.printStackTrace();
-		}
-		switch (objectType) {
-		case LMS.borrower:
-		case LMS.borrowers:
-			allObjects = addLoansToBorrowers(allObjects);
-			break;
-		case LMS.book:
-		case LMS.books:
-			allObjects = completeBookInfo(allObjects);
-		case LMS.branch:
-		case LMS.branches:
-			allObjects = completeBranchInfo(allObjects);
-			break;
-		case LMS.publisher:
-		case LMS.publishers:
-			allObjects = addBooksToPublishers(allObjects);
-			break;
 		}
 		return allObjects;
 	}
