@@ -20,10 +20,12 @@ import com.ss.training.lms.versiontwo.business.dao.GenreDAO;
 import com.ss.training.lms.versiontwo.business.dao.LMSDAO;
 import com.ss.training.lms.versiontwo.business.dao.LoanDAO;
 import com.ss.training.lms.versiontwo.business.dao.PublisherDAO;
+import com.ss.training.lms.versiontwo.object.Author;
 import com.ss.training.lms.versiontwo.object.Book;
 import com.ss.training.lms.versiontwo.object.Borrower;
 import com.ss.training.lms.versiontwo.object.Branch;
 import com.ss.training.lms.versiontwo.object.Copies;
+import com.ss.training.lms.versiontwo.object.Genre;
 import com.ss.training.lms.versiontwo.object.HasIntegerId;
 import com.ss.training.lms.versiontwo.object.LMSObject;
 import com.ss.training.lms.versiontwo.object.Loan;
@@ -36,7 +38,7 @@ import com.ss.training.lms.versiontwo.presentation.Presentation;
 public class LMSService {
 
 	protected Presentation presentation = Presentation.getInstance();
-	
+
 	protected void printRetrievalErrorMessage(String objectType) {
 		System.out.println("There was an error while attempting to retrieve " + objectType + " from the database.");
 	}
@@ -91,17 +93,6 @@ public class LMSService {
 			return new PublisherDAO(connection);
 		}
 		return null;
-	}
-
-	public String create(String objectType, LMSObject object) {
-		int possiblePublisherId;
-		try (Connection connection = getConnection()) {
-			LMSDAO<?> dao = getDAO(connection, objectType);
-			possiblePublisherId = dao.create(object);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return presentation.operationFailed;
-		}
 	}
 
 	private ArrayList<Book> completeBookInfo(ArrayList<Book> books) {

@@ -1,11 +1,19 @@
 package com.ss.training.lms.versiontwo.business;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 import com.ss.training.lms.versiontwo.LMS;
+import com.ss.training.lms.versiontwo.business.dao.AuthorDAO;
 import com.ss.training.lms.versiontwo.business.dao.BookDAO;
+import com.ss.training.lms.versiontwo.business.dao.BorrowerDAO;
+import com.ss.training.lms.versiontwo.business.dao.BranchDAO;
+import com.ss.training.lms.versiontwo.business.dao.CopiesDAO;
+import com.ss.training.lms.versiontwo.business.dao.GenreDAO;
+import com.ss.training.lms.versiontwo.business.dao.LoanDAO;
+import com.ss.training.lms.versiontwo.business.dao.PublisherDAO;
 import com.ss.training.lms.versiontwo.object.Author;
 import com.ss.training.lms.versiontwo.object.Book;
 import com.ss.training.lms.versiontwo.object.Borrower;
@@ -24,16 +32,187 @@ import com.ss.training.lms.versiontwo.object.Publisher;
  */
 public class AdminService extends LMSService {
 
-	public String create(LMSObject newObject) {
-		return null; // placeholder
+	public String createAuthor(Author author) {
+		try (Connection connection = getConnection()) {
+			new AuthorDAO(connection).create(author);
+			connection.commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return presentation.operationFailed;
+		}
+		return presentation.operationSucceeded;
 	}
 
-	public String update(LMSObject newObject) {
-		return null; // placeholder
+	public String createBook(Book book) {
+		int bookId;
+		CopiesDAO copiesDAO;
+		LoanDAO loanDAO;
+		try (Connection connection = getConnection()) {
+			copiesDAO = new CopiesDAO(connection);
+			loanDAO = new LoanDAO(connection);
+			bookId = new BookDAO(connection).create(book);
+			book.getCopies().stream().forEach(copies -> copies.setBookId(bookId));
+			book.getLoans().stream().forEach(loan -> loan.setBookId(bookId));
+			for (Copies copies : book.getCopies())
+				copiesDAO.create(copies);
+			for (Loan loan : book.getLoans())
+				loanDAO.create(loan);
+			connection.commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return presentation.operationFailed;
+		}
+		return presentation.operationSucceeded;
 	}
 
-	public String delete(LMSObject newObject) {
-		return null; // placeholder
+	public String createBorrower(Borrower borrower) {
+		int cardNo;
+		LoanDAO loanDAO;
+		try (Connection connection = getConnection()) {
+			loanDAO = new LoanDAO(connection);
+			cardNo = new BorrowerDAO(connection).create(borrower);
+			new BorrowerDAO(connection).create(borrower);
+			borrower.getLoans().stream().forEach(loan -> loan.setCardNo(cardNo));
+			for (Loan loan : borrower.getLoans())
+				loanDAO.create(loan);
+			connection.commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return presentation.operationFailed;
+		}
+		return presentation.operationSucceeded;
+	}
+	
+	public String createBranch(Branch branch) {
+		int branchId;
+		CopiesDAO copiesDAO;
+		LoanDAO loanDAO;
+		try (Connection connection = getConnection()) {
+			copiesDAO = new CopiesDAO(connection);
+			loanDAO = new LoanDAO(connection);
+			branchId = new BranchDAO(connection).create(branch);
+			branch.getCopies().stream().forEach(copies -> copies.setBranchId(branchId));
+			branch.getLoans().stream().forEach(loan -> loan.setBranchId(branchId));
+			for (Copies copies : branch.getCopies())
+				copiesDAO.create(copies);
+			for (Loan loan : branch.getLoans())
+				loanDAO.create(loan);
+			connection.commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return presentation.operationFailed;
+		}
+		return presentation.operationSucceeded;
+	}
+	
+	public String createGenre(Genre genre) {
+		try (Connection connection = getConnection()) {
+			new GenreDAO(connection).create(genre);
+			connection.commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return presentation.operationFailed;
+		}
+		return presentation.operationSucceeded;
+	}
+	
+	public String createPublisher(Publisher publisher) {
+		BookDAO bookDAO;
+		try (Connection connection = getConnection()) {
+			bookDAO = new BookDAO(connection);
+			publisher.setId(new PublisherDAO(connection).create(publisher));
+			addNewPublisherToBooks(publisher, bookDAO);
+			connection.commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return presentation.operationFailed;
+		}
+		return presentation.operationSucceeded;
+	}
+	
+	public String deleteAuthor(Author author) {
+		try (Connection connection = getConnection()) {
+			new AuthorDAO(connection).delete(author);
+			connection.commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return presentation.operationFailed;
+		}
+		return presentation.operationSucceeded;
+	}
+
+	public String deleteBook(Book book) {
+		CopiesDAO copiesDAO;
+		LoanDAO loanDAO;
+		try (Connection connection = getConnection()) {
+			copiesDAO = new CopiesDAO(connection);
+			loanDAO = new LoanDAO(connection);
+			new BookDAO(connection).delete(book);
+			for (Copies copies : book.getCopies())
+				copiesDAO.delete(copies);
+			for (Loan loan : book.getLoans())
+				loanDAO.delete(loan);
+			connection.commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return presentation.operationFailed;
+		}
+		return presentation.operationSucceeded;
+	}
+
+	public String deleteBorrower(Borrower borrower) {
+		LoanDAO loanDAO;
+		try (Connection connection = getConnection()) {
+			loanDAO = new LoanDAO(connection);
+			new BorrowerDAO(connection).delete(borrower);
+			for (Loan loan : borrower.getLoans())
+				loanDAO.delete(loan);
+			connection.commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return presentation.operationFailed;
+		}
+		return presentation.operationSucceeded;
+	}
+	
+	public String deleteBranch(Branch branch) {
+		CopiesDAO copiesDAO;
+		LoanDAO loanDAO;
+		try (Connection connection = getConnection()) {
+			copiesDAO = new CopiesDAO(connection);
+			loanDAO = new LoanDAO(connection);
+			for (Loan loan : branch.getLoans())
+				loanDAO.delete(loan);
+			for (Copies copies : branch.getCopies())
+				copiesDAO.delete(copies);
+			connection.commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return presentation.operationFailed;
+		}
+		return presentation.operationSucceeded;
+	}
+	
+	public String deleteGenre(Genre genre) {
+		try (Connection connection = getConnection()) {
+			new GenreDAO(connection).delete(genre);
+			connection.commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return presentation.operationFailed;
+		}
+		return presentation.operationSucceeded;
+	}
+	
+	public String deletePublisher(Publisher publisher) {
+		try (Connection connection = getConnection()) {
+			new PublisherDAO(connection).delete(publisher);
+			connection.commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return presentation.operationFailed;
+		}
+		return presentation.operationSucceeded;
 	}
 
 	public LMSObject getBlankObject(String objectType) {

@@ -20,11 +20,10 @@ public class GenreDAO extends LMSDAO<Genre> {
 		nativeTable = tblGenre;
 	}
 
-	public int create(Genre genre) throws ClassNotFoundException, SQLException {
+	public void create(Genre genre) throws ClassNotFoundException, SQLException {
 		Object[] queryArgs = { genre.getName() };
 		int thisGenreId = saveWithPk("INSERT INTO " + nativeTable + " (" + genreName + ") VALUES (?)", queryArgs);
 		createRelations(genre.getBookIds(), tblBookGenre, genreId, bookId, thisGenreId);
-		return 0;
 	}
 
 	public void update(Genre genre) throws ClassNotFoundException, SQLException {

@@ -22,9 +22,9 @@ public class BorrowerDAO extends LMSDAO<Borrower> {
 
 	public int create(Borrower borrower) throws ClassNotFoundException, SQLException {
 		Object[] queryArgs = { borrower.getName(), borrower.getAddress(), borrower.getPhone() };
-		save("INSERT INTO " + nativeTable + " (" + name + ", " + address + ", " + phone + ") VALUES (?, ?, ?)",
+		return saveWithPk(
+				"INSERT INTO " + nativeTable + " (" + name + ", " + address + ", " + phone + ") VALUES (?, ?, ?)",
 				queryArgs);
-		return 0;
 	}
 
 	public void update(Borrower borrower) throws ClassNotFoundException, SQLException {
@@ -34,7 +34,7 @@ public class BorrowerDAO extends LMSDAO<Borrower> {
 	}
 
 	public void delete(Borrower borrower) throws ClassNotFoundException, SQLException {
-		Object[] queryArgs = {  borrower.getCardNo() };
+		Object[] queryArgs = { borrower.getCardNo() };
 		save("DELETE FROM " + nativeTable + " WHERE " + cardNo + " = ?", queryArgs);
 	}
 

@@ -54,7 +54,7 @@ public class Presentation {
 	 */
 	public final String exit = "Exit", librarian = "Librarian", admin = "Administrator", borrower = "Borrower",
 			rootMenuPrompt = "Welcome to the library management system. Please indicate what type of user you are.",
-			operationFailed = "The operation did not succeed.";
+			operationFailed = "The operation did not succeed.", operationSucceeded = "The operation was successful.";
 	protected final String cancelCode = "0";
 	protected final String genericPrompt = "What would you like to do?",
 			cardPrompt = "Enter your library card number, or enter " + cancelCode + " to go back.",
