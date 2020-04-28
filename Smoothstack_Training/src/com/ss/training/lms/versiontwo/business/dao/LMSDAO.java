@@ -66,6 +66,22 @@ public abstract class LMSDAO<T> {
 		}
 	}
 
+	protected void updateRelations(ArrayList<Integer> newRelations, String table, String selfColumn, String otherColumn,
+			Object selfId) throws SQLException, ClassNotFoundException {
+		Object[] queryArgs = { null, selfId };
+		ArrayList<Integer> oldRelations = getRelations(table, selfColumn, otherColumn, selfId);
+		for (int oldOtherId : oldRelations)
+			if (!newRelations.contains(oldOtherId)) {
+				queryArgs[0] = oldOtherId;
+				save("DELETE FROM " + table + " WHERE " + otherColumn + " = ? AND " + selfColumn + " = ?", queryArgs);
+			}
+		for(int newOtherId : newRelations)
+			if(!oldRelations.contains(newOtherId)) {
+				queryArgs[0] = newOtherId;
+				save("INSERT INTO" + table + "(" + otherColumn + ", " + selfColumn + ") VALUES (?, ?)", queryArgs);
+			}
+	}
+
 	public void save(String sqlQuery, Object[] queryArgs) throws ClassNotFoundException, SQLException {
 		PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
 		if (queryArgs != null) {
