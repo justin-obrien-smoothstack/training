@@ -20,6 +20,18 @@ public class LoanDAO extends LMSDAO<Loan> {
 		super(connnection);
 		nativeTable = tblLoans;
 	}
+	
+	public void create() {
+		
+	}
+	
+	public void update() {
+		
+	}
+	
+	public void delete() {
+		
+	}
 
 	@Override
 	public ArrayList<Loan> extractData(ResultSet resultSet) throws SQLException {

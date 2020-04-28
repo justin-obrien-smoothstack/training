@@ -31,6 +31,11 @@ public class CopiesDAO extends LMSDAO<Copies> {
 		save("UPDATE " + nativeTable + " SET " + noOfCopies + " = ? WHERE " + branchId + " = ? AND " + bookId + " = ?",
 				queryArgs);
 	}
+	
+	public void delete()
+	{
+
+	}
 
 	@Override
 	public ArrayList<Copies> extractData(ResultSet resultSet) throws SQLException {

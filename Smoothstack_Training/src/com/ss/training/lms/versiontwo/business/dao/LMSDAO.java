@@ -25,11 +25,25 @@ public abstract class LMSDAO<T> {
 	}
 
 	protected String tblBranch = "tbl_library_branch", tblCopies = "tbl_book_copies", tblLoans = "tbl_book_loans",
-			tblBook = "tbl_book", tblAuthor = "tbl_author", tblBookAuthor = "tbl_book_authors", tblBookGenre = "tbl_book_genres";
-	protected String bookId = "bookId", branchId = "branchId", authorId = "authorId", genreId = "genre_id", pubId = "pubId", branchName = "branchName",
-			title = "title", authorName = "authorName", branchAddress = "branchAddress", noOfCopies = "noOfCopies",
-			cardNo = "cardNo", dateOut = "dateOut", dueDate = "dueDate", dateIn = "dateIn";
+			tblBook = "tbl_book", tblAuthor = "tbl_author", tblPublisher = "tbl_publisher", tblGenre = "tbl_genre",
+			tblBorrower = "tbl_borrower", tblBookAuthor = "tbl_book_authors", tblBookGenre = "tbl_book_genres";
+	protected String bookId = "bookId", branchId = "branchId", authorId = "authorId", genreId = "genre_id",
+			publisherId = "publisherId", pubId = "pubId", branchName = "branchName", title = "title",
+			authorName = "authorName", genreName = "genre_name", publisherName = "publisherName",
+			publisherAddress = "publisherAddress", publisherPhone = "publisherPhone", branchAddress = "branchAddress",
+			name = "name", address = "address", phone = "phone", noOfCopies = "noOfCopies", cardNo = "cardNo",
+			dateOut = "dateOut", dueDate = "dueDate", dateIn = "dateIn";
 
+	/**
+	 * @param table
+	 * @param selfColumn
+	 * @param otherColumn
+	 * @param selfId
+	 * @return ID numbers of each object associated with otherColumn that are
+	 *         related to the object associated with selfColumn with ID number
+	 *         selfId
+	 * @throws SQLException
+	 */
 	protected ArrayList<Integer> getRelations(String table, String selfColumn, String otherColumn, Object selfId)
 			throws SQLException {
 		ArrayList<Integer> relations = new ArrayList<Integer>();
@@ -41,6 +55,15 @@ public abstract class LMSDAO<T> {
 		while (resultSet.next())
 			relations.add(resultSet.getInt(otherColumn));
 		return relations;
+	}
+
+	protected void createRelations(ArrayList<Integer> otherIds, String table, String selfColumn, String otherColumn,
+			Object selfId) throws ClassNotFoundException, SQLException {
+		Object[] queryArgs = { null, selfId };
+		for (int otherId : otherIds) {
+			queryArgs[0] = otherId;
+			save("INSERT INTO" + table + "(" + otherColumn + ", " + selfColumn + ") VALUES (?, ?)", queryArgs);
+		}
 	}
 
 	public void save(String sqlQuery, Object[] queryArgs) throws ClassNotFoundException, SQLException {

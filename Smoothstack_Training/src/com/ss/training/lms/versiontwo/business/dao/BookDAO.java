@@ -21,12 +21,19 @@ public class BookDAO extends LMSDAO<Book> {
 		nativeTable = tblBook;
 	}
 
-	public void create(Copies copies) throws ClassNotFoundException, SQLException {
-		Object[] queryArgs = { copies.getCopies(), copies.getBranchId(), copies.getBookId() };
-		save("INSERT INTO " + nativeTable + "(" + noOfCopies + ", " + branchId + ", " + bookId + ") VALUES (?, ?, ?)",
-				queryArgs);
+	public void create() {
+
 	}
-	
+
+	public void update() {
+
+	}
+
+	public void delete()
+	{
+
+	}
+
 	@Override
 	public ArrayList<Book> extractData(ResultSet resultSet) throws SQLException {
 		Book book;
