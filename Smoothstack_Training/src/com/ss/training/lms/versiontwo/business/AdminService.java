@@ -277,22 +277,6 @@ public class AdminService extends LMSService {
 		return Presentation.operationSucceeded;
 	}
 
-	public String updateBranch(Branch branch) {
-		CopiesDAO copiesDAO;
-		LoanDAO loanDAO;
-		try (Connection connection = getConnection()) {
-			copiesDAO = new CopiesDAO(connection);
-			loanDAO = new LoanDAO(connection);
-			new BranchDAO(connection).update(branch);
-			completeBranchUpdate(branch, copiesDAO, loanDAO);
-			connection.commit();
-		} catch (Exception e) {
-			e.printStackTrace();
-			return Presentation.operationFailed;
-		}
-		return Presentation.operationSucceeded;
-	}
-
 	public String updateGenre(Genre genre) {
 		try (Connection connection = getConnection()) {
 			new GenreDAO(connection).update(genre);
@@ -443,33 +427,6 @@ public class AdminService extends LMSService {
 		}
 		for (Loan loan : oldLoans)
 			if (!borrower.getLoans().contains(loan))
-				loanDAO.delete(loan);
-	}
-
-	private void completeBranchUpdate(Branch branch, CopiesDAO copiesDAO, LoanDAO loanDAO)
-			throws ClassNotFoundException, SQLException {
-		ArrayList<Copies> oldCopies = copiesDAO.readAll().stream()
-				.filter(copies -> copies.getBranchId() == branch.getId())
-				.collect(Collectors.toCollection(ArrayList::new));
-		ArrayList<Loan> oldLoans = loanDAO.readAll().stream().filter(loan -> loan.getBranchId() == branch.getId())
-				.collect(Collectors.toCollection(ArrayList::new));
-		for (Copies copies : branch.getCopies()) {
-			if (oldCopies.contains(copies))
-				copiesDAO.update(copies);
-			else
-				copiesDAO.create(copies);
-		}
-		for (Copies copies : oldCopies)
-			if (!branch.getCopies().contains(copies))
-				copiesDAO.delete(copies);
-		for (Loan loan : branch.getLoans()) {
-			if (oldLoans.contains(loan))
-				loanDAO.update(loan);
-			else
-				loanDAO.create(loan);
-		}
-		for (Loan loan : oldLoans)
-			if (!branch.getLoans().contains(loan))
 				loanDAO.delete(loan);
 	}
 

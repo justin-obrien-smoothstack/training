@@ -28,6 +28,7 @@ import com.ss.training.lms.versiontwo.object.HasIntegerId;
 import com.ss.training.lms.versiontwo.object.LMSObject;
 import com.ss.training.lms.versiontwo.object.Loan;
 import com.ss.training.lms.versiontwo.object.Publisher;
+import com.ss.training.lms.versiontwo.presentation.Presentation;
 
 /**
  * @author Justin O'Brien
@@ -58,6 +59,49 @@ public class LMSService {
 			e.printStackTrace();
 		}
 		return connection;
+	}
+
+	public String updateBranch(Branch branch) {
+		CopiesDAO copiesDAO;
+		LoanDAO loanDAO;
+		try (Connection connection = getConnection()) {
+			copiesDAO = new CopiesDAO(connection);
+			loanDAO = new LoanDAO(connection);
+			new BranchDAO(connection).update(branch);
+			completeBranchUpdate(branch, copiesDAO, loanDAO);
+			connection.commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Presentation.operationFailed;
+		}
+		return Presentation.operationSucceeded;
+	}
+
+	private void completeBranchUpdate(Branch branch, CopiesDAO copiesDAO, LoanDAO loanDAO)
+			throws ClassNotFoundException, SQLException {
+		ArrayList<Copies> oldCopies = copiesDAO.readAll().stream()
+				.filter(copies -> copies.getBranchId() == branch.getId())
+				.collect(Collectors.toCollection(ArrayList::new));
+		ArrayList<Loan> oldLoans = loanDAO.readAll().stream().filter(loan -> loan.getBranchId() == branch.getId())
+				.collect(Collectors.toCollection(ArrayList::new));
+		for (Copies copies : branch.getCopies()) {
+			if (oldCopies.contains(copies))
+				copiesDAO.update(copies);
+			else
+				copiesDAO.create(copies);
+		}
+		for (Copies copies : oldCopies)
+			if (!branch.getCopies().contains(copies))
+				copiesDAO.delete(copies);
+		for (Loan loan : branch.getLoans()) {
+			if (oldLoans.contains(loan))
+				loanDAO.update(loan);
+			else
+				loanDAO.create(loan);
+		}
+		for (Loan loan : oldLoans)
+			if (!branch.getLoans().contains(loan))
+				loanDAO.delete(loan);
 	}
 
 	protected LMSDAO<?> getDAO(Connection connection, String objectType) throws SQLException {

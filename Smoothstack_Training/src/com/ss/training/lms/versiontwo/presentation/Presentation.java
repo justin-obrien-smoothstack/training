@@ -357,6 +357,7 @@ public class Presentation {
 		String objectType;
 		Object[][] bookPksTitlesAndAuthors;
 		ArrayList<Integer> bookPks = new ArrayList<Integer>();
+		Book currentBook;
 		Branch currentBranch;
 		Borrower currentBorrower;
 		for (;;) {
@@ -426,14 +427,16 @@ public class Presentation {
 						.println(librarianService.updateCopies(currentBranch, bookToChangeCopies, newNumberOfCopies));
 				continue;
 			case checkoutBook:
-				currentBranch = PresUtils.getLMSObjectSelection(borrowerService.getBranchesWithBooks(), checkoutBookPrompt, goBack);
-				bookPksTitlesAndAuthors = borrowerService.getAvailableBookPksTitlesAndAuthors(branchPk);
-				prepareForIntCrossSelection(options, bookPks, (String[]) bookPksTitlesAndAuthors[1],
-						(Integer[]) bookPksTitlesAndAuthors[0]);
-				bookPk = getIntCrossSelection(checkoutBookPrompt, options, bookPks);
-				if (bookPk == 0)
+				currentBorrower = (Borrower) parameters.get(0);
+				currentBranch = (Branch) PresUtils.getLMSObjectSelection(borrowerService.getBranchesWithBooks(),
+						checkoutBranchPrompt, goBack);
+				if(currentBranch == null)
 					continue;
-				System.out.println(borrowerService.checkoutBook(cardNumber, branchPk, bookPk));
+				currentBook = (Book) PresUtils.getLMSObjectSelection(borrowerService.getAvailableBooks(currentBranch),
+						checkoutBookPrompt, goBack);
+				if(currentBook == null)
+					continue;
+				System.out.println(borrowerService.checkoutBook(currentBorrower, currentBranch, currentBook));
 				continue;
 			case returnBook:
 				cardNumber = (Integer) parameters.get(0);
