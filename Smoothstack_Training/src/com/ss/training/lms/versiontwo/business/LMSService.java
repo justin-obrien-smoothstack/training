@@ -28,12 +28,15 @@ import com.ss.training.lms.versiontwo.object.HasIntegerId;
 import com.ss.training.lms.versiontwo.object.LMSObject;
 import com.ss.training.lms.versiontwo.object.Loan;
 import com.ss.training.lms.versiontwo.object.Publisher;
+import com.ss.training.lms.versiontwo.presentation.Presentation;
 
 /**
  * @author Justin O'Brien
  */
 public class LMSService {
 
+	protected Presentation presentation = Presentation.getInstance();
+	
 	protected void printRetrievalErrorMessage(String objectType) {
 		System.out.println("There was an error while attempting to retrieve " + objectType + " from the database.");
 	}
@@ -88,6 +91,16 @@ public class LMSService {
 			return new PublisherDAO(connection);
 		}
 		return null;
+	}
+
+	public String create(String objectType, LMSObject object) {
+		try (Connection connection = getConnection()) {
+			LMSDAO<?> dao = getDAO(connection, objectType);
+			dao.create()
+		} catch (Exception e) {
+			e.printStackTrace();
+			return presentation.operationFailed;
+		}
 	}
 
 	private ArrayList<Book> completeBookInfo(ArrayList<Book> books) {

@@ -20,10 +20,11 @@ public class CopiesDAO extends LMSDAO<Copies> {
 		nativeTable = tblCopies;
 	}
 
-	public void create(Copies copies) throws ClassNotFoundException, SQLException {
+	public int create(Copies copies) throws ClassNotFoundException, SQLException {
 		Object[] queryArgs = { copies.getCopies(), copies.getBranchId(), copies.getBookId() };
 		save("INSERT INTO " + nativeTable + " (" + noOfCopies + ", " + branchId + ", " + bookId + ") VALUES (?, ?, ?)",
 				queryArgs);
+		return 0;
 	}
 
 	public void update(Copies copies) throws ClassNotFoundException, SQLException {

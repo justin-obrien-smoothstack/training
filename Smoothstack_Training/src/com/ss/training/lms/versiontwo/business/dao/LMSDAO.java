@@ -5,7 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
+
+import com.ss.training.lms.versiontwo.object.LMSObject;
 
 /**
  * Abstract class for DAO objects for library management system
@@ -121,5 +122,11 @@ public abstract class LMSDAO<T> {
 		return read("SELECT * FROM " + nativeTable, null);
 	}
 
+	public abstract int create(LMSObject object);
+	
+	public abstract void update(LMSObject object);
+	
+	public abstract void delete(LMSObject object);
+	
 	public abstract ArrayList<T> extractData(ResultSet resultSet) throws SQLException;
 }

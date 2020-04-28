@@ -21,11 +21,12 @@ public class LoanDAO extends LMSDAO<Loan> {
 		nativeTable = tblLoans;
 	}
 
-	public void create(Loan loan) throws ClassNotFoundException, SQLException {
+	public int create(Loan loan) throws ClassNotFoundException, SQLException {
 		Object[] queryArgs = { loan.getBranchId(), loan.getBookId(), loan.getCardNo(), loan.getDateOut(),
 				loan.getDueDate(), loan.getDateIn() };
 		save("INSERT INTO " + nativeTable + " (" + branchId + ", " + bookId + cardNo + ", " + dateOut + ", " + dueDate
 				+ ", " + dateIn + ") VALUES (?, ?, ?, ?, ?, ?)", queryArgs);
+		return 0;
 	}
 
 	public void update(Loan loan) throws ClassNotFoundException, SQLException {

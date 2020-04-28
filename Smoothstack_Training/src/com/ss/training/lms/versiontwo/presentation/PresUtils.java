@@ -14,8 +14,7 @@ import com.ss.training.lms.versiontwo.object.LMSObject;
  */
 public class PresUtils {
 
-	private static LMSService lmsService = new LMSService();
-	private static final Scanner scanner = new Scanner(System.in);
+	private static final Presentation presentation = Presentation.getInstance();
 
 	/**
 	 * Gets a menu option selection from the user
@@ -32,14 +31,14 @@ public class PresUtils {
 				System.out.println(i + ") " + options.get(i));
 			}
 			try {
-				selectionNumber = Integer.parseInt(scanner.nextLine());
+				selectionNumber = Integer.parseInt(presentation.scanner.nextLine());
 			} catch (NumberFormatException e) {
-				System.out.println(Presentation.invalidSelection);
+				System.out.println(presentation.invalidSelection);
 				continue;
 			}
 			if (0 <= selectionNumber && selectionNumber < options.size())
 				return selectionNumber;
-			System.out.println(Presentation.invalidSelection);
+			System.out.println(presentation.invalidSelection);
 		}
 	}
 
@@ -48,7 +47,7 @@ public class PresUtils {
 		for (;;) {
 			System.out.println(prompt);
 			try {
-				result = Integer.parseInt(scanner.nextLine());
+				result = Integer.parseInt(presentation.scanner.nextLine());
 			} catch (NumberFormatException e) {
 				System.out.println(errorMessage);
 				continue;
@@ -79,7 +78,7 @@ public class PresUtils {
 		String result;
 		for (;;) {
 			System.out.println(prompt);
-			result = scanner.nextLine();
+			result = presentation.scanner.nextLine();
 			if (result.length() <= maxLength)
 				return result;
 			System.out.println("Error: Maximum " + fieldName + " length is " + maxLength + "characters.");

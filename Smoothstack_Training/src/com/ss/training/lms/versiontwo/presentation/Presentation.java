@@ -48,14 +48,15 @@ public class Presentation {
 		return instance;
 	}
 
-	private static final int maxStringFieldLength = 45;
+	private final int maxStringFieldLength = 45;
 	/**
 	 * Text shown to the user in menus
 	 */
-	public static final String exit = "Exit", librarian = "Librarian", admin = "Administrator", borrower = "Borrower",
-			rootMenuPrompt = "Welcome to the library management system. Please indicate what type of user you are.";
-	protected static final String cancelCode = "0";
-	protected static final String genericPrompt = "What would you like to do?",
+	public final String exit = "Exit", librarian = "Librarian", admin = "Administrator", borrower = "Borrower",
+			rootMenuPrompt = "Welcome to the library management system. Please indicate what type of user you are.",
+			operationFailed = "The operation did not succeed.";
+	protected final String cancelCode = "0";
+	protected final String genericPrompt = "What would you like to do?",
 			cardPrompt = "Enter your library card number, or enter " + cancelCode + " to go back.",
 			manageBranchPrompt = "Which branch do you manage?",
 			updateBranchNamePrompt = "What is the branch's new name? Enter a blank line if it hasn't changed.",
@@ -67,7 +68,7 @@ public class Presentation {
 			returnBranchPrompt = "Which branch would you like to return a book to?",
 			returnBookPrompt = "Which book would you like to return?",
 			overridePrompt = "Which loan would you like to override the due date of?";
-	protected static final String goBack = "Return to the previous menu", manageBranch = "Manage your branch",
+	protected final String goBack = "Return to the previous menu", manageBranch = "Manage your branch",
 			crud = "Create/Read/Update/Delete ", crudBooks = crud + "books", crudAuthors = crud + "authors",
 			crudGenres = crud + "genres", crudPublishers = crud + "publishers",
 			crudBranches = crud + "library branches", crudBorrowers = crud + "borrowers",
@@ -75,17 +76,17 @@ public class Presentation {
 			returnBook = "Return a book", updateBranch = "Update branch information",
 			changeCopies = "Change the number of copies of a book at your branch", create = "Create", read = "Read",
 			update = "Update", delete = "Delete", cancelOperation = "Cancel the operation";
-	protected static final String operationCancelled = "The operation was cancelled.",
+	protected final String operationCancelled = "The operation was cancelled.",
 			noChangesMade = "No changes have been made.";
-	protected static final String invalidSelection = "Error: That is not a valid selection.",
+	protected final String invalidSelection = "Error: That is not a valid selection.",
 			invalidCard = "Error: That is not a valid card number.",
 			invalidCopies = "Error: That is not a valid number of copies.";
 
-	protected static final Scanner scanner = new Scanner(System.in);
+	protected final Scanner scanner = new Scanner(System.in);
 
-	protected static final LibrarianService librarianService = new LibrarianService();
-	protected static final BorrowerService borrowerService = new BorrowerService();
-	protected static final AdminService adminService = new AdminService();
+	protected final LibrarianService librarianService = new LibrarianService();
+	protected final BorrowerService borrowerService = new BorrowerService();
+	protected final AdminService adminService = new AdminService();
 
 	/**
 	 * Removes all elements in a list of strings and repopulates the list
@@ -93,7 +94,7 @@ public class Presentation {
 	 * @param list        The list to be reset
 	 * @param newElements The new contents to populate the list
 	 */
-	protected static void resetList(List<String> list, String... newElements) {
+	protected void resetList(List<String> list, String... newElements) {
 		list.clear();
 		Collections.addAll(list, newElements);
 	}
@@ -104,7 +105,7 @@ public class Presentation {
 	 * @param list        The list to be reset
 	 * @param newElements The new contents to populate the list
 	 */
-	protected static void resetList(List<Integer> list, Integer... newElements) {
+	protected void resetList(List<Integer> list, Integer... newElements) {
 		list.clear();
 		Collections.addAll(list, newElements);
 	}
@@ -115,17 +116,17 @@ public class Presentation {
 	 * @param list        The list to be reset
 	 * @param newElements The new contents to populate the list
 	 */
-	protected static void resetList(List<Object> list, Object... newElements) {
+	protected void resetList(List<Object> list, Object... newElements) {
 		list.clear();
 		Collections.addAll(list, newElements);
 	}
 
-	protected static void resetList(List<Loan> list, Loan... newElements) {
+	protected void resetList(List<Loan> list, Loan... newElements) {
 		list.clear();
 		Collections.addAll(list, newElements);
 	}
 
-	protected static ArrayList<String> newArrayList(String... elements) {
+	protected ArrayList<String> newArrayList(String... elements) {
 		ArrayList<String> result = new ArrayList<String>();
 		Collections.addAll(result, elements);
 		return result;
@@ -144,7 +145,7 @@ public class Presentation {
 	 *                         choice, other than that corresponding to returning to
 	 *                         the previous menu
 	 */
-	protected static void prepareForIntCrossSelection(List<String> userOptions, List<Integer> crossOptions,
+	protected void prepareForIntCrossSelection(List<String> userOptions, List<Integer> crossOptions,
 			String[] userOptionArray, Integer[] crossOptionArray) {
 		resetList(userOptions, userOptionArray);
 		resetList(crossOptions, crossOptionArray);
@@ -165,7 +166,7 @@ public class Presentation {
 	 *                         choice, other than that corresponding to returning to
 	 *                         the previous menu
 	 */
-	protected static void prepareForLoanCrossSelection(List<String> userOptions, List<Loan> crossOptions,
+	protected void prepareForLoanCrossSelection(List<String> userOptions, List<Loan> crossOptions,
 			String[] userOptionArray, Loan[] crossOptionArray) {
 		resetList(userOptions, userOptionArray);
 		resetList(crossOptions, crossOptionArray);
@@ -182,7 +183,7 @@ public class Presentation {
 	 *                     choice
 	 * @return The integer corresponding to the option chosen by the user
 	 */
-	protected static int getIntCrossSelection(String prompt, List<String> userOptions, List<Integer> crossOptions) {
+	protected int getIntCrossSelection(String prompt, List<String> userOptions, List<Integer> crossOptions) {
 		return crossOptions.get(PresUtils.getOptionSelection(prompt, userOptions));
 	}
 
@@ -195,7 +196,7 @@ public class Presentation {
 	 *                     choice
 	 * @return The book loan corresponding to the option chosen by the user
 	 */
-	protected static Loan getLoanCrossSelection(String prompt, List<String> userOptions, List<Loan> crossOptions) {
+	protected Loan getLoanCrossSelection(String prompt, List<String> userOptions, List<Loan> crossOptions) {
 		return crossOptions.get(PresUtils.getOptionSelection(prompt, userOptions));
 	}
 
@@ -206,7 +207,7 @@ public class Presentation {
 	 * @return Primary key of the selected branch, or 0 if the user wants to go back
 	 *         to the previous menu
 	 */
-	protected static int getBranchSelection(String prompt) {
+	protected int getBranchSelection(String prompt) {
 		ArrayList<String> options = new ArrayList<String>();
 		ArrayList<Integer> branchPks = new ArrayList<Integer>();
 		Object[][] branchPksAndNames = librarianService.getBranchPksAndNames();
@@ -222,7 +223,7 @@ public class Presentation {
 	 * @return The card number input by the user, or 0 if the user wants to go back
 	 *         to the previous menu
 	 */
-	protected static int getCardNumber(String prompt) {
+	protected int getCardNumber(String prompt) {
 		int cardNumber;
 		List<Integer> cardNumbers = borrowerService.getCardNumbers();
 		for (;;) {
@@ -246,7 +247,7 @@ public class Presentation {
 	 * @param bookPk   The primary key of the book
 	 * @return The new number of copies
 	 */
-	protected static int getNewNumberOfCopies(String prompt) {
+	protected int getNewNumberOfCopies(String prompt) {
 		int NewNumberOfCopies;
 		for (;;) {
 			System.out.println(prompt);
@@ -262,11 +263,11 @@ public class Presentation {
 		}
 	}
 
-	protected static String[] getChangeOrRemoveOpts(String subject) {
+	protected String[] getChangeOrRemoveOpts(String subject) {
 		return new String[] { cancelCode, "Change " + subject, "Remove " + subject };
 	}
 
-	protected static String[] getAddOrRemoveOpts(String subject) {
+	protected String[] getAddOrRemoveOpts(String subject) {
 		return new String[] { cancelCode, "Add " + subject, "Remove " + subject };
 	}
 
@@ -276,19 +277,19 @@ public class Presentation {
 	 * @param objectType The type of object to be operated on
 	 * @return The prompt
 	 */
-	protected static String getCRUDPrompt(String objectType) {
+	protected String getCRUDPrompt(String objectType) {
 		return "What operation do you want to do with " + objectType + "?";
 	}
 
-	protected static String getObjectUpdatePrompt(String objectType) {
+	protected String getObjectUpdatePrompt(String objectType) {
 		return "Which " + objectType + "do you want to update?";
 	}
 
-	protected static String getObjectDeletionPrompt(String objectType) {
+	protected String getObjectDeletionPrompt(String objectType) {
 		return "Which " + objectType + "do you want to delete?";
 	}
 
-	protected static String getFieldUpdatePrompt(String objectType) {
+	protected String getFieldUpdatePrompt(String objectType) {
 		return "What information about this " + objectType + "do you want to update?";
 	}
 
@@ -300,7 +301,7 @@ public class Presentation {
 	 * @param fieldName  The name of the field
 	 * @return The prompt
 	 */
-	protected static String getMonoStringFieldPrompt(String objectType, String fieldName) {
+	protected String getMonoStringFieldPrompt(String objectType, String fieldName) {
 		return "What is the " + fieldName + " of the " + objectType + "? Enter a blank line to cancel the operation.";
 	}
 
@@ -312,7 +313,7 @@ public class Presentation {
 	 * @param fieldName  The name of the field
 	 * @return The prompt
 	 */
-	protected static String getMonoObjectFieldPrompt(String objectType, String fieldName) {
+	protected String getMonoObjectFieldPrompt(String objectType, String fieldName) {
 		return "What is the " + fieldName + " of the " + objectType + "?";
 	}
 
@@ -324,7 +325,7 @@ public class Presentation {
 	 * @param fieldName  The name of the field
 	 * @return The prompt
 	 */
-	protected static String getMultiFieldPrompt(String objectType, String fieldName) {
+	protected String getMultiFieldPrompt(String objectType, String fieldName) {
 		return "What are the " + fieldName + " of the " + objectType + "? To add multiple " + fieldName
 				+ ", enter the numbers on a single line, separated with spaces.";
 	}
@@ -336,7 +337,7 @@ public class Presentation {
 	 * @param fieldName The name of the field
 	 * @return The prompt
 	 */
-	protected static String getAddMultiFieldPrompt(String fieldName) {
+	protected String getAddMultiFieldPrompt(String fieldName) {
 		return "What " + fieldName + " should be added? To add multiple " + fieldName
 				+ ", enter the numbers on a single line, separated with spaces.";
 	}
@@ -348,7 +349,7 @@ public class Presentation {
 	 * @param fieldName The name of the field
 	 * @return The prompt
 	 */
-	protected static String getRemoveMultiFieldPrompt(String fieldName) {
+	protected String getRemoveMultiFieldPrompt(String fieldName) {
 		return "What " + fieldName + " should be removed? To add multiple " + fieldName
 				+ ", enter the numbers on a single line, separated with spaces.";
 	}
@@ -359,11 +360,11 @@ public class Presentation {
 	 * @param fieldName The name of the optional field
 	 * @return The prompt
 	 */
-	protected static String addFieldPrompt(String fieldName) {
+	protected String addFieldPrompt(String fieldName) {
 		return "Add " + fieldName + "?";
 	}
 
-	protected static ArrayList<Integer> getMultiOptionSelection(String prompt, ArrayList<String> options) {
+	protected ArrayList<Integer> getMultiOptionSelection(String prompt, ArrayList<String> options) {
 		int i, selectionNumber;
 		String[] userInput;
 		ArrayList<Integer> selectedOptions = new ArrayList<Integer>();
