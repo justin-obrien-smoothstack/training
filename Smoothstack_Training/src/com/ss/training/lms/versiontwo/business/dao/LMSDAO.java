@@ -121,12 +121,6 @@ public abstract class LMSDAO<T> {
 	public ArrayList<T> readAll() throws ClassNotFoundException, SQLException {
 		return read("SELECT * FROM " + nativeTable, null);
 	}
-
-	public abstract int create(LMSObject object);
-	
-	public abstract void update(LMSObject object);
-	
-	public abstract void delete(LMSObject object);
 	
 	public abstract ArrayList<T> extractData(ResultSet resultSet) throws SQLException;
 }

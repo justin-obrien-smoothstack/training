@@ -20,6 +20,7 @@ public class BookDAO extends LMSDAO<Book> {
 		nativeTable = tblBook;
 	}
 
+	@Override
 	public int create(Book book) throws ClassNotFoundException, SQLException {
 		Object[] queryArgs = { book.getTitle(), book.getPubId() };
 		int thisBookId = saveWithPk("INSERT INTO " + nativeTable + " (" + title + ", " + pubId + ") VALUES (?,?)",

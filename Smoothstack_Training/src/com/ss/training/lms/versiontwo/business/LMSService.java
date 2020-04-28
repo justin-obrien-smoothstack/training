@@ -94,9 +94,10 @@ public class LMSService {
 	}
 
 	public String create(String objectType, LMSObject object) {
+		int possiblePublisherId;
 		try (Connection connection = getConnection()) {
 			LMSDAO<?> dao = getDAO(connection, objectType);
-			dao.create()
+			possiblePublisherId = dao.create(object);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return presentation.operationFailed;
