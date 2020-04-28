@@ -28,7 +28,7 @@ public class AuthorDAO extends LMSDAO<Author> {
 
 	public void update(Author author) throws ClassNotFoundException, SQLException {
 		Object[] queryArgs = { author.getName(), author.getId() };
-		save("UPDATE" + nativeTable + " SET " + authorName + " = ? WHERE " + authorId + " = ?", queryArgs);
+		save("UPDATE " + nativeTable + " SET " + authorName + " = ? WHERE " + authorId + " = ?", queryArgs);
 		updateRelations(author.getBookIds(), tblBookAuthor, authorId, bookId, author.getId());
 	}
 

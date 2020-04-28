@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import com.ss.training.lms.versiontwo.object.Book;
-import com.ss.training.lms.versiontwo.object.Copies;
 
 /**
  * @author Justin O'Brien
@@ -31,7 +30,7 @@ public class BookDAO extends LMSDAO<Book> {
 
 	public void update(Book book) throws ClassNotFoundException, SQLException {
 		Object[] queryArgs = { book.getTitle(), book.getPubId(), book.getId() };
-		save("UPDATE" + nativeTable + " SET " + title + " = ?, " + pubId + " = ? WHERE " + bookId + " = ?", queryArgs);
+		save("UPDATE " + nativeTable + " SET " + title + " = ?, " + pubId + " = ? WHERE " + bookId + " = ?", queryArgs);
 		updateRelations(book.getAuthorIds(), tblBookAuthor, bookId, authorId, book.getId());
 		updateRelations(book.getGenreIds(), tblBookGenre, bookId, genreId, book.getId());
 	}
