@@ -184,7 +184,7 @@ public class AdminService extends LMSService {
 		output.append("\n");
 		return output.toString();
 	}
-	
+
 	public String readBranches() {
 		StringBuilder output = new StringBuilder();
 		ArrayList<Branch> branchs = (ArrayList<Branch>) getAllObjects(LMS.branch);
@@ -217,12 +217,20 @@ public class AdminService extends LMSService {
 		return output.toString();
 	}
 
-	
-
-	public String read() {
-		StringBuilder output = new StringBuilder("\n");
-		ArrayList<> = getAllObjects(LMS.);
-		
+	public String readPublishers() {
+		StringBuilder output = new StringBuilder();
+		ArrayList<Publisher> publishers = (ArrayList<Publisher>) getAllObjects(LMS.publisher);
+		publishers.stream().forEach(publisher -> {
+			output.append("\nID number: " + publisher.getId());
+			output.append("\nName: " + publisher.getName());
+			output.append("\nAddress: ");
+			appendIfNotNull(output, publisher.getAddress());
+			output.append("\nPhone: ");
+			appendIfNotNull(output, publisher.getPhone());
+			output.append("\nLoans: ");
+			getObjectsById(LMS.book, publisher.getBookIds()).stream()
+					.forEach(book -> output.append("\n\t" + ((Book) book).getDisplayName()));
+		});
 		output.append("\n");
 		return output.toString();
 	}
