@@ -1,6 +1,7 @@
 package com.ss.training.lms.versiontwo.object;
 
-import java.util.HashMap;
+import com.ss.training.lms.versiontwo.LMS;
+import com.ss.training.lms.versiontwo.business.LMSService;
 
 /**
  * @author Justin O'Brien
@@ -8,7 +9,7 @@ import java.util.HashMap;
 public class Copies extends LMSObject {
 
 	private int bookId, branchId, copies;
-	
+
 	/**
 	 * @param bookId
 	 * @param branchId
@@ -87,20 +88,10 @@ public class Copies extends LMSObject {
 
 	@Override
 	public String getDisplayName() {
-		// TODO Auto-generated method stub
-		return "";
+		LMSService service = new LMSService();
+		Book book = (Book) service.getObjectById(LMS.book, bookId);
+		Branch branch = (Branch) service.getObjectById(LMS.branch, branchId);
+		return branch.getDisplayName() + " has " + copies + (copies == 1 ? " copy of " : " copies of ")
+				+ book.getDisplayName();
 	}
-
-	@Override
-	public HashMap<String, HashMap<String, Object>> getFieldsMap() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setFieldsMap(HashMap<String, HashMap<String, Object>> fieldsMap) {
-		// TODO Auto-generated method stub
-
-	}
-
 }

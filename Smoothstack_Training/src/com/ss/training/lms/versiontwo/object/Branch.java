@@ -1,12 +1,11 @@
 package com.ss.training.lms.versiontwo.object;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * @author Justin O'Brien
  */
-public class Branch extends LMSObject implements HasCopiesLoansAndIntegerID{
+public class Branch extends LMSObject implements HasCopiesLoansAndIntegerId {
 
 	private int id;
 	private String name, address;
@@ -113,17 +112,5 @@ public class Branch extends LMSObject implements HasCopiesLoansAndIntegerID{
 	@Override
 	public String getDisplayName() {
 		return (name == null ? "(name not found)" : name) + (address == null ? " (address not found)" : ", " + address);
-	}
-
-	@Override
-	public HashMap<String, HashMap<String, Object>> getFieldsMap() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setFieldsMap(HashMap<String, HashMap<String, Object>> fieldsMap) {
-		// TODO Auto-generated method stub
-
 	}
 }

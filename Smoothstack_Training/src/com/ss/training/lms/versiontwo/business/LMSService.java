@@ -17,9 +17,9 @@ import com.ss.training.lms.versiontwo.business.dao.CopiesDAO;
 import com.ss.training.lms.versiontwo.business.dao.LMSDAO;
 import com.ss.training.lms.versiontwo.business.dao.LoanDAO;
 import com.ss.training.lms.versiontwo.object.Author;
-import com.ss.training.lms.versiontwo.object.BookOrBranch;
 import com.ss.training.lms.versiontwo.object.Copies;
-import com.ss.training.lms.versiontwo.object.HasCopiesLoansAndIntegerID;
+import com.ss.training.lms.versiontwo.object.HasCopiesLoansAndIntegerId;
+import com.ss.training.lms.versiontwo.object.HasIntegerId;
 import com.ss.training.lms.versiontwo.object.LMSObject;
 import com.ss.training.lms.versiontwo.object.Loan;
 
@@ -54,7 +54,8 @@ public class LMSService {
 		return connection;
 	}
 
-	public ArrayList<HasCopiesLoansAndIntegerID> completeCopiesAndLoansInfo(ArrayList<HasCopiesLoansAndIntegerID> hasCopiesAndLoans) {
+	public ArrayList<HasCopiesLoansAndIntegerId> completeCopiesAndLoansInfo(
+			ArrayList<HasCopiesLoansAndIntegerId> hasCopiesAndLoans) {
 		ArrayList<Copies> copieses = new ArrayList<Copies>();
 		ArrayList<Loan> loans = new ArrayList<Loan>();
 		try (Connection connection = getConnection()) {
@@ -80,6 +81,7 @@ public class LMSService {
 			switch (objectType) {
 			case LMS.author:
 			case LMS.authors:
+				dao = new AuthorDAO(connection);
 				break;
 			case LMS.book:
 			case LMS.books:
@@ -124,15 +126,17 @@ public class LMSService {
 		return allObjects;
 	}
 
-	public ArrayList<Author> getAuthorsById(List<Integer> ids) {
-		ArrayList<Author> authors = new ArrayList<Author>();
-		try (Connection connection = getConnection()) {
-			authors = new AuthorDAO(connection).readAll();
-		} catch (Exception e) {
-			printRetrievalErrorMessage(LMS.authors);
-			e.printStackTrace();
-		}
-		return authors.stream().filter(author -> ids.contains(author.getId()))
+	public HasIntegerId getObjectById(String objectType, int id) {
+		ArrayList<HasIntegerId> allObjects = (ArrayList<HasIntegerId>) getAllObjects(objectType);
+		for (HasIntegerId object : allObjects)
+			if (object.getId() == id)
+				return object;
+		return null;
+	}
+
+	public ArrayList<?> getObjectsById(String objectType, List<Integer> ids) {
+		ArrayList<HasIntegerId> allObjects = (ArrayList<HasIntegerId>) getAllObjects(objectType);
+		return allObjects.stream().filter(object -> ids.contains(object.getId()))
 				.collect(Collectors.toCollection(ArrayList::new));
 	}
 }

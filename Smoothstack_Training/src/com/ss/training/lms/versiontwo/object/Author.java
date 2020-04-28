@@ -1,7 +1,6 @@
 package com.ss.training.lms.versiontwo.object;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * @author Justin O'Brien
@@ -58,24 +57,31 @@ public class Author extends LMSObject implements HasIntegerId {
 		this.bookIds = bookIds;
 	}
 
-	
-	
 	@Override
 	public String getDisplayName() {
-		// TODO Auto-generated method stub
-		return null;
+		return getName();
 	}
 
 	@Override
-	public HashMap<String, HashMap<String, Object>> getFieldsMap() {
-		// TODO Auto-generated method stub
-		return null;
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + id;
+		return result;
 	}
 
 	@Override
-	public void setFieldsMap(HashMap<String, HashMap<String, Object>> fieldsMap) {
-		// TODO Auto-generated method stub
-
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Author other = (Author) obj;
+		if (id != other.id)
+			return false;
+		return true;
 	}
 
 }

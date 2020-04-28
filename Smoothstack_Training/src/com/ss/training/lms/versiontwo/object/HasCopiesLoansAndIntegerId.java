@@ -5,7 +5,7 @@ import java.util.ArrayList;
 /**
  * @author Justin O'Brien
  */
-public interface HasCopiesLoansAndIntegerID {
+public interface HasCopiesLoansAndIntegerId {
 
 	public int getId();
 	

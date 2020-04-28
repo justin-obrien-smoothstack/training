@@ -1,7 +1,9 @@
 package com.ss.training.lms.versiontwo.object;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
+
+import com.ss.training.lms.versiontwo.LMS;
+import com.ss.training.lms.versiontwo.business.LMSService;
 
 /**
  * @author Justin O'Brien
@@ -9,41 +11,17 @@ import java.util.HashMap;
 public class Loan extends LMSObject {
 
 	private int bookId, branchId, cardNo;
-	
+
 	private LocalDateTime dateOut, dueDate, dateIn;
-	
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + bookId;
-		result = prime * result + branchId;
-		result = prime * result + cardNo;
-		result = prime * result + ((dateOut == null) ? 0 : dateOut.hashCode());
-		return result;
-	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Loan other = (Loan) obj;
-		if (bookId != other.bookId)
-			return false;
-		if (branchId != other.branchId)
-			return false;
-		if (cardNo != other.cardNo)
-			return false;
-		if (dateOut == null) {
-			if (other.dateOut != null)
-				return false;
-		} else if (!dateOut.equals(other.dateOut))
-			return false;
-		return true;
+	public String getDisplayName() {
+		LMSService service = new LMSService();
+		Borrower borrower = (Borrower) service.getObjectById(LMS.borrower, cardNo);
+		Branch branch = (Branch) service.getObjectById(LMS.branch, branchId);
+		Book book = (Book) service.getObjectById(LMS.book, bookId);
+		return borrower.getDisplayName() + " checked out " + book.getDisplayName() + " from " + branch.getDisplayName()
+				+ " on " + dateOut;
 	}
 
 	/**
@@ -131,18 +109,36 @@ public class Loan extends LMSObject {
 	}
 
 	@Override
-	public String getDisplayName() {
-		return "";
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + bookId;
+		result = prime * result + branchId;
+		result = prime * result + cardNo;
+		result = prime * result + ((dateOut == null) ? 0 : dateOut.hashCode());
+		return result;
 	}
 
 	@Override
-	public HashMap<String, HashMap<String, Object>> getFieldsMap() {
-		return new HashMap<String, HashMap<String, Object>>();
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Loan other = (Loan) obj;
+		if (bookId != other.bookId)
+			return false;
+		if (branchId != other.branchId)
+			return false;
+		if (cardNo != other.cardNo)
+			return false;
+		if (dateOut == null) {
+			if (other.dateOut != null)
+				return false;
+		} else if (!dateOut.equals(other.dateOut))
+			return false;
+		return true;
 	}
-
-	@Override
-	public void setFieldsMap(HashMap<String, HashMap<String, Object>> fieldsMap) {
-
-	}
-
 }

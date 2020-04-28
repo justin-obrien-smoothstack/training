@@ -1,14 +1,14 @@
 package com.ss.training.lms.versiontwo.object;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
+import com.ss.training.lms.versiontwo.LMS;
 import com.ss.training.lms.versiontwo.business.LMSService;
 
 /**
  * @author Justin O'Brien
  */
-public class Book extends LMSObject implements HasCopiesLoansAndIntegerID {
+public class Book extends LMSObject implements HasCopiesLoansAndIntegerId {
 
 	int id;
 	Integer pubId;
@@ -44,6 +44,17 @@ public class Book extends LMSObject implements HasCopiesLoansAndIntegerID {
 		if (id != other.id)
 			return false;
 		return true;
+	}
+
+	@Override
+	public String getDisplayName() {
+		StringBuilder displayName = new StringBuilder(title);
+		ArrayList<Author> authors = (ArrayList<Author>) new LMSService().getObjectsById(LMS.author, authorIds);
+		if (authors.size() != 0) {
+			displayName.append(" by " + authors.stream().map(author -> author.getName())
+					.reduce((partialList, nextName) -> partialList + ", " + nextName));
+		}
+		return displayName.toString();
 	}
 
 	/**
@@ -142,29 +153,6 @@ public class Book extends LMSObject implements HasCopiesLoansAndIntegerID {
 	 */
 	public void setLoans(ArrayList<Loan> loans) {
 		this.loans = loans;
-	}
-
-	@Override
-	public String getDisplayName() {
-		StringBuilder displayName = new StringBuilder(title);
-		ArrayList<Author> authors = new LMSService().getAuthorsById(authorIds);
-		if (authors.size() != 0) {
-			displayName.append(" by " + authors.stream().map(author -> author.getName())
-					.reduce((partialList, nextName) -> partialList + ", " + nextName));
-		}
-		return displayName.toString();
-	}
-
-	@Override
-	public HashMap<String, HashMap<String, Object>> getFieldsMap() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setFieldsMap(HashMap<String, HashMap<String, Object>> fieldsMap) {
-		// TODO Auto-generated method stub
-
 	}
 
 }

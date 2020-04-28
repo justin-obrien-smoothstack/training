@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import com.ss.training.lms.versiontwo.object.Book;
+import com.ss.training.lms.versiontwo.object.Copies;
 
 /**
  * @author Justin O'Brien
@@ -20,6 +21,12 @@ public class BookDAO extends LMSDAO<Book> {
 		nativeTable = tblBook;
 	}
 
+	public void create(Copies copies) throws ClassNotFoundException, SQLException {
+		Object[] queryArgs = { copies.getCopies(), copies.getBranchId(), copies.getBookId() };
+		save("INSERT INTO " + nativeTable + "(" + noOfCopies + ", " + branchId + ", " + bookId + ") VALUES (?, ?, ?)",
+				queryArgs);
+	}
+	
 	@Override
 	public ArrayList<Book> extractData(ResultSet resultSet) throws SQLException {
 		Book book;

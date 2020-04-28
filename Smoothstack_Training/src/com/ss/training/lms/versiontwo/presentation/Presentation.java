@@ -529,19 +529,19 @@ public class Presentation {
 				break;
 			case create:
 				objectType = (String) parameters.get(0);
-				System.out.println(createObject(objectType));
+//				System.out.println(createObject(objectType));
 				break;
 			case read:
 				objectType = (String) parameters.get(0);
-				System.out.println(readObjects(objectType));
+//				System.out.println(readObjects(objectType));
 				return;
 			case update:
 				objectType = (String) parameters.get(0);
-				System.out.println(updateObject(objectType));
+//				System.out.println(updateObject(objectType));
 				break;
 			case delete:
 				objectType = (String) parameters.get(0);
-				System.out.println(deleteObject(objectType));
+//				System.out.println(deleteObject(objectType));
 				break;
 			case override:
 				// must change to take borrower ID & branch
@@ -557,289 +557,289 @@ public class Presentation {
 		}
 	}
 
-	/**
-	 * Creates an object in the database
-	 * 
-	 * @param objectType The type of object to create
-	 * @return A string indicating whether the operation succeeded
-	 */
-	protected static String createObject(String objectType) {
-		int selectedOption;
-		String fieldValue;
-		LMSObject newObject = adminService.getBlankObject(objectType);
-		ArrayList<Integer> selectedOptions;
-		ArrayList<String> options,
-				yesOrNo = (ArrayList<String>) Arrays.asList(new String[] { cancelOperation, "Yes", "No" });
-		ArrayList<LMSObject> possiblyRelatedObjects = new ArrayList<LMSObject>();
-		HashMap<String, HashMap<String, Object>> newObjectFields = newObject.getFieldsMap();
-		HashMap<String, Object> independentRequired = (HashMap<String, Object>) newObjectFields.get(LMS.independent)
-				.get(LMS.required);
-		HashMap<String, Object> independentOptional = (HashMap<String, Object>) newObjectFields.get(LMS.independent)
-				.get(LMS.optional);
-		HashMap<String, Object> relationalMono = (HashMap<String, Object>) newObjectFields.get(LMS.relational)
-				.get(LMS.mono);
-		HashMap<String, Object> relationalMulti = (HashMap<String, Object>) newObjectFields.get(LMS.relational)
-				.get(LMS.multi);
-		// HashMap<String, Object> composite = newObjectFields.get(LMS.composite);
-		for (String fieldName : independentRequired.keySet()) {
-			System.out.println(getMonoStringFieldPrompt(objectType, fieldName));
-			fieldValue = scanner.nextLine();
-			if (fieldValue.isEmpty())
-				return operationCancelled;
-			independentRequired.put(fieldName, fieldValue);
-		}
-		for (String fieldName : independentOptional.keySet()) {
-			selectedOption = PresUtils.getOptionSelection(addFieldPrompt(fieldName), yesOrNo);
-			if (selectedOption == 0)
-				return operationCancelled;
-			if (selectedOption == 1) {
-				System.out.println(getMonoStringFieldPrompt(objectType, fieldName));
-				fieldValue = scanner.nextLine();
-				if (fieldValue.isEmpty())
-					return operationCancelled;
-				independentOptional.put(fieldName, fieldValue);
-			}
-		}
-		for (String fieldName : relationalMono.keySet()) {
-			selectedOption = PresUtils.getOptionSelection(addFieldPrompt(fieldName), yesOrNo);
-			if (selectedOption == 0)
-				return operationCancelled;
-			if (selectedOption == 1) {
-				possiblyRelatedObjects.clear();
-				possiblyRelatedObjects.addAll(adminService.getAllObjects(fieldName));
-				options = possiblyRelatedObjects.stream().map(object -> object.getDisplayName())
-						.collect(Collectors.toCollection(ArrayList::new));
-				options.add(0, cancelOperation);
-				possiblyRelatedObjects.add(0, null);
-				selectedOption = PresUtils.getOptionSelection(getMonoStringFieldPrompt(objectType, fieldName), options);
-				if (selectedOption == 0)
-					return operationCancelled;
-				relationalMono.put(fieldName, possiblyRelatedObjects.get(selectedOption));
-			}
-		}
-		for (String fieldName : relationalMulti.keySet()) {
-			selectedOption = PresUtils.getOptionSelection(addFieldPrompt(fieldName), yesOrNo);
-			if (selectedOption == 0)
-				return operationCancelled;
-			if (selectedOption == 1) {
-				possiblyRelatedObjects.clear();
-				possiblyRelatedObjects.addAll(adminService.getAllObjects(fieldName));
-				options = possiblyRelatedObjects.stream().map(object -> object.getDisplayName())
-						.collect(Collectors.toCollection(ArrayList::new));
-				options.add(0, cancelOperation);
-				possiblyRelatedObjects.add(0, null);
-				selectedOptions = getMultiOptionSelection(getMultiFieldPrompt(objectType, fieldName), options);
-				if (selectedOptions.contains(0))
-					return operationCancelled;
-				selectedOptions.stream().forEach(option -> ((ArrayList<LMSObject>) relationalMulti.get(fieldName))
-						.add(possiblyRelatedObjects.get(option)));
-			}
-		}
-		newObject.setFieldsMap(newObjectFields);
-		return adminService.create(newObject);
-	}
-
-	/**
-	 * Gets information on all objects of a given type in the database
-	 * 
-	 * @param objectType The type of object to read
-	 * @return A string with information on all objects of the given type
-	 */
-	protected static String readObjects(String objectType) {
-		StringBuilder result = new StringBuilder("\n");
-		ArrayList<LMSObject> objectsToRead = adminService.getAllObjects(objectType);
-		objectsToRead.stream().map(object -> object.getFieldsMap()).forEach(fieldsMap -> {
-			HashMap<String, Object> independentFieldsMap = fieldsMap.get(LMS.independent);
-			HashMap<String, Object> relationalFieldsMap = fieldsMap.get(LMS.relational);
-			HashMap<String, Object> relationalMonoFieldsMap = (HashMap<String, Object>) relationalFieldsMap
-					.get(LMS.mono);
-			HashMap<String, Object> relationalMultiFieldsMap = (HashMap<String, Object>) relationalFieldsMap
-					.get(LMS.multi);
-			independentFieldsMap.keySet().stream().forEach(independentFieldsSubmapName -> {
-				HashMap<String, Object> independentFieldsSubmap = (HashMap<String, Object>) independentFieldsMap
-						.get(independentFieldsSubmapName);
-				independentFieldsSubmap.keySet().stream().forEach(independentFieldName -> {
-					String independentFieldValue = independentFieldsSubmap.get(independentFieldName) == null ? ""
-							: (String) independentFieldsSubmap.get(independentFieldName);
-					result.append(independentFieldName + ": " + independentFieldValue);
-				});
-			});
-			relationalMonoFieldsMap.keySet().stream().forEach(relationalMonoFieldName -> {
-				LMSObject relationalMonoFieldValue = (LMSObject) relationalMonoFieldsMap.get(relationalMonoFieldName);
-				String relationalMonoFieldValueName = (relationalMonoFieldValue == null
-						|| relationalMonoFieldValue.getDisplayName() == null) ? ""
-								: relationalMonoFieldValue.getDisplayName();
-				result.append(relationalMonoFieldName + ": " + relationalMonoFieldValueName);
-			});
-			relationalMultiFieldsMap.keySet().stream().forEach(relationalMultiFieldName -> {
-				ArrayList<LMSObject> relationalMultiFieldValues = (ArrayList<LMSObject>) relationalMultiFieldsMap
-						.get(relationalMultiFieldName);
-				String relationalMultiFieldValueNames = relationalMultiFieldValues.stream()
-						.map(relationalMultiFieldValue -> relationalMultiFieldValue.getDisplayName())
-						.reduce((partialResult, nextItem) -> partialResult + ", " + nextItem).orElse("");
-				result.append(relationalMultiFieldName + ": " + relationalMultiFieldValueNames);
-			});
-			result.append("\n");
-		});
-		return result.toString();
-	}
-
-	/**
-	 * Updates an object in the database
-	 * 
-	 * @param objectType The type of object to update
-	 * @return A string indicating whether the operation succeeded
-	 */
-	protected static String updateObject(String objectType) {
-		int selectedOption;
-		ArrayList<Integer> selectedOptions;
-		String nameOfFieldToUpdate, newFieldValueString;
-		ArrayList<LMSObject> updateCandidates = adminService.getAllObjects(objectType), possiblyRelatedObjects,
-				valuesOfFieldToUpdate;
-		ArrayList<String> options = updateCandidates.stream().map(object -> object.getDisplayName())
-				.collect(Collectors.toCollection(ArrayList::new)), tempOptions = new ArrayList<String>();
-		HashMap<String, HashMap<String, Object>> fieldsMap;
-		HashMap<String, Object> independentRequired, independentOptional, relationalMono, relationalMulti;
-		LMSObject objectToUpdate, newFieldValueObject;
-		updateCandidates.add(0, null);
-		options.add(0, cancelOperation);
-		selectedOption = PresUtils.getOptionSelection(getObjectUpdatePrompt(objectType), options);
-		objectToUpdate = updateCandidates.get(selectedOption);
-		fieldsMap = objectToUpdate.getFieldsMap();
-		tempOptions.add(cancelOperation);
-		fieldsMap.keySet().stream().forEach(fieldsMapKey -> {
-			HashMap<String, Object> fieldsSubmap = fieldsMap.get(fieldsMapKey);
-			if (!LMS.composite.equals(fieldsMapKey)) {
-				fieldsSubmap.keySet().stream().forEach(fieldsSubmapKey -> {
-					HashMap<String, Object> fieldsSubsubmap = (HashMap<String, Object>) fieldsSubmap
-							.get(fieldsSubmapKey);
-					fieldsSubsubmap.keySet().stream().forEach(fieldName -> tempOptions.add(fieldName));
-				});
-			}
-		});
-		selectedOption = PresUtils.getOptionSelection(getFieldUpdatePrompt(objectType), options);
-		if (selectedOption == 0)
-			return operationCancelled;
-		nameOfFieldToUpdate = options.get(selectedOption);
-		independentRequired = (HashMap<String, Object>) fieldsMap.get(LMS.independent).get(LMS.required);
-		independentOptional = (HashMap<String, Object>) fieldsMap.get(LMS.independent).get(LMS.optional);
-		relationalMono = (HashMap<String, Object>) fieldsMap.get(LMS.relational).get(LMS.mono);
-		relationalMulti = (HashMap<String, Object>) fieldsMap.get(LMS.relational).get(LMS.multi);
-		if (independentRequired.keySet().contains(nameOfFieldToUpdate)) {
-			System.out.println(getMonoStringFieldPrompt(objectType, nameOfFieldToUpdate));
-			newFieldValueString = scanner.nextLine();
-			if (newFieldValueString.isEmpty())
-				return operationCancelled;
-			independentRequired.put(nameOfFieldToUpdate, newFieldValueString);
-			objectToUpdate.setFieldsMap(fieldsMap);
-			return adminService.update(objectToUpdate);
-		}
-		if (independentOptional.keySet().contains(nameOfFieldToUpdate)) {
-			if (independentOptional.get(nameOfFieldToUpdate) != null) {
-				options = newArrayList(getChangeOrRemoveOpts(nameOfFieldToUpdate));
-				selectedOption = PresUtils.getOptionSelection(genericPrompt, options);
-				if (selectedOption == 0)
-					return operationCancelled;
-				if (selectedOption == 2) {
-					independentOptional.put(nameOfFieldToUpdate, null);
-					objectToUpdate.setFieldsMap(fieldsMap);
-					return adminService.update(objectToUpdate);
-				}
-			}
-			System.out.println(getMonoStringFieldPrompt(objectType, nameOfFieldToUpdate));
-			newFieldValueString = scanner.nextLine();
-			if (newFieldValueString.isEmpty())
-				return operationCancelled;
-			independentOptional.put(nameOfFieldToUpdate, newFieldValueString);
-			objectToUpdate.setFieldsMap(fieldsMap);
-			return adminService.update(objectToUpdate);
-		}
-		if (relationalMono.keySet().contains(nameOfFieldToUpdate)) {
-			if (relationalMono.get(nameOfFieldToUpdate) != null) {
-				options = newArrayList(getChangeOrRemoveOpts(nameOfFieldToUpdate));
-				selectedOption = PresUtils.getOptionSelection(genericPrompt, options);
-				if (selectedOption == 0)
-					return operationCancelled;
-				if (selectedOption == 2) {
-					relationalMono.put(nameOfFieldToUpdate, null);
-					objectToUpdate.setFieldsMap(fieldsMap);
-					return adminService.update(objectToUpdate);
-				}
-			}
-			System.out.println(getMonoStringFieldPrompt(objectType, nameOfFieldToUpdate));
-			possiblyRelatedObjects = adminService.getAllObjects(nameOfFieldToUpdate);
-			possiblyRelatedObjects.add(0, null);
-			options.clear();
-			options.addAll(possiblyRelatedObjects.stream().map(object -> object.getDisplayName())
-					.collect(Collectors.toCollection(ArrayList::new)));
-			selectedOption = PresUtils.getOptionSelection(getMonoObjectFieldPrompt(objectType, nameOfFieldToUpdate),
-					options);
-			if (selectedOption == 0)
-				return operationCancelled;
-			newFieldValueObject = possiblyRelatedObjects.get(selectedOption);
-			relationalMono.put(nameOfFieldToUpdate, newFieldValueObject);
-			objectToUpdate.setFieldsMap(fieldsMap);
-			return adminService.update(objectToUpdate);
-		}
-		if (relationalMulti.keySet().contains(nameOfFieldToUpdate)) {
-			valuesOfFieldToUpdate = (ArrayList<LMSObject>) relationalMulti.get(nameOfFieldToUpdate);
-			if (valuesOfFieldToUpdate.size() != 0) {
-				options = newArrayList(getAddOrRemoveOpts(nameOfFieldToUpdate));
-				selectedOption = PresUtils.getOptionSelection(genericPrompt, options);
-				if (selectedOption == 0)
-					return operationCancelled;
-				if (selectedOption == 2) {
-					options.clear();
-					options.addAll(valuesOfFieldToUpdate.stream().map(object -> object.getDisplayName())
-							.collect(Collectors.toCollection(ArrayList::new)));
-					options.add(0, cancelOperation);
-					valuesOfFieldToUpdate.add(0, null);
-					selectedOptions = getMultiOptionSelection(getRemoveMultiFieldPrompt(nameOfFieldToUpdate), options);
-					if (selectedOptions.contains(0))
-						return operationCancelled;
-					for (int selectionNumber : selectedOptions)
-						valuesOfFieldToUpdate.remove(selectionNumber);
-					valuesOfFieldToUpdate.remove(null);
-					objectToUpdate.setFieldsMap(fieldsMap);
-					return adminService.update(objectToUpdate);
-				}
-				possiblyRelatedObjects = adminService.getAllObjects(objectType);
-				for (LMSObject objectAlreadyPresent : valuesOfFieldToUpdate)
-					possiblyRelatedObjects.removeIf(object -> object.equals(objectAlreadyPresent));
-				options.clear();
-				options.addAll(possiblyRelatedObjects.stream().map(object -> object.getDisplayName())
-						.collect(Collectors.toCollection(ArrayList::new)));
-				options.add(0, cancelOperation);
-				possiblyRelatedObjects.add(0, null);
-				selectedOptions = getMultiOptionSelection(getAddMultiFieldPrompt(nameOfFieldToUpdate), options);
-				if (selectedOptions.contains(0))
-					return operationCancelled;
-				selectedOptions.stream().forEach(index -> valuesOfFieldToUpdate.add(possiblyRelatedObjects.get(index)));
-				objectToUpdate.setFieldsMap(fieldsMap);
-				return adminService.update(objectToUpdate);
-			}
-		}
-		return "Oops, something went wrong.";
-	}
-
-	/**
-	 * Deletes an object in the database
-	 * 
-	 * @param objectType The type of object to delete
-	 * @return A string indicating whether the operation succeeded
-	 */
-	protected static String deleteObject(String objectType) {
-		int selectedOption;
-		LMSObject objectToDelete;
-		ArrayList<LMSObject> deletionCandidates = adminService.getAllObjects(objectType);
-		ArrayList<String> options = deletionCandidates.stream().map(object -> object.getDisplayName())
-				.collect(Collectors.toCollection(ArrayList::new));
-		options.add(0, cancelOperation);
-		deletionCandidates.add(null);
-		selectedOption = PresUtils.getOptionSelection(getObjectDeletionPrompt(objectType), options);
-		if (selectedOption == 0)
-			return operationCancelled;
-		objectToDelete = deletionCandidates.get(selectedOption);
-		return (adminService.delete(objectToDelete));
-	}
+//	/**
+//	 * Creates an object in the database
+//	 * 
+//	 * @param objectType The type of object to create
+//	 * @return A string indicating whether the operation succeeded
+//	 */
+//	protected static String createObject(String objectType) {
+//		int selectedOption;
+//		String fieldValue;
+//		LMSObject newObject = adminService.getBlankObject(objectType);
+//		ArrayList<Integer> selectedOptions;
+//		ArrayList<String> options,
+//				yesOrNo = (ArrayList<String>) Arrays.asList(new String[] { cancelOperation, "Yes", "No" });
+//		ArrayList<LMSObject> possiblyRelatedObjects = new ArrayList<LMSObject>();
+//		HashMap<String, HashMap<String, Object>> newObjectFields = newObject.getFieldsMap();
+//		HashMap<String, Object> independentRequired = (HashMap<String, Object>) newObjectFields.get(LMS.independent)
+//				.get(LMS.required);
+//		HashMap<String, Object> independentOptional = (HashMap<String, Object>) newObjectFields.get(LMS.independent)
+//				.get(LMS.optional);
+//		HashMap<String, Object> relationalMono = (HashMap<String, Object>) newObjectFields.get(LMS.relational)
+//				.get(LMS.mono);
+//		HashMap<String, Object> relationalMulti = (HashMap<String, Object>) newObjectFields.get(LMS.relational)
+//				.get(LMS.multi);
+//		// HashMap<String, Object> composite = newObjectFields.get(LMS.composite);
+//		for (String fieldName : independentRequired.keySet()) {
+//			System.out.println(getMonoStringFieldPrompt(objectType, fieldName));
+//			fieldValue = scanner.nextLine();
+//			if (fieldValue.isEmpty())
+//				return operationCancelled;
+//			independentRequired.put(fieldName, fieldValue);
+//		}
+//		for (String fieldName : independentOptional.keySet()) {
+//			selectedOption = PresUtils.getOptionSelection(addFieldPrompt(fieldName), yesOrNo);
+//			if (selectedOption == 0)
+//				return operationCancelled;
+//			if (selectedOption == 1) {
+//				System.out.println(getMonoStringFieldPrompt(objectType, fieldName));
+//				fieldValue = scanner.nextLine();
+//				if (fieldValue.isEmpty())
+//					return operationCancelled;
+//				independentOptional.put(fieldName, fieldValue);
+//			}
+//		}
+//		for (String fieldName : relationalMono.keySet()) {
+//			selectedOption = PresUtils.getOptionSelection(addFieldPrompt(fieldName), yesOrNo);
+//			if (selectedOption == 0)
+//				return operationCancelled;
+//			if (selectedOption == 1) {
+//				possiblyRelatedObjects.clear();
+//				possiblyRelatedObjects.addAll(adminService.getAllObjects(fieldName));
+//				options = possiblyRelatedObjects.stream().map(object -> object.getDisplayName())
+//						.collect(Collectors.toCollection(ArrayList::new));
+//				options.add(0, cancelOperation);
+//				possiblyRelatedObjects.add(0, null);
+//				selectedOption = PresUtils.getOptionSelection(getMonoStringFieldPrompt(objectType, fieldName), options);
+//				if (selectedOption == 0)
+//					return operationCancelled;
+//				relationalMono.put(fieldName, possiblyRelatedObjects.get(selectedOption));
+//			}
+//		}
+//		for (String fieldName : relationalMulti.keySet()) {
+//			selectedOption = PresUtils.getOptionSelection(addFieldPrompt(fieldName), yesOrNo);
+//			if (selectedOption == 0)
+//				return operationCancelled;
+//			if (selectedOption == 1) {
+//				possiblyRelatedObjects.clear();
+//				possiblyRelatedObjects.addAll(adminService.getAllObjects(fieldName));
+//				options = possiblyRelatedObjects.stream().map(object -> object.getDisplayName())
+//						.collect(Collectors.toCollection(ArrayList::new));
+//				options.add(0, cancelOperation);
+//				possiblyRelatedObjects.add(0, null);
+//				selectedOptions = getMultiOptionSelection(getMultiFieldPrompt(objectType, fieldName), options);
+//				if (selectedOptions.contains(0))
+//					return operationCancelled;
+//				selectedOptions.stream().forEach(option -> ((ArrayList<LMSObject>) relationalMulti.get(fieldName))
+//						.add(possiblyRelatedObjects.get(option)));
+//			}
+//		}
+//		newObject.setFieldsMap(newObjectFields);
+//		return adminService.create(newObject);
+//	}
+//
+//	/**
+//	 * Gets information on all objects of a given type in the database
+//	 * 
+//	 * @param objectType The type of object to read
+//	 * @return A string with information on all objects of the given type
+//	 */
+//	protected static String readObjects(String objectType) {
+//		StringBuilder result = new StringBuilder("\n");
+//		ArrayList<LMSObject> objectsToRead = adminService.getAllObjects(objectType);
+//		objectsToRead.stream().map(object -> object.getFieldsMap()).forEach(fieldsMap -> {
+//			HashMap<String, Object> independentFieldsMap = fieldsMap.get(LMS.independent);
+//			HashMap<String, Object> relationalFieldsMap = fieldsMap.get(LMS.relational);
+//			HashMap<String, Object> relationalMonoFieldsMap = (HashMap<String, Object>) relationalFieldsMap
+//					.get(LMS.mono);
+//			HashMap<String, Object> relationalMultiFieldsMap = (HashMap<String, Object>) relationalFieldsMap
+//					.get(LMS.multi);
+//			independentFieldsMap.keySet().stream().forEach(independentFieldsSubmapName -> {
+//				HashMap<String, Object> independentFieldsSubmap = (HashMap<String, Object>) independentFieldsMap
+//						.get(independentFieldsSubmapName);
+//				independentFieldsSubmap.keySet().stream().forEach(independentFieldName -> {
+//					String independentFieldValue = independentFieldsSubmap.get(independentFieldName) == null ? ""
+//							: (String) independentFieldsSubmap.get(independentFieldName);
+//					result.append(independentFieldName + ": " + independentFieldValue);
+//				});
+//			});
+//			relationalMonoFieldsMap.keySet().stream().forEach(relationalMonoFieldName -> {
+//				LMSObject relationalMonoFieldValue = (LMSObject) relationalMonoFieldsMap.get(relationalMonoFieldName);
+//				String relationalMonoFieldValueName = (relationalMonoFieldValue == null
+//						|| relationalMonoFieldValue.getDisplayName() == null) ? ""
+//								: relationalMonoFieldValue.getDisplayName();
+//				result.append(relationalMonoFieldName + ": " + relationalMonoFieldValueName);
+//			});
+//			relationalMultiFieldsMap.keySet().stream().forEach(relationalMultiFieldName -> {
+//				ArrayList<LMSObject> relationalMultiFieldValues = (ArrayList<LMSObject>) relationalMultiFieldsMap
+//						.get(relationalMultiFieldName);
+//				String relationalMultiFieldValueNames = relationalMultiFieldValues.stream()
+//						.map(relationalMultiFieldValue -> relationalMultiFieldValue.getDisplayName())
+//						.reduce((partialResult, nextItem) -> partialResult + ", " + nextItem).orElse("");
+//				result.append(relationalMultiFieldName + ": " + relationalMultiFieldValueNames);
+//			});
+//			result.append("\n");
+//		});
+//		return result.toString();
+//	}
+//
+//	/**
+//	 * Updates an object in the database
+//	 * 
+//	 * @param objectType The type of object to update
+//	 * @return A string indicating whether the operation succeeded
+//	 */
+//	protected static String updateObject(String objectType) {
+//		int selectedOption;
+//		ArrayList<Integer> selectedOptions;
+//		String nameOfFieldToUpdate, newFieldValueString;
+//		ArrayList<LMSObject> updateCandidates = adminService.getAllObjects(objectType), possiblyRelatedObjects,
+//				valuesOfFieldToUpdate;
+//		ArrayList<String> options = updateCandidates.stream().map(object -> object.getDisplayName())
+//				.collect(Collectors.toCollection(ArrayList::new)), tempOptions = new ArrayList<String>();
+//		HashMap<String, HashMap<String, Object>> fieldsMap;
+//		HashMap<String, Object> independentRequired, independentOptional, relationalMono, relationalMulti;
+//		LMSObject objectToUpdate, newFieldValueObject;
+//		updateCandidates.add(0, null);
+//		options.add(0, cancelOperation);
+//		selectedOption = PresUtils.getOptionSelection(getObjectUpdatePrompt(objectType), options);
+//		objectToUpdate = updateCandidates.get(selectedOption);
+//		fieldsMap = objectToUpdate.getFieldsMap();
+//		tempOptions.add(cancelOperation);
+//		fieldsMap.keySet().stream().forEach(fieldsMapKey -> {
+//			HashMap<String, Object> fieldsSubmap = fieldsMap.get(fieldsMapKey);
+//			if (!LMS.composite.equals(fieldsMapKey)) {
+//				fieldsSubmap.keySet().stream().forEach(fieldsSubmapKey -> {
+//					HashMap<String, Object> fieldsSubsubmap = (HashMap<String, Object>) fieldsSubmap
+//							.get(fieldsSubmapKey);
+//					fieldsSubsubmap.keySet().stream().forEach(fieldName -> tempOptions.add(fieldName));
+//				});
+//			}
+//		});
+//		selectedOption = PresUtils.getOptionSelection(getFieldUpdatePrompt(objectType), options);
+//		if (selectedOption == 0)
+//			return operationCancelled;
+//		nameOfFieldToUpdate = options.get(selectedOption);
+//		independentRequired = (HashMap<String, Object>) fieldsMap.get(LMS.independent).get(LMS.required);
+//		independentOptional = (HashMap<String, Object>) fieldsMap.get(LMS.independent).get(LMS.optional);
+//		relationalMono = (HashMap<String, Object>) fieldsMap.get(LMS.relational).get(LMS.mono);
+//		relationalMulti = (HashMap<String, Object>) fieldsMap.get(LMS.relational).get(LMS.multi);
+//		if (independentRequired.keySet().contains(nameOfFieldToUpdate)) {
+//			System.out.println(getMonoStringFieldPrompt(objectType, nameOfFieldToUpdate));
+//			newFieldValueString = scanner.nextLine();
+//			if (newFieldValueString.isEmpty())
+//				return operationCancelled;
+//			independentRequired.put(nameOfFieldToUpdate, newFieldValueString);
+//			objectToUpdate.setFieldsMap(fieldsMap);
+//			return adminService.update(objectToUpdate);
+//		}
+//		if (independentOptional.keySet().contains(nameOfFieldToUpdate)) {
+//			if (independentOptional.get(nameOfFieldToUpdate) != null) {
+//				options = newArrayList(getChangeOrRemoveOpts(nameOfFieldToUpdate));
+//				selectedOption = PresUtils.getOptionSelection(genericPrompt, options);
+//				if (selectedOption == 0)
+//					return operationCancelled;
+//				if (selectedOption == 2) {
+//					independentOptional.put(nameOfFieldToUpdate, null);
+//					objectToUpdate.setFieldsMap(fieldsMap);
+//					return adminService.update(objectToUpdate);
+//				}
+//			}
+//			System.out.println(getMonoStringFieldPrompt(objectType, nameOfFieldToUpdate));
+//			newFieldValueString = scanner.nextLine();
+//			if (newFieldValueString.isEmpty())
+//				return operationCancelled;
+//			independentOptional.put(nameOfFieldToUpdate, newFieldValueString);
+//			objectToUpdate.setFieldsMap(fieldsMap);
+//			return adminService.update(objectToUpdate);
+//		}
+//		if (relationalMono.keySet().contains(nameOfFieldToUpdate)) {
+//			if (relationalMono.get(nameOfFieldToUpdate) != null) {
+//				options = newArrayList(getChangeOrRemoveOpts(nameOfFieldToUpdate));
+//				selectedOption = PresUtils.getOptionSelection(genericPrompt, options);
+//				if (selectedOption == 0)
+//					return operationCancelled;
+//				if (selectedOption == 2) {
+//					relationalMono.put(nameOfFieldToUpdate, null);
+//					objectToUpdate.setFieldsMap(fieldsMap);
+//					return adminService.update(objectToUpdate);
+//				}
+//			}
+//			System.out.println(getMonoStringFieldPrompt(objectType, nameOfFieldToUpdate));
+//			possiblyRelatedObjects = adminService.getAllObjects(nameOfFieldToUpdate);
+//			possiblyRelatedObjects.add(0, null);
+//			options.clear();
+//			options.addAll(possiblyRelatedObjects.stream().map(object -> object.getDisplayName())
+//					.collect(Collectors.toCollection(ArrayList::new)));
+//			selectedOption = PresUtils.getOptionSelection(getMonoObjectFieldPrompt(objectType, nameOfFieldToUpdate),
+//					options);
+//			if (selectedOption == 0)
+//				return operationCancelled;
+//			newFieldValueObject = possiblyRelatedObjects.get(selectedOption);
+//			relationalMono.put(nameOfFieldToUpdate, newFieldValueObject);
+//			objectToUpdate.setFieldsMap(fieldsMap);
+//			return adminService.update(objectToUpdate);
+//		}
+//		if (relationalMulti.keySet().contains(nameOfFieldToUpdate)) {
+//			valuesOfFieldToUpdate = (ArrayList<LMSObject>) relationalMulti.get(nameOfFieldToUpdate);
+//			if (valuesOfFieldToUpdate.size() != 0) {
+//				options = newArrayList(getAddOrRemoveOpts(nameOfFieldToUpdate));
+//				selectedOption = PresUtils.getOptionSelection(genericPrompt, options);
+//				if (selectedOption == 0)
+//					return operationCancelled;
+//				if (selectedOption == 2) {
+//					options.clear();
+//					options.addAll(valuesOfFieldToUpdate.stream().map(object -> object.getDisplayName())
+//							.collect(Collectors.toCollection(ArrayList::new)));
+//					options.add(0, cancelOperation);
+//					valuesOfFieldToUpdate.add(0, null);
+//					selectedOptions = getMultiOptionSelection(getRemoveMultiFieldPrompt(nameOfFieldToUpdate), options);
+//					if (selectedOptions.contains(0))
+//						return operationCancelled;
+//					for (int selectionNumber : selectedOptions)
+//						valuesOfFieldToUpdate.remove(selectionNumber);
+//					valuesOfFieldToUpdate.remove(null);
+//					objectToUpdate.setFieldsMap(fieldsMap);
+//					return adminService.update(objectToUpdate);
+//				}
+//				possiblyRelatedObjects = adminService.getAllObjects(objectType);
+//				for (LMSObject objectAlreadyPresent : valuesOfFieldToUpdate)
+//					possiblyRelatedObjects.removeIf(object -> object.equals(objectAlreadyPresent));
+//				options.clear();
+//				options.addAll(possiblyRelatedObjects.stream().map(object -> object.getDisplayName())
+//						.collect(Collectors.toCollection(ArrayList::new)));
+//				options.add(0, cancelOperation);
+//				possiblyRelatedObjects.add(0, null);
+//				selectedOptions = getMultiOptionSelection(getAddMultiFieldPrompt(nameOfFieldToUpdate), options);
+//				if (selectedOptions.contains(0))
+//					return operationCancelled;
+//				selectedOptions.stream().forEach(index -> valuesOfFieldToUpdate.add(possiblyRelatedObjects.get(index)));
+//				objectToUpdate.setFieldsMap(fieldsMap);
+//				return adminService.update(objectToUpdate);
+//			}
+//		}
+//		return "Oops, something went wrong.";
+//	}
+//
+//	/**
+//	 * Deletes an object in the database
+//	 * 
+//	 * @param objectType The type of object to delete
+//	 * @return A string indicating whether the operation succeeded
+//	 */
+//	protected static String deleteObject(String objectType) {
+//		int selectedOption;
+//		LMSObject objectToDelete;
+//		ArrayList<LMSObject> deletionCandidates = adminService.getAllObjects(objectType);
+//		ArrayList<String> options = deletionCandidates.stream().map(object -> object.getDisplayName())
+//				.collect(Collectors.toCollection(ArrayList::new));
+//		options.add(0, cancelOperation);
+//		deletionCandidates.add(null);
+//		selectedOption = PresUtils.getOptionSelection(getObjectDeletionPrompt(objectType), options);
+//		if (selectedOption == 0)
+//			return operationCancelled;
+//		objectToDelete = deletionCandidates.get(selectedOption);
+//		return (adminService.delete(objectToDelete));
+//	}
 }
