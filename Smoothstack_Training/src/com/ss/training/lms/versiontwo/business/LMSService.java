@@ -103,7 +103,7 @@ public class LMSService {
 			if (!branch.getLoans().contains(loan))
 				loanDAO.delete(loan);
 	}
-	
+
 	public ArrayList<LMSObject> getBranchesWithLoans(Borrower borrower) {
 		return ((ArrayList<LMSObject>) getAllObjects(LMS.branch)).stream().filter(branch -> {
 			for (Loan loan : ((Branch) branch).getLoans())
@@ -150,7 +150,7 @@ public class LMSService {
 			copieses.addAll(new CopiesDAO(connection).readAll());
 			loans.addAll(new LoanDAO(connection).readAll());
 		} catch (Exception e) {
-			printRetrievalErrorMessage(LMS.loans + " and " + LMS.copieses + " for a " + LMS.branch);
+			printRetrievalErrorMessage(LMS.loans + " and " + LMS.copieses + " for a " + LMS.book);
 			e.printStackTrace();
 		}
 		books.stream().forEach(book -> {
@@ -172,7 +172,7 @@ public class LMSService {
 			e.printStackTrace();
 		}
 		branches.stream().forEach(branch -> {
-			copieses.stream().filter(copies -> copies.getBookId() == branch.getId())
+			copieses.stream().filter(copies -> copies.getBranchId() == branch.getId())
 					.forEach(copies -> branch.getCopies().add(copies));
 			loans.stream().filter(loan -> loan.getBranchId() == branch.getId())
 					.forEach(loan -> branch.getLoans().add(loan));
@@ -218,6 +218,7 @@ public class LMSService {
 			case LMS.book:
 			case LMS.books:
 				allObjects = completeBookInfo(allObjects);
+				break;
 			case LMS.branch:
 			case LMS.branches:
 				allObjects = completeBranchInfo(allObjects);

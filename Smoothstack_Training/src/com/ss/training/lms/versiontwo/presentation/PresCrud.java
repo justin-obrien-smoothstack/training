@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.mysql.cj.x.protobuf.MysqlxDatatypes.Array;
 import com.ss.training.lms.versiontwo.LMS;
 import com.ss.training.lms.versiontwo.business.AdminService;
 import com.ss.training.lms.versiontwo.object.Author;
