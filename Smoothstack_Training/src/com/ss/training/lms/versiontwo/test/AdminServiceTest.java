@@ -39,10 +39,8 @@ public class AdminServiceTest {
 		assertTrue(containsAuthor(allAuthors, author));
 		for (Author thisAuthor : allAuthors)
 			if (thisAuthor.getName().equals(testName)) {
-				author = thisAuthor;
-				break;
+				adminService.deleteAuthor(thisAuthor);
 			}
-		adminService.deleteAuthor(author);
 		allAuthors = (ArrayList<Author>) adminService.getAllObjects(LMS.author);
 		assertFalse(containsAuthor(allAuthors, author));
 	}
