@@ -203,7 +203,7 @@ public class PresCrud {
 		return selectedCopies;
 	}
 
-	private void addCopies(HasCopiesAndIntegerId object, String objectType) {
+	private void addCopiesOnCreate(HasCopiesAndIntegerId object, String objectType) {
 		int id = object.getId();
 		Copies copies;
 		ArrayList<Copies> copieses = object.getCopies();
@@ -219,6 +219,54 @@ public class PresCrud {
 				if (id != 0)
 					copies.setBookId(id);
 			} else
+				copies.setBookId(((Book) getObjectSelection("Which book does the branch have copies of?",
+						(ArrayList<LMSObject>) adminService.getAllObjects(LMS.book))).getId());
+			if (copieses.contains(copies)) {
+				System.out.println("Error: That is already documented.");
+				continue;
+			}
+			if (getYesOrNo("Do you know how many copies the branch has?")) {
+				copies.setCopies(PresUtils.getNaturalNumber("How many copies does the branch have?",
+						"Error: That is not a valid number of copies."));
+			}
+			copieses.add(copies);
+		} while (getYesOrNo("Add another number of copies?"));
+	}
+
+	private void addCopiesOnUpdate(Book book) {
+		Copies copies;
+		ArrayList<Copies> copieses = book.getCopies();
+		ArrayList<Branch> addableBranches =  (ArrayList<Branch>) adminService.getAllObjects(LMS.branch);
+		for(Branch branch : addableBranches)
+			for(Copies thisCopies : copieses)
+				if (branch.getId() == thisCopies.getBranchId())
+				addableBranches.remove(branch);
+		do {
+			copies = new Copies();
+				copies.setBookId(((Book) getObjectSelection("Which branch has copies of this book?",
+						(ArrayList<LMSObject>) adminService.getAllObjects(LMS.branch))).getId());
+			if (copieses.contains(copies)) {
+				System.out.println("Error: That is already documented.");
+				continue;
+			}
+			if (getYesOrNo("Do you know how many copies the branch has?")) {
+				copies.setCopies(PresUtils.getNaturalNumber("How many copies does the branch have?",
+						"Error: That is not a valid number of copies."));
+			}
+			copieses.add(copies);
+		} while (getYesOrNo("Add another number of copies?"));
+	}
+
+	private void addCopiesOnUpdate(Branch branch) {
+		Copies copies;
+		ArrayList<Copies> copieses = branch.getCopies();
+		ArrayList<Book> addableBooks =  (ArrayList<Book>) adminService.getAllObjects(LMS.book);
+		for(Book book : addableBooks)
+			for(Copies thisCopies : copieses)
+				if (book.getId() == thisCopies.getBookId())
+				addableBooks.remove(book);
+		do {
+			copies = new Copies();
 				copies.setBookId(((Book) getObjectSelection("Which book does the branch have copies of?",
 						(ArrayList<LMSObject>) adminService.getAllObjects(LMS.book))).getId());
 			if (copieses.contains(copies)) {
@@ -384,7 +432,7 @@ public class PresCrud {
 					genres.stream().map(genre -> genre.getId()).collect(Collectors.toCollection(ArrayList::new)));
 		}
 		if (allBranches.size() != 0 && getYesOrNo("Do any branches in our system have copies of this book?"))
-			addCopies(book, LMS.book);
+			addCopiesOnCreate(book, LMS.book);
 		if (allBranches.size() != 0 && allBorrowers.size() != 0 && getYesOrNo(
 				"Has this book ever been checked out from a branch in our system by a borrower in our system?"))
 			addLoans(book, LMS.book);
@@ -425,7 +473,7 @@ public class PresCrud {
 			branch.setAddress(PresUtils.getStringWithMaxLength("What is the branch's address?", "address",
 					Presentation.maxStringFieldLength));
 		if (allBooks.size() != 0 && getYesOrNo("Does this branch have copies of any of the books in our system?"))
-			addCopies(branch, LMS.branch);
+			addCopiesOnCreate(branch, LMS.branch);
 		if (allBooks.size() != 0 && allBorrowers.size() != 0 && getYesOrNo(
 				"Have any books in our system ever been checked out from this branch by a borrower in our system?"))
 			addLoans(branch, LMS.branch);
@@ -593,7 +641,7 @@ public class PresCrud {
 				book.setPubId(null);
 				break;
 			case "Add to branches":
-				addCopies(book, LMS.book);
+				addCopiesOnUpdate(book);
 				break;
 			case "Edit the numbers of copies at branches":
 				editCopies(book.getCopies());
@@ -751,7 +799,7 @@ public class PresCrud {
 				branch.setAddress(null);
 				break;
 			case "Add books":
-				addCopies(branch, LMS.branch);
+				addCopiesOnUpdate(branch);
 				break;
 			case "Edit numbers of copies of books":
 				editCopies(branch.getCopies());
@@ -831,7 +879,7 @@ public class PresCrud {
 		Publisher publisher = (Publisher) getObjectSelection("Which publisher would you like to update?",
 				(ArrayList<LMSObject>) adminService.getAllObjects(LMS.publisher));
 		ArrayList<LMSObject> addableBooks = ((ArrayList<LMSObject>) adminService.getAllObjects(LMS.book)).stream()
-				.filter(book -> !publisher.getBookIds().contains(((Publisher) book).getId()))
+				.filter(book -> !publisher.getBookIds().contains(((Book) book).getId()))
 				.collect(Collectors.toCollection(ArrayList::new));
 		ArrayList<String> options = PresUtils.newArrayList("Name");
 		if (publisher.getAddress() == null)
