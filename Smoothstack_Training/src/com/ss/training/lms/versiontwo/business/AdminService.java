@@ -228,7 +228,7 @@ public class AdminService extends LMSService {
 			appendIfNotNull(output, publisher.getAddress());
 			output.append("\nPhone: ");
 			appendIfNotNull(output, publisher.getPhone());
-			output.append("\nLoans: ");
+			output.append("\nBooks: ");
 			getObjectsById(LMS.book, publisher.getBookIds()).stream()
 					.forEach(book -> output.append("\n\t" + ((Book) book).getDisplayName()));
 			output.append("\n");
