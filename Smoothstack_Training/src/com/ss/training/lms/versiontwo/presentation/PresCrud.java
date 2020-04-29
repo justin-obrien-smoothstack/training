@@ -246,7 +246,7 @@ public class PresCrud {
 		do {
 			copies = new Copies();
 			copies.setBranchId(
-					((Branch) getObjectSelection("Which branch does the branch have copies of?", addableBranches))
+					((Branch) getObjectSelection("Which branch has copies of the book?", addableBranches))
 							.getId());
 			if (copieses.contains(copies)) {
 				System.out.println("Error: That is already documented.");
@@ -573,7 +573,7 @@ public class PresCrud {
 		ArrayList<LMSObject> allBranches = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.branch);
 		ArrayList<LMSObject> allBorrowers = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.borrower);
 		ArrayList<LMSObject> addablePublishers = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.publisher)
-				.stream().filter(publisher -> !(book.getPubId() == ((Publisher) publisher).getId()))
+				.stream().filter(publisher -> book.getPubId() == null ||!(book.getPubId() == ((Publisher) publisher).getId()))
 				.collect(Collectors.toCollection(ArrayList::new));
 		ArrayList<String> options = PresUtils.newArrayList("Title");
 		if (addableAuthors.size() != 0)
@@ -619,18 +619,18 @@ public class PresCrud {
 				break;
 			case "Remove authors":
 				ArrayList<Author> authorsToRemove = (ArrayList<Author>) getMultiObjectSelection(
-						"Which authors hasn't this author written?",
+						"Which authors didn't write this book?",
 						(ArrayList<LMSObject>) adminService.getObjectsById(LMS.author, book.getAuthorIds()));
 				authorsToRemove.stream().forEach(author -> book.getAuthorIds().remove((Object) author.getId()));
 				break;
 			case "Add genres":
 				ArrayList<Genre> genresToAdd = (ArrayList<Genre>) getMultiObjectSelection(
-						"Which genres wrote this book?", addableGenres);
+						"Which genres include this book?", addableGenres);
 				genresToAdd.stream().forEach(genre -> book.getGenreIds().add(genre.getId()));
 				break;
 			case "Remove genres":
 				ArrayList<Genre> genresToRemove = (ArrayList<Genre>) getMultiObjectSelection(
-						"Which genres hasn't this genre written?",
+						"Which genres don't include this book?",
 						(ArrayList<LMSObject>) adminService.getObjectsById(LMS.genre, book.getGenreIds()));
 				genresToRemove.stream().forEach(genre -> book.getGenreIds().remove((Object) genre.getId()));
 				break;
