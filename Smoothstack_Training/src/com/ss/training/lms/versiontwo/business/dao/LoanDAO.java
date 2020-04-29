@@ -24,15 +24,17 @@ public class LoanDAO extends LMSDAO<Loan> {
 
 	public void create(Loan loan) throws ClassNotFoundException, SQLException {
 		Object[] queryArgs = { loan.getBranchId(), loan.getBookId(), loan.getCardNo(),
-				Timestamp.valueOf(loan.getDateOut()), Timestamp.valueOf(loan.getDueDate()),
-				Timestamp.valueOf(loan.getDateIn()) };
+				Timestamp.valueOf(loan.getDateOut()),
+				(loan.getDueDate() == null ? null : Timestamp.valueOf(loan.getDueDate())),
+				loan.getDateIn() == null ? null : Timestamp.valueOf(loan.getDateIn()) };
 		save("INSERT INTO " + nativeTable + " (" + branchId + ", " + bookId + ", " + cardNo + ", " + dateOut + ", "
 				+ dueDate + ", " + dateIn + ") VALUES (?, ?, ?, ?, ?, ?)", queryArgs);
 	}
 
 	public void update(Loan loan) throws ClassNotFoundException, SQLException {
-		Object[] queryArgs = { Timestamp.valueOf(loan.getDueDate()), Timestamp.valueOf(loan.getDateIn()),
-				loan.getBranchId(), loan.getBookId(), loan.getCardNo(), Timestamp.valueOf(loan.getDateOut()) };
+		Object[] queryArgs = { loan.getDueDate() == null ? null : Timestamp.valueOf(loan.getDueDate()),
+				loan.getDateIn() == null ? null : Timestamp.valueOf(loan.getDateIn()), loan.getBranchId(),
+				loan.getBookId(), loan.getCardNo(), Timestamp.valueOf(loan.getDateOut()) };
 		save("UPDATE " + nativeTable + " SET " + dueDate + " = ?, " + dateIn + " = ? WHERE " + branchId + " = ? AND "
 				+ bookId + " = ? AND " + cardNo + " = ? AND " + dateOut + " = ?", queryArgs);
 	}
