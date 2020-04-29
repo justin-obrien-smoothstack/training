@@ -183,7 +183,7 @@ public class Presentation {
 			case returnBook:
 				currentBorrower = (Borrower) parameters.get(0);
 				currentBranch = (Branch) PresUtils.getLMSObjectSelection(
-						borrowerService.getBranchesWithLoans(currentBorrower), returnBranchPrompt, goBack);
+						borrowerService.getBranchesWithActiveLoans(currentBorrower), returnBranchPrompt, goBack);
 				if (currentBranch == null)
 					continue;
 				currentBook = (Book) PresUtils.getLMSObjectSelection(
@@ -246,11 +246,10 @@ public class Presentation {
 				if (currentBorrower == null)
 					continue;
 				allBorrowerLoans = (ArrayList<Loan>) currentBorrower.getLoans().clone();
-				currentBorrower.setLoans(currentBorrower.getLoans().stream()
-						.filter((loan -> loan.getDateIn() == null
-								|| loan.getDateIn().isAfter(loan.getDueDate()) && loan.getDueDate() != null))
-						.collect(Collectors.toCollection(ArrayList::new)));
-				if (currentBorrower.getLoans().size() == 0) {
+				if (currentBorrower.getLoans().stream()
+						.filter(loan -> loan.getDueDate() != null
+								&& (loan.getDateIn() == null || loan.getDateIn().isAfter(loan.getDueDate())))
+						.count() == 0) {
 					System.out.println("This borrower has no loans with overridable due dates.");
 					continue;
 				}
