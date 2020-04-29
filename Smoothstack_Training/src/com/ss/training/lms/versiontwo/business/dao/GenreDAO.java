@@ -6,11 +6,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import com.ss.training.lms.versiontwo.object.Genre;
+import com.ss.training.lms.versiontwo.object.HasIntegerId;
 
 /**
  * @author Justin O'Brien
  */
-public class GenreDAO extends LMSDAO<Genre> {
+public class GenreDAO extends LMSDAO<Genre> implements HasIntegerId {
 
 	/**
 	 * @param connnection
