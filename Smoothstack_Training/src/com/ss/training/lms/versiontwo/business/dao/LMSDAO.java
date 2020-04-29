@@ -6,8 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import com.ss.training.lms.versiontwo.object.LMSObject;
-
 /**
  * Abstract class for DAO objects for library management system
  * 
@@ -94,7 +92,8 @@ public abstract class LMSDAO<T> {
 	}
 
 	public Integer saveWithPk(String sqlQuery, Object[] queryArgs) throws ClassNotFoundException, SQLException {
-		PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
+		PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery,
+				PreparedStatement.RETURN_GENERATED_KEYS);
 		ResultSet resultSet;
 		if (queryArgs != null) {
 			for (int i = 0; i < queryArgs.length; i++) {
@@ -102,7 +101,7 @@ public abstract class LMSDAO<T> {
 			}
 		}
 		preparedStatement.executeUpdate();
-		resultSet = preparedStatement.getGeneratedKeys();
+		resultSet =  preparedStatement.getGeneratedKeys();
 		if(resultSet.next())
 			return resultSet.getInt(1);
 		return null;

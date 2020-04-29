@@ -423,7 +423,7 @@ public class PresCrud {
 		if (getYesOrNo("Do you know the genre's name?"))
 			genre.setName(PresUtils.getStringWithMaxLength("What is the genre's name?", "name",
 				Presentation.maxStringFieldLength));
-		if (allBooks.size() != 0 && getYesOrNo("Does this genre Include any of the books in our system?")) {
+		if (allBooks.size() != 0 && getYesOrNo("Does this genre include any of the books in our system?")) {
 			books = (ArrayList<Book>) getMultiObjectSelection("Which books are in this genre?", allBooks);
 			genre.setBookIds(books.stream().map(book -> book.getId()).collect(Collectors.toCollection(ArrayList::new)));
 		}
