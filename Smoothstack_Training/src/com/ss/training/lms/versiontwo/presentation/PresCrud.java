@@ -332,10 +332,12 @@ public class PresCrud {
 		ArrayList<Integer> selectedOptions;
 		Author author = (Author) getObjectSelection("Which author would you like to update?",
 				(ArrayList<LMSObject>) adminService.getAllObjects(LMS.author));
-		ArrayList<LMSObject> allBooks = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.book);
+		ArrayList<LMSObject> addableBooks = ((ArrayList<LMSObject>) adminService.getAllObjects(LMS.book)).stream()
+				.filter(book -> !author.getBookIds().contains(((Author) book).getId()))
+				.collect(Collectors.toCollection(ArrayList::new));
 		ArrayList<String> options = PresUtils.newArrayList("Name");
-		if (allBooks.size() != 0)
-			options.add("Remove books");
+		if (addableBooks.size() != 0)
+			options.add("Add books");
 		if (author.getBookIds().size() != 0)
 			options.add("Remove books");
 		selectedOptions = getMultiOptionSelection(secondUpdatePrompt(LMS.author), options);
@@ -347,7 +349,7 @@ public class PresCrud {
 				break;
 			case "Add books":
 				ArrayList<Book> booksToAdd = (ArrayList<Book>) getMultiObjectSelection(
-						"Which books has this author written?", allBooks);
+						"Which books has this author written?", addableBooks);
 				author.setBookIds(
 						booksToAdd.stream().map(book -> book.getId()).collect(Collectors.toCollection(ArrayList::new)));
 				break;
@@ -366,22 +368,35 @@ public class PresCrud {
 
 	// need to add or remove books
 	private String updateGenre() {
+		ArrayList<Integer> selectedOptions;
 		Genre genre = (Genre) getObjectSelection("Which genre would you like to update?",
 				(ArrayList<LMSObject>) adminService.getAllObjects(LMS.genre));
-		ArrayList<String> options = PresUtils.newArrayList("Name", "Associated books");
-		ArrayList<Integer> selectedNumbers = getMultiOptionSelection(secondUpdatePrompt(LMS.genre), options);
-		selectedNumbers.stream().forEach(number -> {
+		ArrayList<LMSObject> addableBooks = ((ArrayList<LMSObject>) adminService.getAllObjects(LMS.book)).stream()
+				.filter(book -> !genre.getBookIds().contains(((Genre) book).getId()))
+				.collect(Collectors.toCollection(ArrayList::new));
+		ArrayList<String> options = PresUtils.newArrayList("Name");
+		if (addableBooks.size() != 0)
+			options.add("Add books");
+		if (genre.getBookIds().size() != 0)
+			options.add("Remove books");
+		selectedOptions = getMultiOptionSelection(secondUpdatePrompt(LMS.genre), options);
+		selectedOptions.stream().forEach(number -> {
 			switch (options.get(number - 1)) {
 			case "Name":
 				genre.setName(PresUtils.getStringWithMaxLength("What is the genre's name?", "name",
 						Presentation.maxStringFieldLength));
 				break;
-			case "Associated books":
-				ArrayList<LMSObject> allBooks = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.book);
-				ArrayList<Book> books = (ArrayList<Book>) getMultiObjectSelection("Which books are in this genre?",
-						allBooks);
+			case "Add books":
+				ArrayList<Book> booksToAdd = (ArrayList<Book>) getMultiObjectSelection(
+						"Which books does this genre include?", addableBooks);
 				genre.setBookIds(
-						books.stream().map(book -> book.getId()).collect(Collectors.toCollection(ArrayList::new)));
+						booksToAdd.stream().map(book -> book.getId()).collect(Collectors.toCollection(ArrayList::new)));
+				break;
+			case "Remove books":
+				ArrayList<Book> booksToRemove = (ArrayList<Book>) getMultiObjectSelection(
+						"Which books doesn't this genre include?",
+						(ArrayList<LMSObject>) adminService.getObjectsById(LMS.book, genre.getBookIds()));
+				booksToRemove.stream().map(book -> genre.getBookIds().remove(book.getId()));
 				break;
 			}
 		});
