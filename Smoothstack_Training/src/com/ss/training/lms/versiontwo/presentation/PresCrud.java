@@ -420,7 +420,8 @@ public class PresCrud {
 		Genre genre = new Genre();
 		ArrayList<LMSObject> allBooks = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.book);
 		ArrayList<Book> books;
-		genre.setName(PresUtils.getStringWithMaxLength("What is the genre's name?", "name",
+		if (getYesOrNo("Do you know the genre's name?"))
+			genre.setName(PresUtils.getStringWithMaxLength("What is the genre's name?", "name",
 				Presentation.maxStringFieldLength));
 		if (allBooks.size() != 0 && getYesOrNo("Does this genre Include any of the books in our system?")) {
 			books = (ArrayList<Book>) getMultiObjectSelection("Which books are in this genre?", allBooks);
