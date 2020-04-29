@@ -5,16 +5,16 @@ import java.util.ArrayList;
 /**
  * @author Justin O'Brien
  */
-public class Publisher extends LMSObject {
+public class Publisher extends LMSObject implements HasIntegerId {
 
 	private int id;
 	private String name, phone, address;
 	private ArrayList<Integer> bookIds;
-	
+
 	public Publisher() {
-		bookIds = new ArrayList<Integer>(); 
+		bookIds = new ArrayList<Integer>();
 	}
-	
+
 	@Override
 	public String getDisplayName() {
 		return getName();
