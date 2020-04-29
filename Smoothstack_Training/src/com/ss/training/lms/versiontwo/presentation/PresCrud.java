@@ -1,5 +1,7 @@
 package com.ss.training.lms.versiontwo.presentation;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,7 +13,9 @@ import com.ss.training.lms.versiontwo.object.Book;
 import com.ss.training.lms.versiontwo.object.Borrower;
 import com.ss.training.lms.versiontwo.object.Branch;
 import com.ss.training.lms.versiontwo.object.Genre;
+import com.ss.training.lms.versiontwo.object.HasLoansAndIntegerId;
 import com.ss.training.lms.versiontwo.object.LMSObject;
+import com.ss.training.lms.versiontwo.object.Loan;
 import com.ss.training.lms.versiontwo.object.Publisher;
 
 /**
@@ -39,6 +43,23 @@ public class PresCrud {
 		if (PresUtils.getOptionSelection(prompt, PresUtils.newArrayList("No", "Yes")) == 1)
 			return true;
 		return false;
+	}
+
+	private LocalDateTime getPastDate(String prompt) {
+		String input;
+		for (;;) {
+			input = Presentation.scanner.nextLine();
+			LocalDateTime output;
+			try {
+				output = LocalDateTime.parse(input);
+			} catch (DateTimeParseException e) {
+				System.out.println("Error: That is not a valid date.");
+				continue;
+			}
+			if (!LocalDateTime.now().isBefore(output))
+				return output;
+			System.out.println("Error: That date is in the future.");
+		}
 	}
 
 	protected int getOptionSelection(String prompt, List<String> options) {
@@ -109,6 +130,43 @@ public class PresCrud {
 		return selectedObjects;
 	}
 
+	private void addLoans(HasLoansAndIntegerId object, String objectType) {
+		int id = object.getId();
+		Loan loan;
+		ArrayList<Loan> loans = object.getLoans();
+		do {
+			loan = new Loan();
+			if (LMS.borrower.equals(objectType)) {
+				if (id != 0)
+					loan.setCardNo(id);
+			} else
+				loan.setCardNo(((Borrower) getObjectSelection("Who checked out the book?",
+						(ArrayList<LMSObject>) adminService.getAllObjects(LMS.borrower))).getCardNo());
+			if (LMS.branch.equals(objectType)) {
+				if (id != 0)
+					loan.setBranchId(id);
+			} else
+				loan.setCardNo(((Branch) getObjectSelection("What branch was the book checked out from?",
+						(ArrayList<LMSObject>) adminService.getAllObjects(LMS.branch))).getId());
+			if (LMS.book.equals(objectType)) {
+				if (id != 0)
+					loan.setBookId(id);
+			} else
+				loan.setCardNo(((Book) getObjectSelection("What book was checked out?",
+						(ArrayList<LMSObject>) adminService.getAllObjects(LMS.book))).getId());
+			loan.setDateOut(getPastDate("When was the book checked out?"));
+			if (loans.contains(loan)) {
+				System.out.println("Error: That loan is already documented.");
+				continue;
+			}
+			loan.setDueDate(loan.getDateOut().plusDays(7));
+			if (getYesOrNo("Has the book been returned?")) {
+				loan.setDateIn(getPastDate("When was the book returned?"));
+			}
+			loans.add(loan);
+		} while (getYesOrNo("Add another loan?"));
+	}
+
 	private String createAuthor() {
 		Author author = new Author();
 		ArrayList<LMSObject> allBooks = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.book);
@@ -125,8 +183,24 @@ public class PresCrud {
 		return operationCancelled;
 	}
 
-	private String create() {
-		return adminService.create()
+	private String createBorrower() {
+		Borrower borrower = new Borrower();
+		ArrayList<LMSObject> allBooks = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.book);
+		ArrayList<Book> books;
+		if (getYesOrNo("Do you know the borrower's name?"))
+			borrower.setName(PresUtils.getStringWithMaxLength("What is the borrower's name?", "name",
+					Presentation.maxStringFieldLength));
+		if (getYesOrNo("Do you know the borrower's address?"))
+			borrower.setAddress(PresUtils.getStringWithMaxLength("What is the borrower's address?", "address",
+					Presentation.maxStringFieldLength));
+		if (getYesOrNo("Do you know the borrower's phone number?"))
+			borrower.setAddress(PresUtils.getStringWithMaxLength("What is the borrower's phone number?", "phone number",
+					Presentation.maxStringFieldLength));
+		if (allBooks.size() != 0 && getYesOrNo("Does this borrower have any loans with our library?"))
+			addLoans(borrower, LMS.borrower);
+		if (getYesOrNo("Create this borrower?"))
+			return adminService.createBorrower(borrower);
+		return operationCancelled;
 	}
 
 	private String create() {
@@ -174,6 +248,7 @@ public class PresCrud {
 		return operationCancelled;
 	}
 
+	// need to add or remove books
 	private String updateAuthor() {
 		Author author = (Author) getObjectSelection("Which author would you like to update?",
 				(ArrayList<LMSObject>) adminService.getAllObjects(LMS.author));
@@ -198,7 +273,8 @@ public class PresCrud {
 			return adminService.updateAuthor(author);
 		return operationCancelled;
 	}
-	
+
+	// need to add or remove books
 	private String updateGenre() {
 		Genre genre = (Genre) getObjectSelection("Which genre would you like to update?",
 				(ArrayList<LMSObject>) adminService.getAllObjects(LMS.genre));
@@ -212,8 +288,8 @@ public class PresCrud {
 				break;
 			case "Associated books":
 				ArrayList<LMSObject> allBooks = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.book);
-				ArrayList<Book> books = (ArrayList<Book>) getMultiObjectSelection(
-						"Which books are in this genre?", allBooks);
+				ArrayList<Book> books = (ArrayList<Book>) getMultiObjectSelection("Which books are in this genre?",
+						allBooks);
 				genre.setBookIds(
 						books.stream().map(book -> book.getId()).collect(Collectors.toCollection(ArrayList::new)));
 				break;
@@ -221,6 +297,32 @@ public class PresCrud {
 		});
 		if (getYesOrNo("Update this genre?"))
 			return adminService.updateGenre(genre);
+		return operationCancelled;
+	}
+
+	// need to add or remove books
+	private String updatePublisher() {
+		Publisher publisher = (Publisher) getObjectSelection("Which publisher would you like to update?",
+				(ArrayList<LMSObject>) adminService.getAllObjects(LMS.publisher));
+		ArrayList<String> options = PresUtils.newArrayList("Name", "Associated books");
+		ArrayList<Integer> selectedNumbers = getMultiOptionSelection(secondUpdatePrompt(LMS.publisher), options);
+		selectedNumbers.stream().forEach(number -> {
+			switch (options.get(number - 1)) {
+			case "Name":
+				publisher.setName(PresUtils.getStringWithMaxLength("What is the publisher's name?", "name",
+						Presentation.maxStringFieldLength));
+				break;
+			case "Associated books":
+				ArrayList<LMSObject> allBooks = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.book);
+				ArrayList<Book> books = (ArrayList<Book>) getMultiObjectSelection(
+						"Which books has this publisher published?", allBooks);
+				publisher.setBookIds(
+						books.stream().map(book -> book.getId()).collect(Collectors.toCollection(ArrayList::new)));
+				break;
+			}
+		});
+		if (getYesOrNo("Update this publisher?"))
+			return adminService.updatePublisher(publisher);
 		return operationCancelled;
 	}
 

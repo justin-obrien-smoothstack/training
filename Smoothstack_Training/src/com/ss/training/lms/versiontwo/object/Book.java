@@ -8,7 +8,7 @@ import com.ss.training.lms.versiontwo.business.LMSService;
 /**
  * @author Justin O'Brien
  */
-public class Book extends LMSObject implements HasIntegerId {
+public class Book extends LMSObject implements HasIntegerId, HasLoansAndIntegerId {
 
 	int id;
 	Integer pubId;

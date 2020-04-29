@@ -5,7 +5,7 @@ import java.util.ArrayList;
 /**
  * @author Justin O'Brien
  */
-public class Borrower extends LMSObject implements HasIntegerId {
+public class Borrower extends LMSObject implements HasIntegerId, HasLoansAndIntegerId {
 
 	private int cardNo;
 	private String name, address, phone;
