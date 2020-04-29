@@ -5,7 +5,7 @@ import java.util.ArrayList;
 /**
  * @author Justin O'Brien
  */
-public class Genre extends LMSObject {
+public class Genre extends LMSObject implements HasIntegerId {
 
 	private int id;
 	private String name;
@@ -14,7 +14,7 @@ public class Genre extends LMSObject {
 	public Genre() {
 		bookIds = new ArrayList<Integer>();
 	}
-	
+
 	/**
 	 * @return the id
 	 */
