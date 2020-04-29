@@ -236,17 +236,17 @@ public class PresCrud {
 	private void addCopiesOnUpdate(Book book) {
 		Copies copies;
 		ArrayList<Copies> copieses = book.getCopies();
-		ArrayList<Branch> addableBranches = (ArrayList<Branch>) adminService.getAllObjects(LMS.branch);
+		ArrayList<LMSObject> addableBranches = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.branch);
 		ArrayList<Integer> branchIdsToRemove = new ArrayList<Integer>();
-		for (Branch branch : addableBranches)
+		for (LMSObject branch : addableBranches)
 			for (Copies thisCopies : copieses)
-				if (branch.getId() == thisCopies.getBranchId())
-					branchIdsToRemove.add(branch.getId());
+				if (((Branch) branch).getId() == thisCopies.getBranchId())
+					branchIdsToRemove.add(((Branch) branch).getId());
 		branchIdsToRemove.stream().forEach(id -> addableBranches.remove(id));
 		do {
 			copies = new Copies();
-			copies.setBookId(((Book) getObjectSelection("Which branch has copies of this book?",
-					(ArrayList<LMSObject>) adminService.getAllObjects(LMS.branch))).getId());
+			copies.setBranchId(
+					((Branch) getObjectSelection("Which branch does the branch have copies of?", addableBranches)).getId());
 			if (copieses.contains(copies)) {
 				System.out.println("Error: That is already documented.");
 				continue;
@@ -262,17 +262,17 @@ public class PresCrud {
 	private void addCopiesOnUpdate(Branch branch) {
 		Copies copies;
 		ArrayList<Copies> copieses = branch.getCopies();
-		ArrayList<Book> addableBooks = (ArrayList<Book>) adminService.getAllObjects(LMS.book);
+		ArrayList<LMSObject> addableBooks = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.book);
 		ArrayList<Integer> bookIdsToRemove = new ArrayList<Integer>();
-		for (Book book : addableBooks)
+		for (LMSObject book : addableBooks)
 			for (Copies thisCopies : copieses)
-				if (book.getId() == thisCopies.getBookId())
-					bookIdsToRemove.add(book.getId());
+				if (((Book) book).getId() == thisCopies.getBookId())
+					bookIdsToRemove.add(((Book) book).getId());
 		bookIdsToRemove.stream().forEach(id -> addableBooks.remove(id));
 		do {
 			copies = new Copies();
-			copies.setBookId(((Book) getObjectSelection("Which book does the branch have copies of?",
-					(ArrayList<LMSObject>) adminService.getAllObjects(LMS.book))).getId());
+			copies.setBookId(
+					((Book) getObjectSelection("Which book does the branch have copies of?", addableBooks)).getId());
 			if (copieses.contains(copies)) {
 				System.out.println("Error: That is already documented.");
 				continue;
