@@ -1,6 +1,8 @@
 package com.ss.training.lms.versiontwo.presentation;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.ss.training.lms.versiontwo.LMS;
 import com.ss.training.lms.versiontwo.business.AdminService;
@@ -17,7 +19,9 @@ import com.ss.training.lms.versiontwo.object.Publisher;
  */
 public class PresCrud {
 
-	AdminService adminService = new AdminService();
+	private final String operationCancelled = "The operation was cancelled.";
+
+	private AdminService adminService = new AdminService();
 
 	private String udpatePrompt(String objectType) {
 		return "Which " + objectType + " do you want to update?";
@@ -27,19 +31,60 @@ public class PresCrud {
 		return "Which " + objectType + " do you want to delete?";
 	}
 
+	private boolean getYesOrNo(String prompt) {
+		if (PresUtils.getOptionSelection(prompt, PresUtils.newArrayList("No", "Yes")) == 1)
+			return true;
+		return false;
+	}
+
+	protected String createAuthor() {
+		Author author = new Author();
+		ArrayList<Book> books;
+		author.setName(PresUtils.getStringWithMaxLength("What is the author's name?", "name",
+				Presentation.maxStringFieldLength));
+		if(getYesOrNo("Has this author written any of the books in our system?")) {
+			books = getMultiObjectSelection(adminService.getAllObjects(LMS.book);
+			author.setBookIds(books.stream().map(book -> book.getId()).collect(Collectors.toCollection(ArrayList::new)));
+		}
+		if(getYesOrNo("Create this author?"))
+			return adminService.createAuthor(author);
+		return operationCancelled;
+	}
+
+	protected String create() {
+		return adminService.create()
+	}
+
+	protected String create() {
+		return adminService.create()
+	}
+
+	protected String create() {
+		return adminService.create()
+	}
+
+	protected String create() {
+		return adminService.create()
+	}
+
+	protected String create() {
+		return adminService.create()
+	}
+
 	protected String deleteAuthor() {
 		Author author = (Author) PresUtils.getLMSObjectSelection(
 				(List<LMSObject>) adminService.getAllObjects(LMS.author), deletePrompt(LMS.author),
 				Presentation.cancelOperation);
-		if (author== null) return Presentation.operationCancelled;
+		if (author == null)
+			return operationCancelled;
 		return adminService.deleteAuthor(author);
 	}
 
 	protected String deleteBook() {
-		Book book = (Book) PresUtils.getLMSObjectSelection(
-				(List<LMSObject>) adminService.getAllObjects(LMS.book), deletePrompt(LMS.book),
-				Presentation.cancelOperation);
-		if (book== null) return Presentation.operationCancelled;
+		Book book = (Book) PresUtils.getLMSObjectSelection((List<LMSObject>) adminService.getAllObjects(LMS.book),
+				deletePrompt(LMS.book), Presentation.cancelOperation);
+		if (book == null)
+			return operationCancelled;
 		return adminService.deleteBook(book);
 	}
 
@@ -47,7 +92,8 @@ public class PresCrud {
 		Borrower borrower = (Borrower) PresUtils.getLMSObjectSelection(
 				(List<LMSObject>) adminService.getAllObjects(LMS.borrower), deletePrompt(LMS.borrower),
 				Presentation.cancelOperation);
-		if (borrower== null) return Presentation.operationCancelled;
+		if (borrower == null)
+			return operationCancelled;
 		return adminService.deleteBorrower(borrower);
 	}
 
@@ -55,15 +101,16 @@ public class PresCrud {
 		Branch branch = (Branch) PresUtils.getLMSObjectSelection(
 				(List<LMSObject>) adminService.getAllObjects(LMS.branch), deletePrompt(LMS.branch),
 				Presentation.cancelOperation);
-		if (branch== null) return Presentation.operationCancelled;
+		if (branch == null)
+			return operationCancelled;
 		return adminService.deleteBranch(branch);
 	}
 
 	protected String deleteGenre() {
-		Genre genre = (Genre) PresUtils.getLMSObjectSelection(
-				(List<LMSObject>) adminService.getAllObjects(LMS.genre), deletePrompt(LMS.genre),
-				Presentation.cancelOperation);
-		if (genre== null) return Presentation.operationCancelled;
+		Genre genre = (Genre) PresUtils.getLMSObjectSelection((List<LMSObject>) adminService.getAllObjects(LMS.genre),
+				deletePrompt(LMS.genre), Presentation.cancelOperation);
+		if (genre == null)
+			return operationCancelled;
 		return adminService.deleteGenre(genre);
 	}
 
@@ -71,7 +118,8 @@ public class PresCrud {
 		Publisher publisher = (Publisher) PresUtils.getLMSObjectSelection(
 				(List<LMSObject>) adminService.getAllObjects(LMS.publisher), deletePrompt(LMS.publisher),
 				Presentation.cancelOperation);
-		if (publisher== null) return Presentation.operationCancelled;
+		if (publisher == null)
+			return operationCancelled;
 		return adminService.deletePublisher(publisher);
 	}
 

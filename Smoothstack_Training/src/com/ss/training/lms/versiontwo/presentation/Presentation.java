@@ -24,7 +24,7 @@ import com.ss.training.lms.versiontwo.object.Loan;
  */
 public class Presentation {
 
-	private final int maxStringFieldLength = 45;
+	public static final int maxStringFieldLength = 45;
 	/**
 	 * Text shown to the user in menus
 	 */
@@ -53,8 +53,7 @@ public class Presentation {
 			returnBook = "Return a book", updateBranch = "Update branch information",
 			changeCopies = "Change the number of copies of a book at your branch", create = "Create", read = "Read",
 			update = "Update", delete = "Delete", cancelOperation = "Cancel the operation";
-	protected static final String operationCancelled = "The operation was cancelled.",
-			noChangesMade = "No changes have been made.";
+	protected static String noChangesMade = "No changes have been made.";
 	protected static final String invalidSelection = "Error: That is not a valid selection.",
 			invalidCard = "Error: That is not a valid card number.",
 			invalidCopies = "Error: That is not a valid number of copies.";
@@ -101,12 +100,6 @@ public class Presentation {
 	protected void resetList(List<Loan> list, Loan... newElements) {
 		list.clear();
 		Collections.addAll(list, newElements);
-	}
-
-	protected ArrayList<String> newArrayList(String... elements) {
-		ArrayList<String> result = new ArrayList<String>();
-		Collections.addAll(result, elements);
-		return result;
 	}
 
 	/**
@@ -285,18 +278,18 @@ public class Presentation {
 			case goBack:
 				return;
 			case librarian:
-				presentMenu(genericPrompt, newArrayList(goBack, manageBranch), parameters);
+				presentMenu(genericPrompt, PresUtils.newArrayList(goBack, manageBranch), parameters);
 				break;
 			case borrower:
 				currentBorrower = PresUtils.getBorrowerByCardNumber(cardPrompt);
 				if (currentBorrower == null)
 					continue;
 				resetList(parameters, currentBorrower);
-				presentMenu(genericPrompt, newArrayList(goBack, checkoutBook, returnBook), parameters);
+				presentMenu(genericPrompt, PresUtils.newArrayList(goBack, checkoutBook, returnBook), parameters);
 				break;
 			case admin:
-				presentMenu(genericPrompt, newArrayList(goBack, crudBooks, crudAuthors, crudGenres, crudPublishers,
-						crudBranches, crudBorrowers, override), parameters);
+				presentMenu(genericPrompt, PresUtils.newArrayList(goBack, crudBooks, crudAuthors, crudGenres,
+						crudPublishers, crudBranches, crudBorrowers, override), parameters);
 				break;
 			case manageBranch:
 				currentBranch = (Branch) PresUtils.getLMSObjectSelection(
@@ -304,7 +297,7 @@ public class Presentation {
 				if (currentBranch == null)
 					return;
 				resetList(parameters, currentBranch);
-				presentMenu(genericPrompt, newArrayList(goBack, updateBranch, changeCopies), parameters);
+				presentMenu(genericPrompt, PresUtils.newArrayList(goBack, updateBranch, changeCopies), parameters);
 				break;
 			case updateBranch:
 				final String noChange = "", newName, newAddress;
@@ -369,29 +362,32 @@ public class Presentation {
 				continue;
 			case crudBooks:
 				resetList(parameters, LMS.book);
-				presentMenu(getCRUDPrompt(LMS.books), newArrayList(goBack, create, read, update, delete), parameters);
+				presentMenu(getCRUDPrompt(LMS.books), PresUtils.newArrayList(goBack, create, read, update, delete),
+						parameters);
 				break;
 			case crudAuthors:
 				resetList(parameters, LMS.author);
-				presentMenu(getCRUDPrompt(LMS.authors), newArrayList(goBack, create, read, update, delete), parameters);
+				presentMenu(getCRUDPrompt(LMS.authors), PresUtils.newArrayList(goBack, create, read, update, delete),
+						parameters);
 				break;
 			case crudGenres:
 				resetList(parameters, LMS.genre);
-				presentMenu(getCRUDPrompt(LMS.genres), newArrayList(goBack, create, read, update, delete), parameters);
+				presentMenu(getCRUDPrompt(LMS.genres), PresUtils.newArrayList(goBack, create, read, update, delete),
+						parameters);
 				break;
 			case crudPublishers:
 				resetList(parameters, LMS.publisher);
-				presentMenu(getCRUDPrompt(LMS.publishers), newArrayList(goBack, create, read, update, delete),
+				presentMenu(getCRUDPrompt(LMS.publishers), PresUtils.newArrayList(goBack, create, read, update, delete),
 						parameters);
 				break;
 			case crudBranches:
 				resetList(parameters, LMS.branch);
-				presentMenu(getCRUDPrompt(LMS.branches), newArrayList(goBack, create, read, update, delete),
+				presentMenu(getCRUDPrompt(LMS.branches), PresUtils.newArrayList(goBack, create, read, update, delete),
 						parameters);
 				break;
 			case crudBorrowers:
 				resetList(parameters, LMS.borrower);
-				presentMenu(getCRUDPrompt(LMS.borrowers), newArrayList(goBack, create, read, update, delete),
+				presentMenu(getCRUDPrompt(LMS.borrowers), PresUtils.newArrayList(goBack, create, read, update, delete),
 						parameters);
 				break;
 			case create:

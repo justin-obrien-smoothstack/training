@@ -1,6 +1,7 @@
 package com.ss.training.lms.versiontwo.presentation;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -131,5 +132,11 @@ public class PresUtils {
 		options.add(0, negativeOption);
 		selectedOption = getOptionSelection(prompt, options);
 		return loans.get(selectedOption);
+	}
+	
+	protected static ArrayList<String> newArrayList(String... elements) {
+		ArrayList<String> result = new ArrayList<String>();
+		Collections.addAll(result, elements);
+		return result;
 	}
 }
