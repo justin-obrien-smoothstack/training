@@ -139,8 +139,8 @@ public class AdminService extends LMSService {
 			output.append("\nBooks: ");
 			getObjectsById(LMS.book, author.getBookIds()).stream()
 					.forEach(book -> output.append("\n\t" + ((Book) book).getDisplayName()));
+			output.append("\n");
 		});
-		output.append("\n");
 		return output.toString();
 	}
 
@@ -163,8 +163,8 @@ public class AdminService extends LMSService {
 			book.getCopies().stream().forEach(copies -> output.append("\n\t" + copies.getDisplayName()));
 			output.append("\nLoans: ");
 			book.getLoans().stream().forEach(loan -> output.append("\n\t" + loan.getDisplayName()));
+			output.append("\n");
 		});
-		output.append("\n");
 		return output.toString();
 	}
 
@@ -181,8 +181,8 @@ public class AdminService extends LMSService {
 			appendIfNotNull(output, borrower.getPhone());
 			output.append("\nLoans: ");
 			borrower.getLoans().stream().forEach(loan -> output.append("\n\t" + loan.getDisplayName()));
+			output.append("\n");
 		});
-		output.append("\n");
 		return output.toString();
 	}
 
@@ -199,8 +199,8 @@ public class AdminService extends LMSService {
 			branch.getCopies().stream().forEach(copies -> output.append("\n\t" + copies.getDisplayName()));
 			output.append("\nLoans: ");
 			branch.getLoans().stream().forEach(loan -> output.append("\n\t" + loan.getDisplayName()));
+			output.append("\n");
 		});
-		output.append("\n");
 		return output.toString();
 	}
 
@@ -213,8 +213,8 @@ public class AdminService extends LMSService {
 			output.append("\nBooks: ");
 			getObjectsById(LMS.book, genre.getBookIds()).stream()
 					.forEach(book -> output.append("\n\t" + ((Book) book).getDisplayName()));
+			output.append("\n");
 		});
-		output.append("\n");
 		return output.toString();
 	}
 
@@ -231,8 +231,8 @@ public class AdminService extends LMSService {
 			output.append("\nLoans: ");
 			getObjectsById(LMS.book, publisher.getBookIds()).stream()
 					.forEach(book -> output.append("\n\t" + ((Book) book).getDisplayName()));
+			output.append("\n");
 		});
-		output.append("\n");
 		return output.toString();
 	}
 
