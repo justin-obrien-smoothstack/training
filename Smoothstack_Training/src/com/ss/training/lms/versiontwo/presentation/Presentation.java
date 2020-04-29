@@ -45,9 +45,9 @@ public class Presentation {
 			returnBookPrompt = "Which book would you like to return?",
 			overridePrompt = "Which loan would you like to override the due date of?",
 			adminCardPrompt = "Enter the borrower's card number, or enter " + cancelCode + " to go back.";
-	protected static final String goBack = "Return to the previous menu", manageBranch = "Manage your branch",
-			crud = "Create/Read/Update/Delete ", crudBooks = crud + "books", crudAuthors = crud + "authors",
-			crudGenres = crud + "genres", crudPublishers = crud + "publishers",
+	protected static final String goBack = "Return to the previous menu", nevermind = "Nevermind",
+			manageBranch = "Manage your branch", crud = "Create/Read/Update/Delete ", crudBooks = crud + "books",
+			crudAuthors = crud + "authors", crudGenres = crud + "genres", crudPublishers = crud + "publishers",
 			crudBranches = crud + "library branches", crudBorrowers = crud + "borrowers",
 			override = "Override due date for a book loan", checkoutBook = "Check out a book",
 			returnBook = "Return a book", updateBranch = "Update branch information",
@@ -106,6 +106,7 @@ public class Presentation {
 			switch (options.get(selectedOption)) {
 			case exit:
 			case goBack:
+			case nevermind:
 				return;
 			case librarian:
 				presentMenu(genericPrompt, PresUtils.newArrayList(goBack, manageBranch), parameters);
@@ -173,7 +174,7 @@ public class Presentation {
 				if (currentBranch == null)
 					continue;
 				currentBook = (Book) PresUtils.getLMSObjectSelection(borrowerService.getAvailableBooks(currentBranch),
-						checkoutBookPrompt, goBack);
+						checkoutBookPrompt, nevermind);
 				if (currentBook == null)
 					continue;
 				System.out.println(borrowerService.checkoutBook(currentBorrower, currentBranch, currentBook));
@@ -185,7 +186,8 @@ public class Presentation {
 				if (currentBranch == null)
 					continue;
 				currentBook = (Book) PresUtils.getLMSObjectSelection(
-						borrowerService.getReturnableBooks(currentBorrower, currentBranch), returnBookPrompt, goBack);
+						borrowerService.getReturnableBooks(currentBorrower, currentBranch), returnBookPrompt,
+						nevermind);
 				if (currentBook == null)
 					continue;
 				System.out.println(borrowerService.returnBook(currentBorrower, currentBranch, currentBook));
