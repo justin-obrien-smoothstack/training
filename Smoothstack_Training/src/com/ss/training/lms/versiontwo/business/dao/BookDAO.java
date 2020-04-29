@@ -49,7 +49,7 @@ public class BookDAO extends LMSDAO<Book> {
 			book = new Book();
 			book.setId(resultSet.getInt(bookId));
 			book.setTitle(resultSet.getString(title));
-			book.setPubId(resultSet.getInt(pubId));
+			book.setPubId((Integer) resultSet.getObject(pubId));
 			book.setAuthorIds(getRelations(tblBookAuthor, bookId, authorId, book.getId()));
 			book.setGenreIds(getRelations(tblBookGenre, bookId, genreId, book.getId()));
 			books.add(book);
