@@ -83,6 +83,12 @@ public class BorrowerService extends LMSService {
 		Loan loan = borrower.getLoans().stream()
 				.filter(thisLoan -> branch.getLoans().contains(thisLoan) && book.getLoans().contains(thisLoan))
 				.sorted((loanOne, loanTwo) -> {
+					if (loanOne.getDueDate() == null && loanTwo.getDueDate() == null)
+						return 0;
+					if (loanOne.getDueDate() != null && loanTwo.getDueDate() == null)
+						return -1;
+					if (loanOne.getDueDate() == null && loanTwo.getDueDate() != null)
+						return 1;
 					if (loanOne.getDueDate().isBefore(loanTwo.getDueDate()))
 						return -1;
 					if (loanOne.getDueDate().isAfter(loanTwo.getDueDate()))
