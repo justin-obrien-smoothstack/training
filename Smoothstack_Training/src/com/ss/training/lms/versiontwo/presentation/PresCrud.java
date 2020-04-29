@@ -106,7 +106,8 @@ public class PresCrud {
 					selectedOptions.clear();
 					continue outerLoop;
 				}
-				selectedOptions.add(selectionNumber);
+				if(!selectedOptions.contains(selectionNumber))
+					selectedOptions.add(selectionNumber);
 			}
 			return selectedOptions;
 		}
@@ -186,7 +187,7 @@ public class PresCrud {
 	private String createBorrower() {
 		Borrower borrower = new Borrower();
 		ArrayList<LMSObject> allBooks = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.book);
-		ArrayList<Book> books;
+		ArrayList<LMSObject> allBranches = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.book);
 		if (getYesOrNo("Do you know the borrower's name?"))
 			borrower.setName(PresUtils.getStringWithMaxLength("What is the borrower's name?", "name",
 					Presentation.maxStringFieldLength));
@@ -196,7 +197,8 @@ public class PresCrud {
 		if (getYesOrNo("Do you know the borrower's phone number?"))
 			borrower.setAddress(PresUtils.getStringWithMaxLength("What is the borrower's phone number?", "phone number",
 					Presentation.maxStringFieldLength));
-		if (allBooks.size() != 0 && getYesOrNo("Does this borrower have any loans with our library?"))
+		if (allBooks.size() != 0 && allBranches.size() != 0
+				&& getYesOrNo("Does this borrower have any loans with our library?"))
 			addLoans(borrower, LMS.borrower);
 		if (getYesOrNo("Create this borrower?"))
 			return adminService.createBorrower(borrower);
