@@ -67,14 +67,14 @@ public class Copies extends LMSObject {
 	/**
 	 * @return the copies
 	 */
-	public int getCopies() {
+	public Integer getCopies() {
 		return copies;
 	}
 
 	/**
 	 * @param copies the copies to set
 	 */
-	public void setCopies(int copies) {
+	public void setCopies(Integer copies) {
 		this.copies = copies;
 	}
 

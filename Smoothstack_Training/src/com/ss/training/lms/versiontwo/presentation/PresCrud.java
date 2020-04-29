@@ -148,12 +148,20 @@ public class PresCrud {
 		return selectedObjects;
 	}
 
-	protected Loan getLoanSelection(String prompt, ArrayList<Loan> lmsObjects) {
+	protected Copies getCopiesSelection(String prompt, ArrayList<Copies> copies) {
 		int selectedOption;
-		ArrayList<String> options = lmsObjects.stream().map(object -> object.getDisplayName())
+		ArrayList<String> options = copies.stream().map(object -> object.getDisplayName())
 				.collect(Collectors.toCollection(ArrayList::new));
 		selectedOption = getOptionSelection(prompt, options);
-		return lmsObjects.get(selectedOption - 1);
+		return copies.get(selectedOption - 1);
+	}
+
+	protected Loan getLoanSelection(String prompt, ArrayList<Loan> loans) {
+		int selectedOption;
+		ArrayList<String> options = loans.stream().map(object -> object.getDisplayName())
+				.collect(Collectors.toCollection(ArrayList::new));
+		selectedOption = getOptionSelection(prompt, options);
+		return loans.get(selectedOption - 1);
 	}
 
 	private ArrayList<Loan> getMultiLoanSelection(String prompt, ArrayList<Loan> loans) {
@@ -165,7 +173,7 @@ public class PresCrud {
 		selectedNumbers.stream().forEach(number -> selectedLoans.add(loans.get(number - 1)));
 		return selectedLoans;
 	}
-	
+
 	private ArrayList<Copies> getMultiCopiesSelection(String prompt, ArrayList<Copies> copies) {
 		ArrayList<Copies> selectedCopies = new ArrayList<Copies>();
 		ArrayList<String> options = copies.stream().map(object -> object.getDisplayName())
@@ -243,6 +251,37 @@ public class PresCrud {
 		} while (getYesOrNo("Add another loan?"));
 	}
 
+	private void editCopies(ArrayList<Copies> copieses) {
+		Copies copies;
+		ArrayList<String> options = new ArrayList<String>();
+		ArrayList<Integer> selectedOptions;
+		do {
+			copies = getCopiesSelection(updatePrompt(LMS.copies), copieses);
+			if (copies.getCopies() == null)
+				options.add("Add number of copies");
+			else {
+				options.add("Change number of copies");
+				options.add("Remove number of copies");
+				selectedOptions = getMultiOptionSelection(secondUpdatePrompt(LMS.copies), options);
+				for (int number : selectedOptions) {
+					switch (options.get(number - 1)) {
+					case "Add number of copies":
+					case "Change number of copies":
+						copies.setCopies(
+								PresUtils.getNaturalNumber("How many copies of this book does the branch have?",
+										"Error: That is not a valid number of copies."));
+						break;
+					case "Remove number of copies":
+						copies.setCopies(null);
+						break;
+					}
+				}
+				copieses.remove(copies);
+				copieses.add(copies);
+			}
+		} while (getYesOrNo("Edit another number of copies?"));
+	}
+
 	private void editLoans(ArrayList<Loan> loans) {
 		Loan loan;
 		ArrayList<String> options = new ArrayList<String>();
@@ -267,13 +306,17 @@ public class PresCrud {
 				case "Due date":
 				case "Change due date":
 					loan.setDueDate(getDate("When is the book due?"));
+					break;
 				case "Remove due date":
 					loan.setDueDate(null);
+					break;
 				case "Return date":
 				case "Change return date":
-					loan.setDueDate(getNonFutureDate("When was the book returned?"));
+					loan.setDateIn(getNonFutureDate("When was the book returned?"));
+					break;
 				case "Remove return date":
 					loan.setDateIn(null);
+					break;
 				}
 			}
 			loans.remove(loan);
@@ -521,7 +564,7 @@ public class PresCrud {
 			return adminService.updateBorrower(borrower);
 		return operationCancelled;
 	}
-	
+
 	private String updateBranch() {
 		ArrayList<Integer> selectedOptions;
 		Branch branch = (Branch) getObjectSelection("Which branch would you like to update?",
@@ -576,7 +619,7 @@ public class PresCrud {
 				addCopies(branch, LMS.branch);
 				break;
 			case "Edit numbers of copies of books":
-				editCopies(branch);
+				editCopies(branch.getCopies());
 				break;
 			case "Remove books":
 				ArrayList<Copies> copiesToRemove = (ArrayList<Copies>) getMultiCopiesSelection(
