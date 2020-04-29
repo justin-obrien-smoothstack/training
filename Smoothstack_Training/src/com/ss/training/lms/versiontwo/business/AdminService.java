@@ -2,6 +2,7 @@ package com.ss.training.lms.versiontwo.business;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
@@ -32,6 +33,16 @@ import com.ss.training.lms.versiontwo.presentation.Presentation;
  * @author Justin O'Brien
  */
 public class AdminService extends LMSService {
+
+	public ArrayList<LMSObject> getBranchesWithOverridableLoans(Borrower borrower) {
+		return ((ArrayList<LMSObject>) getAllObjects(LMS.branch)).stream().filter(branch -> {
+			for (Loan loan : ((Branch) branch).getLoans())
+				if (loan.getCardNo() == borrower.getCardNo() && loan.getDueDate() != null
+						&& (loan.getDateIn() == null || loan.getDateIn().isAfter(loan.getDueDate())))
+					return true;
+			return false;
+		}).collect(Collectors.toCollection(ArrayList::new));
+	}
 
 	public String createAuthor(Author author) {
 		try (Connection connection = getConnection()) {
@@ -409,28 +420,6 @@ public class AdminService extends LMSService {
 		for (Loan loan : oldLoans)
 			if (!borrower.getLoans().contains(loan))
 				loanDAO.delete(loan);
-	}
-
-	public LMSObject getBlankObject(String objectType) {
-		switch (objectType) {
-		case LMS.book:
-			return new Book();
-		case LMS.author:
-			return new Author();
-		case LMS.publisher:
-			return new Publisher();
-		case LMS.genre:
-			return new Genre();
-		case LMS.borrower:
-			return new Borrower();
-		case LMS.branch:
-			return new Branch();
-		case LMS.loan:
-			return new Loan();
-		case LMS.copies:
-			return new Copies();
-		}
-		return null;
 	}
 
 	public void addNewPublisherToBooks(Publisher publisher, BookDAO bookDAO)

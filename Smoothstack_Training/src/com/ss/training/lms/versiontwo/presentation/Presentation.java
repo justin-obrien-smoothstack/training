@@ -255,7 +255,7 @@ public class Presentation {
 					continue;
 				}
 				currentBranch = (Branch) PresUtils.getLMSObjectSelection(
-						adminService.getBranchesWithLoans(currentBorrower), overrideBranchPrompt, goBack);
+						adminService.getBranchesWithOverridableLoans(currentBorrower), overrideBranchPrompt, goBack);
 				if (currentBranch == null)
 					continue;
 				loanToOverride = (Loan) PresUtils.getLMSObjectSelection(currentBorrower.getLoans(), overridePrompt,
