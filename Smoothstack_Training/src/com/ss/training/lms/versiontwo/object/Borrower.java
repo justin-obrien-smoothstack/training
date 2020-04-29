@@ -95,7 +95,7 @@ public class Borrower extends LMSObject implements HasIntegerId, HasLoansAndInte
 
 	@Override
 	public String getDisplayName() {
-		return name == null ? "(name not found)" : getName();
+		return name == null ? "(borrower name not found)" : getName();
 	}
 
 	@Override

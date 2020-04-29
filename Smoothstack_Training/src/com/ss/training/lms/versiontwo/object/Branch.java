@@ -111,6 +111,6 @@ public class Branch extends LMSObject implements HasIntegerId, HasLoansAndIntege
 
 	@Override
 	public String getDisplayName() {
-		return (name == null ? "(name not found)" : name) + (address == null ? " (address not found)" : ", " + address);
+		return (name == null ? "(branch name not found)" : name) + (address == null ? " (branch address not found)" : ", " + address);
 	}
 }
