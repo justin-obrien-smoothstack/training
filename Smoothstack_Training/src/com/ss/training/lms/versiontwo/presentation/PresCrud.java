@@ -198,6 +198,31 @@ public class PresCrud {
 			return adminService.updateAuthor(author);
 		return operationCancelled;
 	}
+	
+	private String updateGenre() {
+		Genre genre = (Genre) getObjectSelection("Which genre would you like to update?",
+				(ArrayList<LMSObject>) adminService.getAllObjects(LMS.genre));
+		ArrayList<String> options = PresUtils.newArrayList("Name", "Associated books");
+		ArrayList<Integer> selectedNumbers = getMultiOptionSelection(secondUpdatePrompt(LMS.genre), options);
+		selectedNumbers.stream().forEach(number -> {
+			switch (options.get(number - 1)) {
+			case "Name":
+				genre.setName(PresUtils.getStringWithMaxLength("What is the genre's name?", "name",
+						Presentation.maxStringFieldLength));
+				break;
+			case "Associated books":
+				ArrayList<LMSObject> allBooks = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.book);
+				ArrayList<Book> books = (ArrayList<Book>) getMultiObjectSelection(
+						"Which books are in this genre?", allBooks);
+				genre.setBookIds(
+						books.stream().map(book -> book.getId()).collect(Collectors.toCollection(ArrayList::new)));
+				break;
+			}
+		});
+		if (getYesOrNo("Update this genre?"))
+			return adminService.updateGenre(genre);
+		return operationCancelled;
+	}
 
 	private String deleteAuthor() {
 		Author author = (Author) PresUtils.getLMSObjectSelection(
