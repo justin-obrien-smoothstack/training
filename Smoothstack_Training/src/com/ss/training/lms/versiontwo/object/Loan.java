@@ -21,7 +21,8 @@ public class Loan extends LMSObject {
 		Branch branch = (Branch) service.getObjectById(LMS.branch, branchId);
 		Book book = (Book) service.getObjectById(LMS.book, bookId);
 		return borrower.getDisplayName() + " checked out " + book.getDisplayName() + " from " + branch.getDisplayName()
-				+ " on " + dateOut;
+				+ " on " + dateOut + (dueDate == null ? "" : ("; the due date is " + dueDate))
+				+ (dateIn == null ? "" : ("; it was returned on " + dateIn));
 	}
 
 	/**
