@@ -43,6 +43,7 @@ public class Presentation {
 			checkoutBookPrompt = "Which book would you like to check out?",
 			returnBranchPrompt = "Which branch would you like to return a book to?",
 			returnBookPrompt = "Which book would you like to return?",
+			overrideBranchPrompt = "Which branch would you like to override the due date of a loan from?",
 			overridePrompt = "Which loan would you like to override the due date of?",
 			adminCardPrompt = "Enter the borrower's card number, or enter " + cancelCode + " to go back.";
 	protected static final String goBack = "Return to the previous menu", nevermind = "Nevermind",
@@ -253,7 +254,7 @@ public class Presentation {
 					continue;
 				}
 				currentBranch = (Branch) PresUtils.getLMSObjectSelection(
-						adminService.getBranchesWithLoans(currentBorrower), checkoutBranchPrompt, goBack);
+						adminService.getBranchesWithLoans(currentBorrower), overrideBranchPrompt, goBack);
 				if (currentBranch == null)
 					continue;
 				loanToOverride = (Loan) PresUtils.getLMSObjectSelection(currentBorrower.getLoans(), overridePrompt,
