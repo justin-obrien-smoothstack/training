@@ -63,7 +63,7 @@ public abstract class LMSDAO<T> {
 		Object[] queryArgs = { null, selfId };
 		for (int otherId : otherIds) {
 			queryArgs[0] = otherId;
-			save("INSERT INTO" + table + "(" + otherColumn + ", " + selfColumn + ") VALUES (?, ?)", queryArgs);
+			save("INSERT INTO " + table + "(" + otherColumn + ", " + selfColumn + ") VALUES (?, ?)", queryArgs);
 		}
 	}
 
@@ -79,7 +79,7 @@ public abstract class LMSDAO<T> {
 		for(int newOtherId : newRelations)
 			if(!oldRelations.contains(newOtherId)) {
 				queryArgs[0] = newOtherId;
-				save("INSERT INTO" + table + "(" + otherColumn + ", " + selfColumn + ") VALUES (?, ?)", queryArgs);
+				save("INSERT INTO " + table + "(" + otherColumn + ", " + selfColumn + ") VALUES (?, ?)", queryArgs);
 			}
 	}
 
