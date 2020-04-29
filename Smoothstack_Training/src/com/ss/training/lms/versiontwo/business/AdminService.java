@@ -188,8 +188,8 @@ public class AdminService extends LMSService {
 
 	public String readBranches() {
 		StringBuilder output = new StringBuilder();
-		ArrayList<Branch> branchs = (ArrayList<Branch>) getAllObjects(LMS.branch);
-		branchs.stream().forEach(branch -> {
+		ArrayList<Branch> branches = (ArrayList<Branch>) getAllObjects(LMS.branch);
+		branches.stream().forEach(branch -> {
 			output.append("\nID number: " + branch.getId());
 			output.append("\nName: ");
 			appendIfNotNull(output, branch.getName());
@@ -209,7 +209,7 @@ public class AdminService extends LMSService {
 		ArrayList<Genre> genres = (ArrayList<Genre>) getAllObjects(LMS.genre);
 		genres.stream().forEach(genre -> {
 			output.append("\nID number: " + genre.getId());
-			output.append("\nName: " + genre.getName());
+			output.append("\nName: " + genre.getDisplayName());
 			output.append("\nBooks: ");
 			getObjectsById(LMS.book, genre.getBookIds()).stream()
 					.forEach(book -> output.append("\n\t" + ((Book) book).getDisplayName()));
