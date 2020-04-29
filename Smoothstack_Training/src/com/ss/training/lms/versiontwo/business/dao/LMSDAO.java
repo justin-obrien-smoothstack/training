@@ -101,11 +101,9 @@ public abstract class LMSDAO<T> {
 				preparedStatement.setObject(i + 1, queryArgs[i]);
 			}
 		}
-		preparedStatement.executeUpdate();
-		ResultSet resultSet = preparedStatement.executeQuery();
-		if (resultSet.next())
-			return resultSet.getInt(1);
-		return null;
+//		preparedStatement.executeUpdate();
+//		ResultSet resultSet = preparedStatement.executeQuery();
+		return preparedStatement.executeUpdate();
 	}
 
 	public ArrayList<T> read(String sqlQuery, Object[] queryArgs) throws ClassNotFoundException, SQLException {
