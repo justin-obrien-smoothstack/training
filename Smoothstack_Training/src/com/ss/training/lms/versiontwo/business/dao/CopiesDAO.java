@@ -45,7 +45,7 @@ public class CopiesDAO extends LMSDAO<Copies> {
 			copies = new Copies();
 			copies.setBranchId(resultSet.getInt(branchId));
 			copies.setBookId(resultSet.getInt(bookId));
-			copies.setCopies(resultSet.getInt(noOfCopies));
+			copies.setCopies((Integer) resultSet.getObject(noOfCopies));
 			copieses.add(copies);
 		}
 		return copieses;
