@@ -350,14 +350,12 @@ public class PresCrud {
 			case "Add books":
 				ArrayList<Book> booksToAdd = (ArrayList<Book>) getMultiObjectSelection(
 						"Which books has this author written?", addableBooks);
-				author.setBookIds(
-						booksToAdd.stream().map(book -> book.getId()).collect(Collectors.toCollection(ArrayList::new)));
-				break;
+				booksToAdd.stream().forEach(book -> author.getBookIds().add(book.getId()));
 			case "Remove books":
 				ArrayList<Book> booksToRemove = (ArrayList<Book>) getMultiObjectSelection(
 						"Which books hasn't this author written?",
 						(ArrayList<LMSObject>) adminService.getObjectsById(LMS.book, author.getBookIds()));
-				booksToRemove.stream().map(book -> author.getBookIds().remove(book.getId()));
+				booksToRemove.stream().forEach(book -> author.getBookIds().remove(book.getId()));
 				break;
 			}
 		});
@@ -366,7 +364,6 @@ public class PresCrud {
 		return operationCancelled;
 	}
 
-	// need to add or remove books
 	private String updateGenre() {
 		ArrayList<Integer> selectedOptions;
 		Genre genre = (Genre) getObjectSelection("Which genre would you like to update?",
@@ -389,14 +386,13 @@ public class PresCrud {
 			case "Add books":
 				ArrayList<Book> booksToAdd = (ArrayList<Book>) getMultiObjectSelection(
 						"Which books does this genre include?", addableBooks);
-				genre.setBookIds(
-						booksToAdd.stream().map(book -> book.getId()).collect(Collectors.toCollection(ArrayList::new)));
+				booksToAdd.stream().forEach(book -> genre.getBookIds().add(book.getId()));
 				break;
 			case "Remove books":
 				ArrayList<Book> booksToRemove = (ArrayList<Book>) getMultiObjectSelection(
 						"Which books doesn't this genre include?",
 						(ArrayList<LMSObject>) adminService.getObjectsById(LMS.book, genre.getBookIds()));
-				booksToRemove.stream().map(book -> genre.getBookIds().remove(book.getId()));
+				booksToRemove.stream().forEach(book -> genre.getBookIds().remove(book.getId()));
 				break;
 			}
 		});
