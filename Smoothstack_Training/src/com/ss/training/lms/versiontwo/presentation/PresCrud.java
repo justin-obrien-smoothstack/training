@@ -68,7 +68,7 @@ public class PresCrud {
 		}
 	}
 
-	private ArrayList<LMSObject> getMultiObjectSelection(String prompt, ArrayList<LMSObject> objects) {
+	private ArrayList<?> getMultiObjectSelection(String prompt, ArrayList<LMSObject> objects) {
 		ArrayList<LMSObject> selectedObjects = new ArrayList<LMSObject>();
 		ArrayList<String> options = objects.stream().map(object -> object.getDisplayName())
 				.collect(Collectors.toCollection(ArrayList::new));
@@ -80,14 +80,16 @@ public class PresCrud {
 
 	protected String createAuthor() {
 		Author author = new Author();
-		ArrayList<Book> allBooks = (ArrayList<Book>) adminService.getAllObjects(LMS.book);
+		ArrayList<LMSObject> allBooks = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.book);
+		ArrayList<Book> books;
 		author.setName(PresUtils.getStringWithMaxLength("What is the author's name?", "name",
 				Presentation.maxStringFieldLength));
-		if(allBooks.size()!=0&&getYesOrNo("Has this author written any of the books in our system?")) {
-			books = getMultiObjectSelection(adminService.getAllObjects(LMS.book);
-			author.setBookIds(books.stream().map(book -> book.getId()).collect(Collectors.toCollection(ArrayList::new)));
+		if (allBooks.size() != 0 && getYesOrNo("Has this author written any of the books in our system?")) {
+			books = (ArrayList<Book>) getMultiObjectSelection("What books has this author written?", allBooks);
+			author.setBookIds(
+					books.stream().map(book -> book.getId()).collect(Collectors.toCollection(ArrayList::new)));
 		}
-		if(getYesOrNo("Create this author?"))
+		if (getYesOrNo("Create this author?"))
 			return adminService.createAuthor(author);
 		return operationCancelled;
 	}
@@ -104,8 +106,20 @@ public class PresCrud {
 		return adminService.create()
 	}
 
-	protected String create() {
-		return adminService.create()
+	protected String createGenre() {
+		Genre genre = new Genre();
+		ArrayList<LMSObject> allBooks = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.book);
+		ArrayList<Book> books;
+		genre.setName(PresUtils.getStringWithMaxLength("What is the genre's name?", "name",
+				Presentation.maxStringFieldLength));
+		if (allBooks.size() != 0 && getYesOrNo("Does this genre Include any of the books in our system?")) {
+			books = (ArrayList<Book>) getMultiObjectSelection("What books are in this genre?", allBooks);
+			genre.setBookIds(
+					books.stream().map(book -> book.getId()).collect(Collectors.toCollection(ArrayList::new)));
+		}
+		if (getYesOrNo("Create this genre?"))
+			return adminService.createGenre(genre);
+		return operationCancelled;
 	}
 
 	protected String create() {
