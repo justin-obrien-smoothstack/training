@@ -1,7 +1,16 @@
 package com.ss.training.lms.versiontwo.presentation;
 
+import java.util.List;
+
 import com.ss.training.lms.versiontwo.LMS;
 import com.ss.training.lms.versiontwo.business.AdminService;
+import com.ss.training.lms.versiontwo.object.Author;
+import com.ss.training.lms.versiontwo.object.Book;
+import com.ss.training.lms.versiontwo.object.Borrower;
+import com.ss.training.lms.versiontwo.object.Branch;
+import com.ss.training.lms.versiontwo.object.Genre;
+import com.ss.training.lms.versiontwo.object.LMSObject;
+import com.ss.training.lms.versiontwo.object.Publisher;
 
 /**
  * @author Justin O'Brien
@@ -10,28 +19,60 @@ public class PresCrud {
 
 	AdminService adminService = new AdminService();
 
-	protected String deleteAuthor() {
+	private String udpatePrompt(String objectType) {
+		return "Which " + objectType + " do you want to update?";
+	}
 
+	private String deletePrompt(String objectType) {
+		return "Which " + objectType + " do you want to delete?";
+	}
+
+	protected String deleteAuthor() {
+		Author author = (Author) PresUtils.getLMSObjectSelection(
+				(List<LMSObject>) adminService.getAllObjects(LMS.author), deletePrompt(LMS.author),
+				Presentation.cancelOperation);
+		if (author== null) return Presentation.operationCancelled;
+		return adminService.deleteAuthor(author);
 	}
 
 	protected String deleteBook() {
+		Book book = (Book) PresUtils.getLMSObjectSelection(
+				(List<LMSObject>) adminService.getAllObjects(LMS.book), deletePrompt(LMS.book),
+				Presentation.cancelOperation);
+		if (book== null) return Presentation.operationCancelled;
+		return adminService.deleteBook(book);
+	}
 
+	protected String deleteBorrower() {
+		Borrower borrower = (Borrower) PresUtils.getLMSObjectSelection(
+				(List<LMSObject>) adminService.getAllObjects(LMS.borrower), deletePrompt(LMS.borrower),
+				Presentation.cancelOperation);
+		if (borrower== null) return Presentation.operationCancelled;
+		return adminService.deleteBorrower(borrower);
 	}
 
 	protected String deleteBranch() {
-
+		Branch branch = (Branch) PresUtils.getLMSObjectSelection(
+				(List<LMSObject>) adminService.getAllObjects(LMS.branch), deletePrompt(LMS.branch),
+				Presentation.cancelOperation);
+		if (branch== null) return Presentation.operationCancelled;
+		return adminService.deleteBranch(branch);
 	}
 
-	protected String delete() {
-
+	protected String deleteGenre() {
+		Genre genre = (Genre) PresUtils.getLMSObjectSelection(
+				(List<LMSObject>) adminService.getAllObjects(LMS.genre), deletePrompt(LMS.genre),
+				Presentation.cancelOperation);
+		if (genre== null) return Presentation.operationCancelled;
+		return adminService.deleteGenre(genre);
 	}
 
-	protected String delete() {
-
-	}
-
-	protected String delete() {
-
+	protected String deletePublisher() {
+		Publisher publisher = (Publisher) PresUtils.getLMSObjectSelection(
+				(List<LMSObject>) adminService.getAllObjects(LMS.publisher), deletePrompt(LMS.publisher),
+				Presentation.cancelOperation);
+		if (publisher== null) return Presentation.operationCancelled;
+		return adminService.deletePublisher(publisher);
 	}
 
 	protected String crudRouter(String operation, String objectType) {
