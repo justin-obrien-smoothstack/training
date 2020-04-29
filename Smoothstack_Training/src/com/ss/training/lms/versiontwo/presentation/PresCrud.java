@@ -31,10 +31,33 @@ public class PresCrud {
 		return "Which " + objectType + " do you want to delete?";
 	}
 
+	private String secondUpdatePrompt(String objectType) {
+		return "Which information do you want to update for this " + objectType + "?";
+	}
+
 	private boolean getYesOrNo(String prompt) {
 		if (PresUtils.getOptionSelection(prompt, PresUtils.newArrayList("No", "Yes")) == 1)
 			return true;
 		return false;
+	}
+
+	protected int getOptionSelection(String prompt, List<String> options) {
+		int i, selectionNumber;
+		for (;;) {
+			System.out.println(prompt);
+			for (i = 0; i < options.size(); i++) {
+				System.out.println((i + 1) + ") " + options.get(i));
+			}
+			try {
+				selectionNumber = Integer.parseInt(Presentation.scanner.nextLine());
+			} catch (NumberFormatException e) {
+				System.out.println(Presentation.invalidSelection);
+				continue;
+			}
+			if (0 < selectionNumber && selectionNumber <= options.size())
+				return selectionNumber;
+			System.out.println(Presentation.invalidSelection);
+		}
 	}
 
 	protected ArrayList<Integer> getMultiOptionSelection(String prompt, ArrayList<String> options) {
@@ -68,6 +91,14 @@ public class PresCrud {
 		}
 	}
 
+	protected LMSObject getObjectSelection(String prompt, ArrayList<LMSObject> lmsObjects) {
+		int selectedOption;
+		ArrayList<String> options = lmsObjects.stream().map(object -> object.getDisplayName())
+				.collect(Collectors.toCollection(ArrayList::new));
+		selectedOption = getOptionSelection(prompt, options);
+		return lmsObjects.get(selectedOption - 1);
+	}
+
 	private ArrayList<?> getMultiObjectSelection(String prompt, ArrayList<LMSObject> objects) {
 		ArrayList<LMSObject> selectedObjects = new ArrayList<LMSObject>();
 		ArrayList<String> options = objects.stream().map(object -> object.getDisplayName())
@@ -78,7 +109,7 @@ public class PresCrud {
 		return selectedObjects;
 	}
 
-	protected String createAuthor() {
+	private String createAuthor() {
 		Author author = new Author();
 		ArrayList<LMSObject> allBooks = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.book);
 		ArrayList<Book> books;
@@ -94,19 +125,19 @@ public class PresCrud {
 		return operationCancelled;
 	}
 
-	protected String create() {
+	private String create() {
 		return adminService.create()
 	}
 
-	protected String create() {
+	private String create() {
 		return adminService.create()
 	}
 
-	protected String create() {
+	private String create() {
 		return adminService.create()
 	}
 
-	protected String createGenre() {
+	private String createGenre() {
 		Genre genre = new Genre();
 		ArrayList<LMSObject> allBooks = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.book);
 		ArrayList<Book> books;
@@ -114,15 +145,14 @@ public class PresCrud {
 				Presentation.maxStringFieldLength));
 		if (allBooks.size() != 0 && getYesOrNo("Does this genre Include any of the books in our system?")) {
 			books = (ArrayList<Book>) getMultiObjectSelection("Which books are in this genre?", allBooks);
-			genre.setBookIds(
-					books.stream().map(book -> book.getId()).collect(Collectors.toCollection(ArrayList::new)));
+			genre.setBookIds(books.stream().map(book -> book.getId()).collect(Collectors.toCollection(ArrayList::new)));
 		}
 		if (getYesOrNo("Create this genre?"))
 			return adminService.createGenre(genre);
 		return operationCancelled;
 	}
 
-	protected String createPublisher() {
+	private String createPublisher() {
 		Publisher publisher = new Publisher();
 		ArrayList<LMSObject> allBooks = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.book);
 		ArrayList<Book> books;
@@ -132,8 +162,8 @@ public class PresCrud {
 			publisher.setAddress(PresUtils.getStringWithMaxLength("What is the publisher's address?", "address",
 					Presentation.maxStringFieldLength));
 		if (getYesOrNo("Do you know the publisher's phone number?"))
-			publisher.setAddress(PresUtils.getStringWithMaxLength("What is the publisher's phone number?", "phone number",
-					Presentation.maxStringFieldLength));
+			publisher.setAddress(PresUtils.getStringWithMaxLength("What is the publisher's phone number?",
+					"phone number", Presentation.maxStringFieldLength));
 		if (allBooks.size() != 0 && getYesOrNo("Has this publisher published any of the books in our system?")) {
 			books = (ArrayList<Book>) getMultiObjectSelection("Which books has this publisher published?", allBooks);
 			publisher.setBookIds(
@@ -144,7 +174,32 @@ public class PresCrud {
 		return operationCancelled;
 	}
 
-	protected String deleteAuthor() {
+	private String updateAuthor() {
+		Author author = (Author) getObjectSelection("Which author would you like to update?",
+				(ArrayList<LMSObject>) adminService.getAllObjects(LMS.author));
+		ArrayList<String> options = PresUtils.newArrayList("Name", "Associated books");
+		ArrayList<Integer> selectedNumbers = getMultiOptionSelection(secondUpdatePrompt(LMS.author), options);
+		selectedNumbers.stream().forEach(number -> {
+			switch (options.get(number - 1)) {
+			case "Name":
+				author.setName(PresUtils.getStringWithMaxLength("What is the author's name?", "name",
+						Presentation.maxStringFieldLength));
+				break;
+			case "Associated books":
+				ArrayList<LMSObject> allBooks = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.book);
+				ArrayList<Book> books = (ArrayList<Book>) getMultiObjectSelection(
+						"Which books has this author written?", allBooks);
+				author.setBookIds(
+						books.stream().map(book -> book.getId()).collect(Collectors.toCollection(ArrayList::new)));
+				break;
+			}
+		});
+		if (getYesOrNo("Update this author?"))
+			return adminService.createAuthor(author);
+		return operationCancelled;
+	}
+
+	private String deleteAuthor() {
 		Author author = (Author) PresUtils.getLMSObjectSelection(
 				(List<LMSObject>) adminService.getAllObjects(LMS.author), deletePrompt(LMS.author),
 				Presentation.cancelOperation);
@@ -153,7 +208,7 @@ public class PresCrud {
 		return adminService.deleteAuthor(author);
 	}
 
-	protected String deleteBook() {
+	private String deleteBook() {
 		Book book = (Book) PresUtils.getLMSObjectSelection((List<LMSObject>) adminService.getAllObjects(LMS.book),
 				deletePrompt(LMS.book), Presentation.cancelOperation);
 		if (book == null)
@@ -161,7 +216,7 @@ public class PresCrud {
 		return adminService.deleteBook(book);
 	}
 
-	protected String deleteBorrower() {
+	private String deleteBorrower() {
 		Borrower borrower = (Borrower) PresUtils.getLMSObjectSelection(
 				(List<LMSObject>) adminService.getAllObjects(LMS.borrower), deletePrompt(LMS.borrower),
 				Presentation.cancelOperation);
@@ -170,7 +225,7 @@ public class PresCrud {
 		return adminService.deleteBorrower(borrower);
 	}
 
-	protected String deleteBranch() {
+	private String deleteBranch() {
 		Branch branch = (Branch) PresUtils.getLMSObjectSelection(
 				(List<LMSObject>) adminService.getAllObjects(LMS.branch), deletePrompt(LMS.branch),
 				Presentation.cancelOperation);
@@ -179,7 +234,7 @@ public class PresCrud {
 		return adminService.deleteBranch(branch);
 	}
 
-	protected String deleteGenre() {
+	private String deleteGenre() {
 		Genre genre = (Genre) PresUtils.getLMSObjectSelection((List<LMSObject>) adminService.getAllObjects(LMS.genre),
 				deletePrompt(LMS.genre), Presentation.cancelOperation);
 		if (genre == null)
@@ -187,7 +242,7 @@ public class PresCrud {
 		return adminService.deleteGenre(genre);
 	}
 
-	protected String deletePublisher() {
+	private String deletePublisher() {
 		Publisher publisher = (Publisher) PresUtils.getLMSObjectSelection(
 				(List<LMSObject>) adminService.getAllObjects(LMS.publisher), deletePrompt(LMS.publisher),
 				Presentation.cancelOperation);
