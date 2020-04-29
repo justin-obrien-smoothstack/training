@@ -37,12 +37,53 @@ public class PresCrud {
 		return false;
 	}
 
+	protected ArrayList<Integer> getMultiOptionSelection(String prompt, ArrayList<String> options) {
+		int i, selectionNumber;
+		String[] userInput;
+		ArrayList<Integer> selectedOptions = new ArrayList<Integer>();
+		outerLoop: for (;;) {
+			System.out.println(prompt);
+			for (i = 0; i < options.size(); i++) {
+				System.out.println((i + 1) + ") " + options.get(i));
+			}
+			userInput = Presentation.scanner.nextLine().split(" ");
+			if (userInput[0].isEmpty())
+				return selectedOptions;
+			for (String selectedOption : userInput) {
+				try {
+					selectionNumber = Integer.parseInt(selectedOption);
+				} catch (NumberFormatException e) {
+					System.out.println(Presentation.invalidSelection);
+					selectedOptions.clear();
+					continue outerLoop;
+				}
+				if (selectionNumber < 1 || selectionNumber > options.size()) {
+					System.out.println(Presentation.invalidSelection);
+					selectedOptions.clear();
+					continue outerLoop;
+				}
+				selectedOptions.add(selectionNumber);
+			}
+			return selectedOptions;
+		}
+	}
+
+	private ArrayList<LMSObject> getMultiObjectSelection(String prompt, ArrayList<LMSObject> objects) {
+		ArrayList<LMSObject> selectedObjects = new ArrayList<LMSObject>();
+		ArrayList<String> options = objects.stream().map(object -> object.getDisplayName())
+				.collect(Collectors.toCollection(ArrayList::new));
+		ArrayList<Integer> selectedNumbers = getMultiOptionSelection(
+				prompt + "\nEnter all that apply, separated by spaces.", options);
+		selectedNumbers.stream().forEach(number -> selectedObjects.add(objects.get(number - 1)));
+		return selectedObjects;
+	}
+
 	protected String createAuthor() {
 		Author author = new Author();
-		ArrayList<Book> books;
+		ArrayList<Book> allBooks = (ArrayList<Book>) adminService.getAllObjects(LMS.book);
 		author.setName(PresUtils.getStringWithMaxLength("What is the author's name?", "name",
 				Presentation.maxStringFieldLength));
-		if(getYesOrNo("Has this author written any of the books in our system?")) {
+		if(allBooks.size()!=0&&getYesOrNo("Has this author written any of the books in our system?")) {
 			books = getMultiObjectSelection(adminService.getAllObjects(LMS.book);
 			author.setBookIds(books.stream().map(book -> book.getId()).collect(Collectors.toCollection(ArrayList::new)));
 		}

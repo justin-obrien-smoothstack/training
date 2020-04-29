@@ -226,34 +226,7 @@ public class Presentation {
 		return "Add " + fieldName + "?";
 	}
 
-	protected ArrayList<Integer> getMultiOptionSelection(String prompt, ArrayList<String> options) {
-		int i, selectionNumber;
-		String[] userInput;
-		ArrayList<Integer> selectedOptions = new ArrayList<Integer>();
-		outerLoop: for (;;) {
-			System.out.println(prompt);
-			for (i = 0; i < options.size(); i++) {
-				System.out.println(i + ") " + options.get(i));
-			}
-			userInput = scanner.nextLine().split(" ");
-			for (String selectedOption : userInput) {
-				try {
-					selectionNumber = Integer.parseInt(selectedOption);
-				} catch (NumberFormatException e) {
-					System.out.println(invalidSelection);
-					selectedOptions.clear();
-					continue outerLoop;
-				}
-				if (selectionNumber < 0 || selectionNumber >= options.size()) {
-					System.out.println(invalidSelection);
-					selectedOptions.clear();
-					continue outerLoop;
-				}
-				selectedOptions.add(selectionNumber);
-			}
-			return selectedOptions;
-		}
-	}
+
 
 	/**
 	 * Presents a menu to the user and takes action according to user input
