@@ -157,13 +157,23 @@ public class PresCrud {
 	}
 
 	private ArrayList<Loan> getMultiLoanSelection(String prompt, ArrayList<Loan> loans) {
-		ArrayList<Loan> selectedObjects = new ArrayList<Loan>();
+		ArrayList<Loan> selectedLoans = new ArrayList<Loan>();
 		ArrayList<String> options = loans.stream().map(object -> object.getDisplayName())
 				.collect(Collectors.toCollection(ArrayList::new));
 		ArrayList<Integer> selectedNumbers = getMultiOptionSelection(
 				prompt + "\nEnter all that apply, separated by spaces.", options);
-		selectedNumbers.stream().forEach(number -> selectedObjects.add(loans.get(number - 1)));
-		return selectedObjects;
+		selectedNumbers.stream().forEach(number -> selectedLoans.add(loans.get(number - 1)));
+		return selectedLoans;
+	}
+	
+	private ArrayList<Copies> getMultiCopiesSelection(String prompt, ArrayList<Copies> copies) {
+		ArrayList<Copies> selectedCopies = new ArrayList<Copies>();
+		ArrayList<String> options = copies.stream().map(object -> object.getDisplayName())
+				.collect(Collectors.toCollection(ArrayList::new));
+		ArrayList<Integer> selectedNumbers = getMultiOptionSelection(
+				prompt + "\nEnter all that apply, separated by spaces.", options);
+		selectedNumbers.stream().forEach(number -> selectedCopies.add(copies.get(number - 1)));
+		return selectedCopies;
 	}
 
 	private void addCopies(HasCopiesAndIntegerId object, String objectType) {
@@ -233,9 +243,8 @@ public class PresCrud {
 		} while (getYesOrNo("Add another loan?"));
 	}
 
-	private void editLoans(HasLoansAndIntegerId object, String objectType) {
+	private void editLoans(ArrayList<Loan> loans) {
 		Loan loan;
-		ArrayList<Loan> loans = object.getLoans();
 		ArrayList<String> options = new ArrayList<String>();
 		ArrayList<Integer> selectedOptions;
 		do {
@@ -499,7 +508,8 @@ public class PresCrud {
 				addLoans(borrower, LMS.borrower);
 				break;
 			case "Edit loans":
-				editLoans(borrower, LMS.borrower);
+				editLoans(borrower.getLoans());
+				break;
 			case "Remove loans":
 				ArrayList<Loan> loansToRemove = (ArrayList<Loan>) getMultiLoanSelection(
 						"Which loans should be removed?", borrower.getLoans());
@@ -509,6 +519,85 @@ public class PresCrud {
 		});
 		if (getYesOrNo("Update this borrower?"))
 			return adminService.updateBorrower(borrower);
+		return operationCancelled;
+	}
+	
+	private String updateBranch() {
+		ArrayList<Integer> selectedOptions;
+		Branch branch = (Branch) getObjectSelection("Which branch would you like to update?",
+				(ArrayList<LMSObject>) adminService.getAllObjects(LMS.branch));
+		ArrayList<LMSObject> allBooks = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.book);
+		ArrayList<LMSObject> allBorrowers = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.borrower);
+		ArrayList<String> options = new ArrayList<String>();
+		if (branch.getName() == null)
+			options.add("Name");
+		else {
+			options.add("Change name");
+			options.add("Remove name");
+		}
+		if (branch.getAddress() == null)
+			options.add("Address");
+		else {
+			options.add("Change address");
+			options.add("Remove address");
+		}
+		if (allBooks.size() != 0) {
+			options.add("Add books");
+			if (branch.getCopies().size() != 0)
+				options.add("Edit numbers of copies of books");
+			options.add("Remove books");
+		}
+		if (allBooks.size() != 0 && allBorrowers.size() != 0) {
+			options.add("Add loans");
+			if (branch.getLoans().size() != 0)
+				options.add("Edit loans");
+			options.add("Remove loans");
+		}
+		selectedOptions = getMultiOptionSelection(secondUpdatePrompt(LMS.branch), options);
+		selectedOptions.stream().forEach(number -> {
+			switch (options.get(number - 1)) {
+			case "Name":
+			case "Change name":
+				branch.setName(PresUtils.getStringWithMaxLength("What is the branch's name?", "name",
+						Presentation.maxStringFieldLength));
+				break;
+			case "Remove name":
+				branch.setName(null);
+				break;
+			case "Address":
+			case "Change address":
+				branch.setAddress(PresUtils.getStringWithMaxLength("What is the branch's address?", "address",
+						Presentation.maxStringFieldLength));
+				break;
+			case "Remove address":
+				branch.setAddress(null);
+				break;
+			case "Add books":
+				addCopies(branch, LMS.branch);
+				break;
+			case "Edit numbers of copies of books":
+				editCopies(branch);
+				break;
+			case "Remove books":
+				ArrayList<Copies> copiesToRemove = (ArrayList<Copies>) getMultiCopiesSelection(
+						"Which copiess should be removed?", branch.getCopies());
+				copiesToRemove.stream().forEach(copies -> branch.getCopies().remove(copies));
+				break;
+			case "Add loans":
+				addLoans(branch, LMS.branch);
+				break;
+			case "Edit loans":
+				editLoans(branch.getLoans());
+				break;
+			case "Remove loans":
+				ArrayList<Loan> loansToRemove = (ArrayList<Loan>) getMultiLoanSelection(
+						"Which loans should be removed?", branch.getLoans());
+				loansToRemove.stream().forEach(loan -> branch.getLoans().remove(loan));
+				break;
+			}
+		});
+		if (getYesOrNo("Update this branch?"))
+			return adminService.updateBranch(branch);
 		return operationCancelled;
 	}
 
