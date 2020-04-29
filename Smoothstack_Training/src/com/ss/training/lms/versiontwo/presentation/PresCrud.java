@@ -133,6 +133,16 @@ public class PresCrud {
 		return selectedObjects;
 	}
 
+	private ArrayList<Loan> getMultiLoanSelection(String prompt, ArrayList<Loan> objects) {
+		ArrayList<Loan> selectedObjects = new ArrayList<Loan>();
+		ArrayList<String> options = objects.stream().map(object -> object.getDisplayName())
+				.collect(Collectors.toCollection(ArrayList::new));
+		ArrayList<Integer> selectedNumbers = getMultiOptionSelection(
+				prompt + "\nEnter all that apply, separated by spaces.", options);
+		selectedNumbers.stream().forEach(number -> selectedObjects.add(objects.get(number - 1)));
+		return selectedObjects;
+	}
+
 	private void addLoans(HasLoansAndIntegerId object, String objectType) {
 		int id = object.getId();
 		Loan loan;
@@ -365,6 +375,81 @@ public class PresCrud {
 		return operationCancelled;
 	}
 
+	private String updateBorrower() {
+		ArrayList<Integer> selectedOptions;
+		Borrower borrower = (Borrower) getObjectSelection("Which borrower would you like to update?",
+				(ArrayList<LMSObject>) adminService.getAllObjects(LMS.borrower));
+		ArrayList<LMSObject> allBooks = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.book);
+		ArrayList<LMSObject> allBranches = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.branch);
+		ArrayList<String> options = new ArrayList<String>();
+		if (borrower.getName() == null)
+			options.add("Name");
+		else {
+			options.add("Change name");
+			options.add("Remove name");
+		}
+		if (borrower.getAddress() == null)
+			options.add("Address");
+		else {
+			options.add("Change address");
+			options.add("Remove address");
+		}
+		if (borrower.getPhone() == null)
+			options.add("Phone number");
+		else {
+			options.add("Change phone number");
+			options.add("Remove phone number");
+		}
+		if (allBooks.size() != 0 && allBranches.size() != 0) {
+			options.add("Add loans");
+			if (borrower.getLoans().size() != 0)
+				options.add("Edit loans");
+			options.add("Remove loans");
+		}
+		selectedOptions = getMultiOptionSelection(secondUpdatePrompt(LMS.borrower), options);
+		selectedOptions.stream().forEach(number -> {
+			switch (options.get(number - 1)) {
+			case "Name":
+			case "Change name":
+				borrower.setName(PresUtils.getStringWithMaxLength("What is the borrower's name?", "name",
+						Presentation.maxStringFieldLength));
+				break;
+			case "Remove name":
+				borrower.setName(null);
+				break;
+			case "Address":
+			case "Change address":
+				borrower.setAddress(PresUtils.getStringWithMaxLength("What is the borrower's address?", "address",
+						Presentation.maxStringFieldLength));
+				break;
+			case "Remove address":
+				borrower.setAddress(null);
+				break;
+			case "Phone number":
+			case "Change phone number":
+				borrower.setPhone(PresUtils.getStringWithMaxLength("What is the borrower's phone number?",
+						"phone number", Presentation.maxStringFieldLength));
+				break;
+			case "Remove phone number":
+				borrower.setPhone(null);
+				break;
+			case "Add loans":
+				addLoans(borrower, LMS.borrower);
+				break;
+			case "Edit loans":
+				editLoans(borrower, LMS.borrower);
+			case "Remove loans":
+				ArrayList<Loan> loansToRemove = (ArrayList<Loan>) getMultiLoanSelection(
+						"Which loans should be removed?", borrower.getLoans());
+				loansToRemove.stream().forEach(loan -> borrower.getLoans().remove(loan));
+				break;
+			}
+		});
+		if (getYesOrNo("Update this borrower?"))
+			return adminService.updateBorrower(borrower);
+		return operationCancelled;
+	}
+
 	private String updateGenre() {
 		ArrayList<Integer> selectedOptions;
 		Genre genre = (Genre) getObjectSelection("Which genre would you like to update?",
@@ -372,7 +457,13 @@ public class PresCrud {
 		ArrayList<LMSObject> addableBooks = ((ArrayList<LMSObject>) adminService.getAllObjects(LMS.book)).stream()
 				.filter(book -> !genre.getBookIds().contains(((Genre) book).getId()))
 				.collect(Collectors.toCollection(ArrayList::new));
-		ArrayList<String> options = PresUtils.newArrayList("Name");
+		ArrayList<String> options = new ArrayList<String>();
+		if (genre.getName() == null)
+			options.add("Name");
+		else {
+			options.add("Change name");
+			options.add("Remove name");
+		}
 		if (addableBooks.size() != 0)
 			options.add("Add books");
 		if (genre.getBookIds().size() != 0)
@@ -381,8 +472,12 @@ public class PresCrud {
 		selectedOptions.stream().forEach(number -> {
 			switch (options.get(number - 1)) {
 			case "Name":
-				genre.setName(PresUtils.getStringWithMaxLength("What is the genre's name?", "name",
+			case "Change name":
+				genre.setName(PresUtils.getStringWithMaxLength("What is the borrower's name?", "name",
 						Presentation.maxStringFieldLength));
+				break;
+			case "Remove name":
+				genre.setName(null);
 				break;
 			case "Add books":
 				ArrayList<Book> booksToAdd = (ArrayList<Book>) getMultiObjectSelection(
@@ -440,13 +535,15 @@ public class PresCrud {
 				break;
 			case "Remove address":
 				publisher.setAddress(null);
+				break;
 			case "Phone number":
 			case "Change phone number":
-				publisher.setPhone(PresUtils.getStringWithMaxLength("What is the publisher's phone number?", "phone number",
-						Presentation.maxStringFieldLength));
+				publisher.setPhone(PresUtils.getStringWithMaxLength("What is the publisher's phone number?",
+						"phone number", Presentation.maxStringFieldLength));
 				break;
 			case "Remove phone number":
 				publisher.setPhone(null);
+				break;
 			case "Add books":
 				ArrayList<Book> booksToAdd = (ArrayList<Book>) getMultiObjectSelection(
 						"Which books has this publisher published?", addableBooks);
