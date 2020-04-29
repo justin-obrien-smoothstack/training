@@ -247,7 +247,8 @@ public class Presentation {
 					continue;
 				allBorrowerLoans = (ArrayList<Loan>) currentBorrower.getLoans().clone();
 				currentBorrower.setLoans(currentBorrower.getLoans().stream()
-						.filter(loan -> loan.getDateIn() == null || loan.getDateIn().isAfter(loan.getDueDate()))
+						.filter((loan -> loan.getDateIn() == null
+								|| loan.getDateIn().isAfter(loan.getDueDate()) && loan.getDueDate() != null))
 						.collect(Collectors.toCollection(ArrayList::new)));
 				if (currentBorrower.getLoans().size() == 0) {
 					System.out.println("This borrower has no loans with overridable due dates.");
