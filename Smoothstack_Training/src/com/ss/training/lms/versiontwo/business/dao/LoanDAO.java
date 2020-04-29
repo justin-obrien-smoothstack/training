@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.time.LocalDateTime;
 
 import com.ss.training.lms.versiontwo.object.Loan;
 
@@ -22,21 +23,23 @@ public class LoanDAO extends LMSDAO<Loan> {
 	}
 
 	public void create(Loan loan) throws ClassNotFoundException, SQLException {
-		Object[] queryArgs = { loan.getBranchId(), loan.getBookId(), loan.getCardNo(), Timestamp.valueOf(loan.getDateOut()),
-				Timestamp.valueOf(loan.getDueDate()), Timestamp.valueOf(loan.getDateIn()) };
-		save("INSERT INTO " + nativeTable + " (" + branchId + ", " + bookId + cardNo + ", " + dateOut + ", " + dueDate
-				+ ", " + dateIn + ") VALUES (?, ?, ?, ?, ?, ?)", queryArgs);
+		Object[] queryArgs = { loan.getBranchId(), loan.getBookId(), loan.getCardNo(),
+				Timestamp.valueOf(loan.getDateOut()), Timestamp.valueOf(loan.getDueDate()),
+				Timestamp.valueOf(loan.getDateIn()) };
+		save("INSERT INTO " + nativeTable + " (" + branchId + ", " + bookId + ", " + cardNo + ", " + dateOut + ", "
+				+ dueDate + ", " + dateIn + ") VALUES (?, ?, ?, ?, ?, ?)", queryArgs);
 	}
 
 	public void update(Loan loan) throws ClassNotFoundException, SQLException {
-		Object[] queryArgs = { loan.getBranchId(), loan.getBookId(), loan.getCardNo(), Timestamp.valueOf(loan.getDateOut()),
-				Timestamp.valueOf(loan.getDueDate()), Timestamp.valueOf(loan.getDateIn()) };
+		Object[] queryArgs = { Timestamp.valueOf(loan.getDueDate()), Timestamp.valueOf(loan.getDateIn()),
+				loan.getBranchId(), loan.getBookId(), loan.getCardNo(), Timestamp.valueOf(loan.getDateOut()) };
 		save("UPDATE " + nativeTable + " SET " + dueDate + " = ?, " + dateIn + " = ? WHERE " + branchId + " = ? AND "
 				+ bookId + " = ? AND " + cardNo + " = ? AND " + dateOut + " = ?", queryArgs);
 	}
 
 	public void delete(Loan loan) throws ClassNotFoundException, SQLException {
-		Object[] queryArgs = { loan.getBranchId(), loan.getBookId(), loan.getCardNo(), Timestamp.valueOf(loan.getDateOut()) };
+		Object[] queryArgs = { loan.getBranchId(), loan.getBookId(), loan.getCardNo(),
+				Timestamp.valueOf(loan.getDateOut()) };
 		save("DELETE FROM " + nativeTable + " WHERE " + branchId + " = ? AND " + bookId + " = ? AND " + cardNo
 				+ " = ? AND " + dateOut + " = ?", queryArgs);
 	}
