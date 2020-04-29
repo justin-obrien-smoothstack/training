@@ -242,14 +242,16 @@ public class Presentation {
 			case override:
 				Loan loanToOverride;
 				ArrayList<Loan> allBorrowerLoans;
+				ArrayList<Loan> overridableLoans;
 				currentBorrower = (Borrower) PresUtils.getBorrowerByCardNumber(adminCardPrompt);
 				if (currentBorrower == null)
 					continue;
 				allBorrowerLoans = (ArrayList<Loan>) currentBorrower.getLoans().clone();
-				if (currentBorrower.getLoans().stream()
+				overridableLoans = currentBorrower.getLoans().stream()
 						.filter(loan -> loan.getDueDate() != null
 								&& (loan.getDateIn() == null || loan.getDateIn().isAfter(loan.getDueDate())))
-						.count() == 0) {
+						.collect(Collectors.toCollection(ArrayList::new));
+				if (overridableLoans.size() == 0) {
 					System.out.println("This borrower has no loans with overridable due dates.");
 					continue;
 				}
@@ -257,7 +259,7 @@ public class Presentation {
 						adminService.getBranchesWithOverridableLoans(currentBorrower), overrideBranchPrompt, goBack);
 				if (currentBranch == null)
 					continue;
-				loanToOverride = (Loan) PresUtils.getLMSObjectSelection(currentBorrower.getLoans(), overridePrompt,
+				loanToOverride = (Loan) PresUtils.getLMSObjectSelection(overridableLoans, overridePrompt,
 						cancelOperation);
 				if (loanToOverride == null)
 					continue;
