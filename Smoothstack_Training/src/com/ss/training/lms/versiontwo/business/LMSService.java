@@ -105,16 +105,6 @@ public class LMSService {
 				loanDAO.delete(loan);
 	}
 
-	public ArrayList<LMSObject> getBranchesWithLoans(Borrower borrower) {
-		return ((ArrayList<LMSObject>) getAllObjects(LMS.branch)).stream().filter(branch -> {
-			for (Loan loan : ((Branch) branch).getLoans())
-				if (loan.getCardNo() == borrower.getCardNo()
-						&& (loan.getDateIn() == null || loan.getDateIn().isAfter(LocalDateTime.now())))
-					return true;
-			return false;
-		}).collect(Collectors.toCollection(ArrayList::new));
-	}
-
 	protected LMSDAO<?> getDAO(Connection connection, String objectType) throws SQLException {
 		switch (objectType) {
 		case LMS.author:
