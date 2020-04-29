@@ -434,7 +434,9 @@ public class PresCrud {
 
 	private String createPublisher() {
 		Publisher publisher = new Publisher();
-		ArrayList<LMSObject> allBooks = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.book);
+		ArrayList<LMSObject> addableBooks = ((ArrayList<LMSObject>) adminService.getAllObjects(LMS.book)).stream()
+				.filter(book -> publisher.getBookIds() == null)
+				.collect(Collectors.toCollection(ArrayList::new));
 		ArrayList<Book> books;
 		publisher.setName(PresUtils.getStringWithMaxLength("What is the publisher's name?", "name",
 				Presentation.maxStringFieldLength));
@@ -444,8 +446,8 @@ public class PresCrud {
 		if (getYesOrNo("Do you know the publisher's phone number?"))
 			publisher.setAddress(PresUtils.getStringWithMaxLength("What is the publisher's phone number?",
 					"phone number", Presentation.maxStringFieldLength));
-		if (allBooks.size() != 0 && getYesOrNo("Has this publisher published any of the books in our system?")) {
-			books = (ArrayList<Book>) getMultiObjectSelection("Which books has this publisher published?", allBooks);
+		if (addableBooks.size() != 0 && getYesOrNo("Has this publisher published any of the books in our system?")) {
+			books = (ArrayList<Book>) getMultiObjectSelection("Which books has this publisher published?", addableBooks);
 			publisher.setBookIds(
 					books.stream().map(book -> book.getId()).collect(Collectors.toCollection(ArrayList::new)));
 		}
