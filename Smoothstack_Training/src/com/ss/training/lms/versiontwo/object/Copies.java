@@ -8,7 +8,8 @@ import com.ss.training.lms.versiontwo.business.LMSService;
  */
 public class Copies extends LMSObject {
 
-	private int bookId, branchId, copies;
+	private int bookId, branchId;
+	private Integer copies;
 
 	@Override
 	public int hashCode() {
@@ -82,7 +83,7 @@ public class Copies extends LMSObject {
 		LMSService service = new LMSService();
 		Book book = (Book) service.getObjectById(LMS.book, bookId);
 		Branch branch = (Branch) service.getObjectById(LMS.branch, branchId);
-		return branch.getDisplayName() + " has " + copies + (copies == 1 ? " copy of " : " copies of ")
-				+ book.getDisplayName();
+		return branch.getDisplayName() + " has " + (copies == null ? "an unknown number of" : copies)
+				+ (copies != null && copies == 1 ? " copy of " : " copies of ") + book.getDisplayName();
 	}
 }

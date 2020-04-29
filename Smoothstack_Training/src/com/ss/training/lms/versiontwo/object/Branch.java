@@ -5,7 +5,7 @@ import java.util.ArrayList;
 /**
  * @author Justin O'Brien
  */
-public class Branch extends LMSObject implements HasIntegerId, HasLoansAndIntegerId {
+public class Branch extends LMSObject implements HasIntegerId, HasLoansAndIntegerId, HasCopiesAndIntegerId {
 
 	private int id;
 	private String name, address;

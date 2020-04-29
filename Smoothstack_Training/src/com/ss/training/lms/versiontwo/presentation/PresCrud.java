@@ -12,7 +12,9 @@ import com.ss.training.lms.versiontwo.object.Author;
 import com.ss.training.lms.versiontwo.object.Book;
 import com.ss.training.lms.versiontwo.object.Borrower;
 import com.ss.training.lms.versiontwo.object.Branch;
+import com.ss.training.lms.versiontwo.object.Copies;
 import com.ss.training.lms.versiontwo.object.Genre;
+import com.ss.training.lms.versiontwo.object.HasCopiesAndIntegerId;
 import com.ss.training.lms.versiontwo.object.HasLoansAndIntegerId;
 import com.ss.training.lms.versiontwo.object.LMSObject;
 import com.ss.training.lms.versiontwo.object.Loan;
@@ -106,7 +108,7 @@ public class PresCrud {
 					selectedOptions.clear();
 					continue outerLoop;
 				}
-				if(!selectedOptions.contains(selectionNumber))
+				if (!selectedOptions.contains(selectionNumber))
 					selectedOptions.add(selectionNumber);
 			}
 			return selectedOptions;
@@ -147,13 +149,13 @@ public class PresCrud {
 				if (id != 0)
 					loan.setBranchId(id);
 			} else
-				loan.setCardNo(((Branch) getObjectSelection("What branch was the book checked out from?",
+				loan.setBranchId(((Branch) getObjectSelection("What branch was the book checked out from?",
 						(ArrayList<LMSObject>) adminService.getAllObjects(LMS.branch))).getId());
 			if (LMS.book.equals(objectType)) {
 				if (id != 0)
 					loan.setBookId(id);
 			} else
-				loan.setCardNo(((Book) getObjectSelection("What book was checked out?",
+				loan.setBookId(((Book) getObjectSelection("What book was checked out?",
 						(ArrayList<LMSObject>) adminService.getAllObjects(LMS.book))).getId());
 			loan.setDateOut(getPastDate("When was the book checked out?"));
 			if (loans.contains(loan)) {
@@ -166,6 +168,36 @@ public class PresCrud {
 			}
 			loans.add(loan);
 		} while (getYesOrNo("Add another loan?"));
+	}
+
+	private void addCopies(HasCopiesAndIntegerId object, String objectType) {
+		int id = object.getId();
+		Copies copies;
+		ArrayList<Copies> copieses = object.getCopies();
+		do {
+			copies = new Copies();
+			if (LMS.branch.equals(objectType)) {
+				if (id != 0)
+					copies.setBranchId(id);
+			} else
+				copies.setBranchId(((Branch) getObjectSelection("Which branch has copies of the book?",
+						(ArrayList<LMSObject>) adminService.getAllObjects(LMS.branch))).getId());
+			if (LMS.book.equals(objectType)) {
+				if (id != 0)
+					copies.setBookId(id);
+			} else
+				copies.setBookId(((Book) getObjectSelection("Which book does the branch have copies of?",
+						(ArrayList<LMSObject>) adminService.getAllObjects(LMS.book))).getId());
+			if (copieses.contains(copies)) {
+				System.out.println("Error: That is already documented.");
+				continue;
+			}
+			if (getYesOrNo("Do you know how many copies the branch has?")) {
+				copies.setCopies(PresUtils.getNaturalNumber("How many copies does the branch have?",
+						"Error: That is not a valid number of copies."));
+			}
+			copieses.add(copies);
+		} while (getYesOrNo("Add another number of copies?"));
 	}
 
 	private String createAuthor() {
@@ -184,10 +216,44 @@ public class PresCrud {
 		return operationCancelled;
 	}
 
+	private String createBook() {
+		Book book = new Book();
+		Publisher publisher;
+		ArrayList<LMSObject> allPublishers = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.publisher),
+				allAuthors = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.author),
+				allGenres = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.genre),
+				allBranches = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.branch),
+				allBorrowers = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.borrower);
+		ArrayList<Author> authors;
+		ArrayList<Genre> genres;
+		book.setTitle(PresUtils.getStringWithMaxLength("What is the book's title?", "title",
+				Presentation.maxStringFieldLength));
+		if (allPublishers.size() != 0 && getYesOrNo("Was this book published by any of the publishers in our system?"))
+			book.setPubId(((Publisher) getObjectSelection("Who is the book's publisher?", allPublishers)).getId());
+		if (allAuthors.size() != 0 && getYesOrNo("Was this book written by any of the authors in our system?")) {
+			authors = (ArrayList<Author>) getMultiObjectSelection("Which authors wrote this book?", allAuthors);
+			book.setAuthorIds(
+					authors.stream().map(author -> author.getId()).collect(Collectors.toCollection(ArrayList::new)));
+		}
+		if (allGenres.size() != 0 && getYesOrNo("Do any of the genres in our system include this book?")) {
+			genres = (ArrayList<Genre>) getMultiObjectSelection("Which genres include this book?", allGenres);
+			book.setGenreIds(
+					genres.stream().map(genre -> genre.getId()).collect(Collectors.toCollection(ArrayList::new)));
+		}
+		if (allBranches.size() != 0 && getYesOrNo("Do any branches have copies of this book?"))
+			addCopies(book, LMS.book);
+		if (allBranches.size() != 0 && allBorrowers.size() != 0
+				&& getYesOrNo("Has this book ever been checked out from our library?"))
+			addLoans(book, LMS.book);
+		if (getYesOrNo("Create this book?"))
+			return adminService.createBook(book);
+		return operationCancelled;
+	}
+
 	private String createBorrower() {
 		Borrower borrower = new Borrower();
 		ArrayList<LMSObject> allBooks = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.book);
-		ArrayList<LMSObject> allBranches = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.book);
+		ArrayList<LMSObject> allBranches = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.branches);
 		if (getYesOrNo("Do you know the borrower's name?"))
 			borrower.setName(PresUtils.getStringWithMaxLength("What is the borrower's name?", "name",
 					Presentation.maxStringFieldLength));
@@ -198,19 +264,31 @@ public class PresCrud {
 			borrower.setAddress(PresUtils.getStringWithMaxLength("What is the borrower's phone number?", "phone number",
 					Presentation.maxStringFieldLength));
 		if (allBooks.size() != 0 && allBranches.size() != 0
-				&& getYesOrNo("Does this borrower have any loans with our library?"))
+				&& getYesOrNo("Has this borrower ever checked out any books from our library?"))
 			addLoans(borrower, LMS.borrower);
 		if (getYesOrNo("Create this borrower?"))
 			return adminService.createBorrower(borrower);
 		return operationCancelled;
 	}
 
-	private String create() {
-		return adminService.create()
-	}
-
-	private String create() {
-		return adminService.create()
+	private String createBranch() {
+		Branch branch = new Branch();
+		ArrayList<LMSObject> allBooks = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.book);
+		ArrayList<LMSObject> allBorrowers = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.borrower);
+		if (getYesOrNo("Do you know the branch's name?"))
+			branch.setName(PresUtils.getStringWithMaxLength("What is the branch's name?", "name",
+					Presentation.maxStringFieldLength));
+		if (getYesOrNo("Do you know the branch's address?"))
+			branch.setAddress(PresUtils.getStringWithMaxLength("What is the branch's address?", "address",
+					Presentation.maxStringFieldLength));
+		if (allBooks.size() != 0 && getYesOrNo("Does this branch have copies of any books?"))
+			addCopies(branch, LMS.branch);
+		if (allBooks.size() != 0 && allBorrowers.size() != 0
+				&& getYesOrNo("Have any books ever been checked out from this branch?"))
+			addLoans(branch, LMS.branch);
+		if (getYesOrNo("Create this branch?"))
+			return adminService.createBranch(branch);
+		return operationCancelled;
 	}
 
 	private String createGenre() {
