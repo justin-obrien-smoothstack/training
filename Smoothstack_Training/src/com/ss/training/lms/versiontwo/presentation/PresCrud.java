@@ -351,6 +351,7 @@ public class PresCrud {
 				ArrayList<Book> booksToAdd = (ArrayList<Book>) getMultiObjectSelection(
 						"Which books has this author written?", addableBooks);
 				booksToAdd.stream().forEach(book -> author.getBookIds().add(book.getId()));
+				break;
 			case "Remove books":
 				ArrayList<Book> booksToRemove = (ArrayList<Book>) getMultiObjectSelection(
 						"Which books hasn't this author written?",
@@ -401,24 +402,61 @@ public class PresCrud {
 		return operationCancelled;
 	}
 
-	// need to add or remove books
 	private String updatePublisher() {
+		ArrayList<Integer> selectedOptions;
 		Publisher publisher = (Publisher) getObjectSelection("Which publisher would you like to update?",
 				(ArrayList<LMSObject>) adminService.getAllObjects(LMS.publisher));
-		ArrayList<String> options = PresUtils.newArrayList("Name", "Associated books");
-		ArrayList<Integer> selectedNumbers = getMultiOptionSelection(secondUpdatePrompt(LMS.publisher), options);
-		selectedNumbers.stream().forEach(number -> {
+		ArrayList<LMSObject> addableBooks = ((ArrayList<LMSObject>) adminService.getAllObjects(LMS.book)).stream()
+				.filter(book -> !publisher.getBookIds().contains(((Publisher) book).getId()))
+				.collect(Collectors.toCollection(ArrayList::new));
+		ArrayList<String> options = PresUtils.newArrayList("Name");
+		if (publisher.getAddress() == null)
+			options.add("Address");
+		else {
+			options.add("Change address");
+			options.add("Remove address");
+		}
+		if (publisher.getPhone() == null)
+			options.add("Phone number");
+		else {
+			options.add("Change phone number");
+			options.add("Remove phone number");
+		}
+		if (addableBooks.size() != 0)
+			options.add("Add books");
+		if (publisher.getBookIds().size() != 0)
+			options.add("Remove books");
+		selectedOptions = getMultiOptionSelection(secondUpdatePrompt(LMS.publisher), options);
+		selectedOptions.stream().forEach(number -> {
 			switch (options.get(number - 1)) {
 			case "Name":
 				publisher.setName(PresUtils.getStringWithMaxLength("What is the publisher's name?", "name",
 						Presentation.maxStringFieldLength));
 				break;
-			case "Associated books":
-				ArrayList<LMSObject> allBooks = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.book);
-				ArrayList<Book> books = (ArrayList<Book>) getMultiObjectSelection(
-						"Which books has this publisher published?", allBooks);
-				publisher.setBookIds(
-						books.stream().map(book -> book.getId()).collect(Collectors.toCollection(ArrayList::new)));
+			case "Address":
+			case "Change address":
+				publisher.setAddress(PresUtils.getStringWithMaxLength("What is the publisher's address?", "address",
+						Presentation.maxStringFieldLength));
+				break;
+			case "Remove address":
+				publisher.setAddress(null);
+			case "Phone number":
+			case "Change phone number":
+				publisher.setPhone(PresUtils.getStringWithMaxLength("What is the publisher's phone number?", "phone number",
+						Presentation.maxStringFieldLength));
+				break;
+			case "Remove phone number":
+				publisher.setPhone(null);
+			case "Add books":
+				ArrayList<Book> booksToAdd = (ArrayList<Book>) getMultiObjectSelection(
+						"Which books has this publisher published?", addableBooks);
+				booksToAdd.stream().forEach(book -> publisher.getBookIds().add(book.getId()));
+				break;
+			case "Remove books":
+				ArrayList<Book> booksToRemove = (ArrayList<Book>) getMultiObjectSelection(
+						"Which books hasn't this publisher published?",
+						(ArrayList<LMSObject>) adminService.getObjectsById(LMS.book, publisher.getBookIds()));
+				booksToRemove.stream().forEach(book -> publisher.getBookIds().remove(book.getId()));
 				break;
 			}
 		});
