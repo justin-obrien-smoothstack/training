@@ -396,19 +396,19 @@ public class Presentation {
 				break;
 			case create:
 				objectType = (String) parameters.get(0);
-//				System.out.println(createObject(objectType));
+				System.out.println(new PresCrud().crudRouter(create, objectType));
 				break;
 			case read:
 				objectType = (String) parameters.get(0);
-//				System.out.println(readObjects(objectType));
-				return;
+				System.out.println(new PresCrud().crudRouter(read, objectType));
+				break;
 			case update:
 				objectType = (String) parameters.get(0);
-//				System.out.println(updateObject(objectType));
+				System.out.println(new PresCrud().crudRouter(update, objectType));
 				break;
 			case delete:
 				objectType = (String) parameters.get(0);
-//				System.out.println(deleteObject(objectType));
+				System.out.println(new PresCrud().crudRouter(delete, objectType));
 				break;
 			case override:
 				Loan loanToOverride;
@@ -431,7 +431,6 @@ public class Presentation {
 				if (loanToOverride == null)
 					continue;
 				currentBorrower.setLoans(allBorrowerLoans);
-				
 				System.out.println(adminService.overrideDueDate(currentBorrower, loanToOverride));
 				continue;
 			}
