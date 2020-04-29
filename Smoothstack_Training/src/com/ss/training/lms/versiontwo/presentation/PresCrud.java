@@ -195,7 +195,7 @@ public class PresCrud {
 			}
 		});
 		if (getYesOrNo("Update this author?"))
-			return adminService.createAuthor(author);
+			return adminService.updateAuthor(author);
 		return operationCancelled;
 	}
 
