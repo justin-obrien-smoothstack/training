@@ -242,6 +242,8 @@ public class Presentation {
 				Loan loanToOverride;
 				ArrayList<Loan> allBorrowerLoans;
 				currentBorrower = (Borrower) PresUtils.getBorrowerByCardNumber(adminCardPrompt);
+				if (currentBorrower == null)
+					continue;
 				allBorrowerLoans = (ArrayList<Loan>) currentBorrower.getLoans().clone();
 				currentBorrower.setLoans(currentBorrower.getLoans().stream()
 						.filter(loan -> loan.getDateIn() == null || loan.getDateIn().isAfter(loan.getDueDate()))
