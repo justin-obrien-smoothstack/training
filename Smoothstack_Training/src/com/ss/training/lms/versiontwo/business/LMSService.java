@@ -200,7 +200,7 @@ public class LMSService {
 	private ArrayList<Publisher> addBooksToPublishers(ArrayList<Publisher> publishers) {
 		ArrayList<Book> books = (ArrayList<Book>) getAllObjects(LMS.book);
 		publishers.stream().forEach(publisher -> {
-			books.stream().filter(book -> book.getPubId() == publisher.getId())
+			books.stream().filter(book -> book.getPubId() != null && book.getPubId() == publisher.getId())
 					.forEach(book -> publisher.getBookIds().add(book.getId()));
 		});
 		return publishers;
