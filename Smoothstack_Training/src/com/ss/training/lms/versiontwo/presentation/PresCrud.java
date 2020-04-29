@@ -328,24 +328,34 @@ public class PresCrud {
 		return operationCancelled;
 	}
 
-	// need to add or remove books
 	private String updateAuthor() {
+		ArrayList<Integer> selectedOptions;
 		Author author = (Author) getObjectSelection("Which author would you like to update?",
 				(ArrayList<LMSObject>) adminService.getAllObjects(LMS.author));
-		ArrayList<String> options = PresUtils.newArrayList("Name", "Associated books");
-		ArrayList<Integer> selectedNumbers = getMultiOptionSelection(secondUpdatePrompt(LMS.author), options);
-		selectedNumbers.stream().forEach(number -> {
+		ArrayList<LMSObject> allBooks = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.book);
+		ArrayList<String> options = PresUtils.newArrayList("Name");
+		if (allBooks.size() != 0)
+			options.add("Remove books");
+		if (author.getBookIds().size() != 0)
+			options.add("Remove books");
+		selectedOptions = getMultiOptionSelection(secondUpdatePrompt(LMS.author), options);
+		selectedOptions.stream().forEach(number -> {
 			switch (options.get(number - 1)) {
 			case "Name":
 				author.setName(PresUtils.getStringWithMaxLength("What is the author's name?", "name",
 						Presentation.maxStringFieldLength));
 				break;
-			case "Associated books":
-				ArrayList<LMSObject> allBooks = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.book);
-				ArrayList<Book> books = (ArrayList<Book>) getMultiObjectSelection(
+			case "Add books":
+				ArrayList<Book> booksToAdd = (ArrayList<Book>) getMultiObjectSelection(
 						"Which books has this author written?", allBooks);
 				author.setBookIds(
-						books.stream().map(book -> book.getId()).collect(Collectors.toCollection(ArrayList::new)));
+						booksToAdd.stream().map(book -> book.getId()).collect(Collectors.toCollection(ArrayList::new)));
+				break;
+			case "Remove books":
+				ArrayList<Book> booksToRemove = (ArrayList<Book>) getMultiObjectSelection(
+						"Which books hasn't this author written?",
+						(ArrayList<LMSObject>) adminService.getObjectsById(LMS.book, author.getBookIds()));
+				booksToRemove.stream().map(book -> author.getBookIds().remove(book.getId()));
 				break;
 			}
 		});
