@@ -9,11 +9,35 @@ import com.ss.training.lms.versiontwo.business.AdminService;
 public class PresCrud {
 
 	AdminService adminService = new AdminService();
-	
+
+	protected String deleteAuthor() {
+
+	}
+
+	protected String deleteBook() {
+
+	}
+
+	protected String deleteBranch() {
+
+	}
+
+	protected String delete() {
+
+	}
+
+	protected String delete() {
+
+	}
+
+	protected String delete() {
+
+	}
+
 	protected String crudRouter(String operation, String objectType) {
-		switch(operation) {
+		switch (operation) {
 		case Presentation.create:
-			switch(objectType) {
+			switch (objectType) {
 			case LMS.author:
 				return createAuthor();
 			case LMS.book:
@@ -28,7 +52,7 @@ public class PresCrud {
 				return createPublisher();
 			}
 		case Presentation.read:
-			switch(objectType) {
+			switch (objectType) {
 			case LMS.author:
 				return adminService.readAuthors();
 			case LMS.book:
@@ -43,7 +67,7 @@ public class PresCrud {
 				return adminService.readPublishers();
 			}
 		case Presentation.update:
-			switch(objectType) {
+			switch (objectType) {
 			case LMS.author:
 				return updateAuthor();
 			case LMS.book:
@@ -58,7 +82,7 @@ public class PresCrud {
 				return updatePublisher();
 			}
 		case Presentation.delete:
-			switch(objectType) {
+			switch (objectType) {
 			case LMS.author:
 				return deleteAuthor();
 			case LMS.book:
@@ -75,5 +99,5 @@ public class PresCrud {
 		}
 		return "No action was taken.";
 	}
-	
+
 }

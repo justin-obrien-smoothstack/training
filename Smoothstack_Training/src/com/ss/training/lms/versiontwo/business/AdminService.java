@@ -312,16 +312,8 @@ public class AdminService extends LMSService {
 	}
 
 	public String deleteBook(Book book) {
-		CopiesDAO copiesDAO;
-		LoanDAO loanDAO;
 		try (Connection connection = getConnection()) {
-			copiesDAO = new CopiesDAO(connection);
-			loanDAO = new LoanDAO(connection);
 			new BookDAO(connection).delete(book);
-			for (Copies copies : book.getCopies())
-				copiesDAO.delete(copies);
-			for (Loan loan : book.getLoans())
-				loanDAO.delete(loan);
 			connection.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -331,12 +323,8 @@ public class AdminService extends LMSService {
 	}
 
 	public String deleteBorrower(Borrower borrower) {
-		LoanDAO loanDAO;
 		try (Connection connection = getConnection()) {
-			loanDAO = new LoanDAO(connection);
 			new BorrowerDAO(connection).delete(borrower);
-			for (Loan loan : borrower.getLoans())
-				loanDAO.delete(loan);
 			connection.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -346,15 +334,8 @@ public class AdminService extends LMSService {
 	}
 
 	public String deleteBranch(Branch branch) {
-		CopiesDAO copiesDAO;
-		LoanDAO loanDAO;
 		try (Connection connection = getConnection()) {
-			copiesDAO = new CopiesDAO(connection);
-			loanDAO = new LoanDAO(connection);
-			for (Loan loan : branch.getLoans())
-				loanDAO.delete(loan);
-			for (Copies copies : branch.getCopies())
-				copiesDAO.delete(copies);
+			new BranchDAO(connection).delete(branch);
 			connection.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
