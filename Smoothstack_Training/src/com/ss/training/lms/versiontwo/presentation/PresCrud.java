@@ -93,7 +93,7 @@ public class PresCrud {
 			}
 			if (!LocalDateTime.now().isBefore(output) && !output.isBefore(date))
 				return output;
-			System.out.println("Error: That date is in the future.");
+			System.out.println("Error: That date is too early.");
 		}
 	}
 
