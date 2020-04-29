@@ -79,6 +79,7 @@ public class PresCrud {
 			System.out.println("Error: That date is in the future.");
 		}
 	}
+
 	private LocalDateTime getDateNotBefore(String prompt, LocalDateTime date) {
 		String input;
 		for (;;) {
@@ -121,7 +122,7 @@ public class PresCrud {
 		String[] userInput;
 		ArrayList<Integer> selectedOptions = new ArrayList<Integer>();
 		outerLoop: for (;;) {
-			System.out.println(prompt);
+			System.out.println(prompt + "\nSelect all that apply, separated by spaces.");
 			for (i = 0; i < options.size(); i++) {
 				System.out.println((i + 1) + ") " + options.get(i));
 			}
@@ -382,10 +383,10 @@ public class PresCrud {
 			book.setGenreIds(
 					genres.stream().map(genre -> genre.getId()).collect(Collectors.toCollection(ArrayList::new)));
 		}
-		if (allBranches.size() != 0 && getYesOrNo("Do any branches have copies of this book?"))
+		if (allBranches.size() != 0 && getYesOrNo("Do any branches in our system have copies of this book?"))
 			addCopies(book, LMS.book);
-		if (allBranches.size() != 0 && allBorrowers.size() != 0
-				&& getYesOrNo("Has this book ever been checked out from our library?"))
+		if (allBranches.size() != 0 && allBorrowers.size() != 0 && getYesOrNo(
+				"Has this book ever been checked out from a branch in our system by a borrower in our system?"))
 			addLoans(book, LMS.book);
 		if (getYesOrNo("Create this book?"))
 			return adminService.createBook(book);
@@ -405,8 +406,8 @@ public class PresCrud {
 		if (getYesOrNo("Do you know the borrower's phone number?"))
 			borrower.setAddress(PresUtils.getStringWithMaxLength("What is the borrower's phone number?", "phone number",
 					Presentation.maxStringFieldLength));
-		if (allBooks.size() != 0 && allBranches.size() != 0
-				&& getYesOrNo("Has this borrower ever checked out any of the books in our system from a library branch in our system?"))
+		if (allBooks.size() != 0 && allBranches.size() != 0 && getYesOrNo(
+				"Has this borrower ever checked out any of the books in our system from a library branch in our system?"))
 			addLoans(borrower, LMS.borrower);
 		if (getYesOrNo("Create this borrower?"))
 			return adminService.createBorrower(borrower);
@@ -425,8 +426,8 @@ public class PresCrud {
 					Presentation.maxStringFieldLength));
 		if (allBooks.size() != 0 && getYesOrNo("Does this branch have copies of any of the books in our system?"))
 			addCopies(branch, LMS.branch);
-		if (allBooks.size() != 0 && allBorrowers.size() != 0
-				&& getYesOrNo("Have any books in our system ever been checked out from this branch by a borrower in our system?"))
+		if (allBooks.size() != 0 && allBorrowers.size() != 0 && getYesOrNo(
+				"Have any books in our system ever been checked out from this branch by a borrower in our system?"))
 			addLoans(branch, LMS.branch);
 		if (getYesOrNo("Create this branch?"))
 			return adminService.createBranch(branch);
@@ -501,7 +502,7 @@ public class PresCrud {
 				ArrayList<Book> booksToRemove = (ArrayList<Book>) getMultiObjectSelection(
 						"Which books hasn't this author written?",
 						(ArrayList<LMSObject>) adminService.getObjectsById(LMS.book, author.getBookIds()));
-				booksToRemove.stream().forEach(book -> author.getBookIds().remove(book.getId()));
+				booksToRemove.stream().forEach(book -> author.getBookIds().remove((Object) book.getId()));
 				break;
 			}
 		});
@@ -570,7 +571,7 @@ public class PresCrud {
 				ArrayList<Author> authorsToRemove = (ArrayList<Author>) getMultiObjectSelection(
 						"Which authors hasn't this author written?",
 						(ArrayList<LMSObject>) adminService.getObjectsById(LMS.author, book.getAuthorIds()));
-				authorsToRemove.stream().forEach(author -> book.getAuthorIds().remove(author.getId()));
+				authorsToRemove.stream().forEach(author -> book.getAuthorIds().remove((Object) author.getId()));
 				break;
 			case "Add genres":
 				ArrayList<Genre> genresToAdd = (ArrayList<Genre>) getMultiObjectSelection(
@@ -581,7 +582,7 @@ public class PresCrud {
 				ArrayList<Genre> genresToRemove = (ArrayList<Genre>) getMultiObjectSelection(
 						"Which genres hasn't this genre written?",
 						(ArrayList<LMSObject>) adminService.getObjectsById(LMS.genre, book.getGenreIds()));
-				genresToRemove.stream().forEach(genre -> book.getGenreIds().remove(genre.getId()));
+				genresToRemove.stream().forEach(genre -> book.getGenreIds().remove((Object) genre.getId()));
 				break;
 			case "Publisher":
 			case "Change publisher":
@@ -783,7 +784,7 @@ public class PresCrud {
 		Genre genre = (Genre) getObjectSelection("Which genre would you like to update?",
 				(ArrayList<LMSObject>) adminService.getAllObjects(LMS.genre));
 		ArrayList<LMSObject> addableBooks = ((ArrayList<LMSObject>) adminService.getAllObjects(LMS.book)).stream()
-				.filter(book -> !genre.getBookIds().contains(((Genre) book).getId()))
+				.filter(book -> !genre.getBookIds().contains(((Book) book).getId()))
 				.collect(Collectors.toCollection(ArrayList::new));
 		ArrayList<String> options = new ArrayList<String>();
 		if (genre.getName() == null)
@@ -801,7 +802,7 @@ public class PresCrud {
 			switch (options.get(number - 1)) {
 			case "Name":
 			case "Change name":
-				genre.setName(PresUtils.getStringWithMaxLength("What is the borrower's name?", "name",
+				genre.setName(PresUtils.getStringWithMaxLength("What is the genre's name?", "name",
 						Presentation.maxStringFieldLength));
 				break;
 			case "Remove name":
@@ -816,7 +817,7 @@ public class PresCrud {
 				ArrayList<Book> booksToRemove = (ArrayList<Book>) getMultiObjectSelection(
 						"Which books doesn't this genre include?",
 						(ArrayList<LMSObject>) adminService.getObjectsById(LMS.book, genre.getBookIds()));
-				booksToRemove.stream().forEach(book -> genre.getBookIds().remove(book.getId()));
+				booksToRemove.stream().forEach(book -> genre.getBookIds().remove((Object) book.getId()));
 				break;
 			}
 		});
@@ -881,7 +882,7 @@ public class PresCrud {
 				ArrayList<Book> booksToRemove = (ArrayList<Book>) getMultiObjectSelection(
 						"Which books hasn't this publisher published?",
 						(ArrayList<LMSObject>) adminService.getObjectsById(LMS.book, publisher.getBookIds()));
-				booksToRemove.stream().forEach(book -> publisher.getBookIds().remove(book.getId()));
+				booksToRemove.stream().forEach(book -> publisher.getBookIds().remove((Object) book.getId()));
 				break;
 			}
 		});
