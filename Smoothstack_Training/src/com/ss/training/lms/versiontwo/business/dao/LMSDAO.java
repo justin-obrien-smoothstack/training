@@ -94,16 +94,18 @@ public abstract class LMSDAO<T> {
 	}
 
 	public Integer saveWithPk(String sqlQuery, Object[] queryArgs) throws ClassNotFoundException, SQLException {
-		PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery,
-				PreparedStatement.RETURN_GENERATED_KEYS);
+		PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
+		ResultSet resultSet;
 		if (queryArgs != null) {
 			for (int i = 0; i < queryArgs.length; i++) {
 				preparedStatement.setObject(i + 1, queryArgs[i]);
 			}
 		}
-//		preparedStatement.executeUpdate();
-//		ResultSet resultSet = preparedStatement.executeQuery();
-		return preparedStatement.executeUpdate();
+		preparedStatement.executeUpdate();
+		resultSet = preparedStatement.getGeneratedKeys();
+		if(resultSet.next())
+			return resultSet.getInt(1);
+		return null;
 	}
 
 	public ArrayList<T> read(String sqlQuery, Object[] queryArgs) throws ClassNotFoundException, SQLException {
