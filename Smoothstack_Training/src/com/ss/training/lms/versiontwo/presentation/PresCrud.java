@@ -50,6 +50,7 @@ public class PresCrud {
 	private LocalDateTime getDate(String prompt) {
 		String input;
 		for (;;) {
+			System.out.println(prompt);
 			input = Presentation.scanner.nextLine();
 			LocalDateTime output;
 			try {
@@ -64,6 +65,7 @@ public class PresCrud {
 	private LocalDateTime getNonFutureDate(String prompt) {
 		String input;
 		for (;;) {
+			System.out.println(prompt);
 			input = Presentation.scanner.nextLine();
 			LocalDateTime output;
 			try {
