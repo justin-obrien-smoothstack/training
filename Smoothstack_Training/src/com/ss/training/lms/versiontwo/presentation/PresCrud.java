@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.mysql.cj.x.protobuf.MysqlxDatatypes.Array;
 import com.ss.training.lms.versiontwo.LMS;
 import com.ss.training.lms.versiontwo.business.AdminService;
 import com.ss.training.lms.versiontwo.object.Author;
@@ -29,7 +30,7 @@ public class PresCrud {
 
 	private AdminService adminService = new AdminService();
 
-	private String udpatePrompt(String objectType) {
+	private String updatePrompt(String objectType) {
 		return "Which " + objectType + " do you want to update?";
 	}
 
@@ -47,7 +48,21 @@ public class PresCrud {
 		return false;
 	}
 
-	private LocalDateTime getPastDate(String prompt) {
+	private LocalDateTime getDate(String prompt) {
+		String input;
+		for (;;) {
+			input = Presentation.scanner.nextLine();
+			LocalDateTime output;
+			try {
+				output = LocalDateTime.parse(input);
+				return output;
+			} catch (DateTimeParseException e) {
+				System.out.println("Error: That is not a valid date.");
+			}
+		}
+	}
+
+	private LocalDateTime getNonFutureDate(String prompt) {
 		String input;
 		for (;;) {
 			input = Presentation.scanner.nextLine();
@@ -123,61 +138,32 @@ public class PresCrud {
 		return lmsObjects.get(selectedOption - 1);
 	}
 
-	private ArrayList<?> getMultiObjectSelection(String prompt, ArrayList<LMSObject> objects) {
+	private ArrayList<?> getMultiObjectSelection(String prompt, ArrayList<LMSObject> loans) {
 		ArrayList<LMSObject> selectedObjects = new ArrayList<LMSObject>();
-		ArrayList<String> options = objects.stream().map(object -> object.getDisplayName())
+		ArrayList<String> options = loans.stream().map(object -> object.getDisplayName())
 				.collect(Collectors.toCollection(ArrayList::new));
 		ArrayList<Integer> selectedNumbers = getMultiOptionSelection(
 				prompt + "\nEnter all that apply, separated by spaces.", options);
-		selectedNumbers.stream().forEach(number -> selectedObjects.add(objects.get(number - 1)));
+		selectedNumbers.stream().forEach(number -> selectedObjects.add(loans.get(number - 1)));
 		return selectedObjects;
 	}
 
-	private ArrayList<Loan> getMultiLoanSelection(String prompt, ArrayList<Loan> objects) {
+	protected Loan getLoanSelection(String prompt, ArrayList<Loan> lmsObjects) {
+		int selectedOption;
+		ArrayList<String> options = lmsObjects.stream().map(object -> object.getDisplayName())
+				.collect(Collectors.toCollection(ArrayList::new));
+		selectedOption = getOptionSelection(prompt, options);
+		return lmsObjects.get(selectedOption - 1);
+	}
+
+	private ArrayList<Loan> getMultiLoanSelection(String prompt, ArrayList<Loan> loans) {
 		ArrayList<Loan> selectedObjects = new ArrayList<Loan>();
-		ArrayList<String> options = objects.stream().map(object -> object.getDisplayName())
+		ArrayList<String> options = loans.stream().map(object -> object.getDisplayName())
 				.collect(Collectors.toCollection(ArrayList::new));
 		ArrayList<Integer> selectedNumbers = getMultiOptionSelection(
 				prompt + "\nEnter all that apply, separated by spaces.", options);
-		selectedNumbers.stream().forEach(number -> selectedObjects.add(objects.get(number - 1)));
+		selectedNumbers.stream().forEach(number -> selectedObjects.add(loans.get(number - 1)));
 		return selectedObjects;
-	}
-
-	private void addLoans(HasLoansAndIntegerId object, String objectType) {
-		int id = object.getId();
-		Loan loan;
-		ArrayList<Loan> loans = object.getLoans();
-		do {
-			loan = new Loan();
-			if (LMS.borrower.equals(objectType)) {
-				if (id != 0)
-					loan.setCardNo(id);
-			} else
-				loan.setCardNo(((Borrower) getObjectSelection("Who checked out the book?",
-						(ArrayList<LMSObject>) adminService.getAllObjects(LMS.borrower))).getCardNo());
-			if (LMS.branch.equals(objectType)) {
-				if (id != 0)
-					loan.setBranchId(id);
-			} else
-				loan.setBranchId(((Branch) getObjectSelection("What branch was the book checked out from?",
-						(ArrayList<LMSObject>) adminService.getAllObjects(LMS.branch))).getId());
-			if (LMS.book.equals(objectType)) {
-				if (id != 0)
-					loan.setBookId(id);
-			} else
-				loan.setBookId(((Book) getObjectSelection("What book was checked out?",
-						(ArrayList<LMSObject>) adminService.getAllObjects(LMS.book))).getId());
-			loan.setDateOut(getPastDate("When was the book checked out?"));
-			if (loans.contains(loan)) {
-				System.out.println("Error: That loan is already documented.");
-				continue;
-			}
-			loan.setDueDate(loan.getDateOut().plusDays(7));
-			if (getYesOrNo("Has the book been returned?")) {
-				loan.setDateIn(getPastDate("When was the book returned?"));
-			}
-			loans.add(loan);
-		} while (getYesOrNo("Add another loan?"));
 	}
 
 	private void addCopies(HasCopiesAndIntegerId object, String objectType) {
@@ -208,6 +194,82 @@ public class PresCrud {
 			}
 			copieses.add(copies);
 		} while (getYesOrNo("Add another number of copies?"));
+	}
+
+	private void addLoans(HasLoansAndIntegerId object, String objectType) {
+		int id = object.getId();
+		Loan loan;
+		ArrayList<Loan> loans = object.getLoans();
+		do {
+			loan = new Loan();
+			if (LMS.borrower.equals(objectType)) {
+				if (id != 0)
+					loan.setCardNo(id);
+			} else
+				loan.setCardNo(((Borrower) getObjectSelection("Who checked out the book?",
+						(ArrayList<LMSObject>) adminService.getAllObjects(LMS.borrower))).getCardNo());
+			if (LMS.branch.equals(objectType)) {
+				if (id != 0)
+					loan.setBranchId(id);
+			} else
+				loan.setBranchId(((Branch) getObjectSelection("What branch was the book checked out from?",
+						(ArrayList<LMSObject>) adminService.getAllObjects(LMS.branch))).getId());
+			if (LMS.book.equals(objectType)) {
+				if (id != 0)
+					loan.setBookId(id);
+			} else
+				loan.setBookId(((Book) getObjectSelection("What book was checked out?",
+						(ArrayList<LMSObject>) adminService.getAllObjects(LMS.book))).getId());
+			loan.setDateOut(getNonFutureDate("When was the book checked out?"));
+			if (loans.contains(loan)) {
+				System.out.println("Error: That loan is already documented.");
+				continue;
+			}
+			loan.setDueDate(loan.getDateOut().plusDays(7));
+			if (getYesOrNo("Has the book been returned?")) {
+				loan.setDateIn(getNonFutureDate("When was the book returned?"));
+			}
+			loans.add(loan);
+		} while (getYesOrNo("Add another loan?"));
+	}
+
+	private void editLoans(HasLoansAndIntegerId object, String objectType) {
+		Loan loan;
+		ArrayList<Loan> loans = object.getLoans();
+		ArrayList<String> options = new ArrayList<String>();
+		ArrayList<Integer> selectedOptions;
+		do {
+			loan = getLoanSelection(updatePrompt(LMS.loan), loans);
+			if (loan.getDueDate() == null)
+				options.add("Due date");
+			else {
+				options.add("Change due date");
+				options.add("Remove due date");
+			}
+			if (loan.getDateIn() == null)
+				options.add("Return date");
+			else {
+				options.add("Change return date");
+				options.add("Remove return date");
+			}
+			selectedOptions = getMultiOptionSelection(secondUpdatePrompt(LMS.loan), options);
+			for (int number : selectedOptions) {
+				switch (options.get(number - 1)) {
+				case "Due date":
+				case "Change due date":
+					loan.setDueDate(getDate("When is the book due?"));
+				case "Remove due date":
+					loan.setDueDate(null);
+				case "Return date":
+				case "Change return date":
+					loan.setDueDate(getNonFutureDate("When was the book returned?"));
+				case "Remove return date":
+					loan.setDateIn(null);
+				}
+			}
+			loans.remove(loan);
+			loans.add(loan);
+		} while (getYesOrNo("Edit another loan?"));
 	}
 
 	private String createAuthor() {
