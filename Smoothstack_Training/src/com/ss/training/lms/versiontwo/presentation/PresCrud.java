@@ -246,7 +246,8 @@ public class PresCrud {
 		do {
 			copies = new Copies();
 			copies.setBranchId(
-					((Branch) getObjectSelection("Which branch does the branch have copies of?", addableBranches)).getId());
+					((Branch) getObjectSelection("Which branch does the branch have copies of?", addableBranches))
+							.getId());
 			if (copieses.contains(copies)) {
 				System.out.println("Error: That is already documented.");
 				continue;
@@ -333,19 +334,15 @@ public class PresCrud {
 			else {
 				options.add("Change number of copies");
 				options.add("Remove number of copies");
-				selectedOptions = getMultiOptionSelection(secondUpdatePrompt(LMS.copies), options);
-				for (int number : selectedOptions) {
-					switch (options.get(number - 1)) {
-					case "Add number of copies":
-					case "Change number of copies":
-						copies.setCopies(
-								PresUtils.getNaturalNumber("How many copies of this book does the branch have?",
-										"Error: That is not a valid number of copies."));
-						break;
-					case "Remove number of copies":
-						copies.setCopies(null);
-						break;
-					}
+				switch (options.get(getOptionSelection(secondUpdatePrompt(LMS.copies), options))) {
+				case "Add number of copies":
+				case "Change number of copies":
+					copies.setCopies(PresUtils.getNaturalNumber("How many copies of this book does the branch have?",
+							"Error: That is not a valid number of copies."));
+					break;
+				case "Remove number of copies":
+					copies.setCopies(null);
+					break;
 				}
 				copieses.remove(copies);
 				copieses.add(copies);
@@ -576,7 +573,8 @@ public class PresCrud {
 		ArrayList<LMSObject> allBranches = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.branch);
 		ArrayList<LMSObject> allBorrowers = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.borrower);
 		ArrayList<LMSObject> addablePublishers = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.publisher)
-				.stream().filter(publisher -> !(book.getPubId() == ((Publisher) publisher).getId()));
+				.stream().filter(publisher -> !(book.getPubId() == ((Publisher) publisher).getId()))
+				.collect(Collectors.toCollection(ArrayList::new));
 		ArrayList<String> options = PresUtils.newArrayList("Title");
 		if (addableAuthors.size() != 0)
 			options.add("Add authors");
