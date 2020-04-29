@@ -457,7 +457,7 @@ public class PresCrud {
 		Author author = (Author) getObjectSelection("Which author would you like to update?",
 				(ArrayList<LMSObject>) adminService.getAllObjects(LMS.author));
 		ArrayList<LMSObject> addableBooks = ((ArrayList<LMSObject>) adminService.getAllObjects(LMS.book)).stream()
-				.filter(book -> !author.getBookIds().contains(((Author) book).getId()))
+				.filter(book -> !author.getBookIds().contains(((Book) book).getId()))
 				.collect(Collectors.toCollection(ArrayList::new));
 		ArrayList<String> options = PresUtils.newArrayList("Name");
 		if (addableBooks.size() != 0)
@@ -489,6 +489,116 @@ public class PresCrud {
 		return operationCancelled;
 	}
 
+	private String updateBook() {
+		ArrayList<Integer> selectedOptions;
+		Book book = (Book) getObjectSelection("Which book would you like to update?",
+				(ArrayList<LMSObject>) adminService.getAllObjects(LMS.book));
+		ArrayList<LMSObject> addableAuthors = ((ArrayList<LMSObject>) adminService.getAllObjects(LMS.author)).stream()
+				.filter(author -> !book.getAuthorIds().contains(((Author) author).getId()))
+				.collect(Collectors.toCollection(ArrayList::new));
+		ArrayList<LMSObject> addableGenres = ((ArrayList<LMSObject>) adminService.getAllObjects(LMS.genre)).stream()
+				.filter(genre -> !book.getGenreIds().contains(((Genre) genre).getId()))
+				.collect(Collectors.toCollection(ArrayList::new));
+		ArrayList<LMSObject> allBranches = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.branch);
+		ArrayList<LMSObject> allBorrowers = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.borrower);
+		ArrayList<LMSObject> addablePublishers = (ArrayList<LMSObject>) adminService.getAllObjects(LMS.publisher)
+				.stream().filter(publisher -> !(book.getPubId() == ((Publisher) publisher).getId()));
+		ArrayList<String> options = PresUtils.newArrayList("Title");
+		if (addableAuthors.size() != 0)
+			options.add("Add authors");
+		if (book.getAuthorIds().size() != 0)
+			options.add("Remove authors");
+		if (addableGenres.size() != 0)
+			options.add("Add genres");
+		if (book.getGenreIds().size() != 0)
+			options.add("Remove genres");
+		if (book.getPubId() == null)
+			options.add("Publisher");
+		else {
+			if (addablePublishers.size() != 0)
+				options.add("Change publisher");
+			options.add("Remove publisher");
+		}
+		if (allBranches.size() != 0) {
+			options.add("Add to branches");
+			if (book.getCopies().size() != 0) {
+				options.add("Edit the numbers of copies at branches");
+				options.add("Remove from branches");
+			}
+		}
+		if (allBranches.size() != 0 && allBorrowers.size() != 0) {
+			options.add("Add loans");
+			if (book.getLoans().size() != 0) {
+				options.add("Edit loans");
+				options.add("Remove loans");
+			}
+		}
+		selectedOptions = getMultiOptionSelection(secondUpdatePrompt(LMS.book), options);
+		selectedOptions.stream().forEach(number -> {
+			switch (options.get(number - 1)) {
+			case "Title":
+				book.setTitle(PresUtils.getStringWithMaxLength("What is the book's title?", "title",
+						Presentation.maxStringFieldLength));
+				break;
+			case "Add authors":
+				ArrayList<Author> authorsToAdd = (ArrayList<Author>) getMultiObjectSelection(
+						"Which authors wrote this book?", addableAuthors);
+				authorsToAdd.stream().forEach(author -> book.getAuthorIds().add(author.getId()));
+				break;
+			case "Remove authors":
+				ArrayList<Author> authorsToRemove = (ArrayList<Author>) getMultiObjectSelection(
+						"Which authors hasn't this author written?",
+						(ArrayList<LMSObject>) adminService.getObjectsById(LMS.author, book.getAuthorIds()));
+				authorsToRemove.stream().forEach(author -> book.getAuthorIds().remove(author.getId()));
+				break;
+			case "Add genres":
+				ArrayList<Genre> genresToAdd = (ArrayList<Genre>) getMultiObjectSelection(
+						"Which genres wrote this book?", addableGenres);
+				genresToAdd.stream().forEach(genre -> book.getGenreIds().add(genre.getId()));
+				break;
+			case "Remove genres":
+				ArrayList<Genre> genresToRemove = (ArrayList<Genre>) getMultiObjectSelection(
+						"Which genres hasn't this genre written?",
+						(ArrayList<LMSObject>) adminService.getObjectsById(LMS.genre, book.getGenreIds()));
+				genresToRemove.stream().forEach(genre -> book.getGenreIds().remove(genre.getId()));
+				break;
+			case "Publisher":
+			case "Change publisher":
+				book.setPubId(
+						((Publisher) (getObjectSelection("Who published this book?", addablePublishers))).getId());
+				break;
+			case "Remove publisher":
+				book.setPubId(null);
+				break;
+			case "Add to branches":
+				addCopies(book, LMS.book);
+				break;
+			case "Edit the numbers of copies at branches":
+				editCopies(book.getCopies());
+				break;
+			case "Remove from branches":
+				ArrayList<Copies> copiesToRemove = (ArrayList<Copies>) getMultiCopiesSelection(
+						"Which branches should this book be removed from?", book.getCopies());
+				copiesToRemove.stream().forEach(copies -> book.getCopies().remove(copies));
+				break;
+			case "Add loans":
+				addLoans(book, LMS.book);
+				break;
+			case "Edit loans":
+				editLoans(book.getLoans());
+				break;
+			case "Remove loans":
+				ArrayList<Loan> loansToRemove = (ArrayList<Loan>) getMultiLoanSelection(
+						"Which loans should be removed?", book.getLoans());
+				loansToRemove.stream().forEach(loan -> book.getLoans().remove(loan));
+				break;
+			}
+		});
+		if (getYesOrNo("Update this book?"))
+			return adminService.updateBook(book);
+		return operationCancelled;
+	}
+
 	private String updateBorrower() {
 		ArrayList<Integer> selectedOptions;
 		Borrower borrower = (Borrower) getObjectSelection("Which borrower would you like to update?",
@@ -516,9 +626,10 @@ public class PresCrud {
 		}
 		if (allBooks.size() != 0 && allBranches.size() != 0) {
 			options.add("Add loans");
-			if (borrower.getLoans().size() != 0)
+			if (borrower.getLoans().size() != 0) {
 				options.add("Edit loans");
-			options.add("Remove loans");
+				options.add("Remove loans");
+			}
 		}
 		selectedOptions = getMultiOptionSelection(secondUpdatePrompt(LMS.borrower), options);
 		selectedOptions.stream().forEach(number -> {
@@ -586,15 +697,17 @@ public class PresCrud {
 		}
 		if (allBooks.size() != 0) {
 			options.add("Add books");
-			if (branch.getCopies().size() != 0)
+			if (branch.getCopies().size() != 0) {
 				options.add("Edit numbers of copies of books");
-			options.add("Remove books");
+				options.add("Remove books");
+			}
 		}
 		if (allBooks.size() != 0 && allBorrowers.size() != 0) {
 			options.add("Add loans");
-			if (branch.getLoans().size() != 0)
+			if (branch.getLoans().size() != 0) {
 				options.add("Edit loans");
-			options.add("Remove loans");
+				options.add("Remove loans");
+			}
 		}
 		selectedOptions = getMultiOptionSelection(secondUpdatePrompt(LMS.branch), options);
 		selectedOptions.stream().forEach(number -> {
@@ -623,7 +736,7 @@ public class PresCrud {
 				break;
 			case "Remove books":
 				ArrayList<Copies> copiesToRemove = (ArrayList<Copies>) getMultiCopiesSelection(
-						"Which copiess should be removed?", branch.getCopies());
+						"Which books should be removed?", branch.getCopies());
 				copiesToRemove.stream().forEach(copies -> branch.getCopies().remove(copies));
 				break;
 			case "Add loans":
