@@ -443,7 +443,7 @@ public class PresCrud {
 			publisher.setAddress(PresUtils.getStringWithMaxLength("What is the publisher's address?", "address",
 					Presentation.maxStringFieldLength));
 		if (getYesOrNo("Do you know the publisher's phone number?"))
-			publisher.setAddress(PresUtils.getStringWithMaxLength("What is the publisher's phone number?",
+			publisher.setPhone(PresUtils.getStringWithMaxLength("What is the publisher's phone number?",
 					"phone number", Presentation.maxStringFieldLength));
 		if (addableBooks.size() != 0 && getYesOrNo("Has this publisher published any of the books in our system?")) {
 			books = (ArrayList<Book>) getMultiObjectSelection("Which books has this publisher published?",
