@@ -182,7 +182,7 @@ public class Presentation {
 			case returnBook:
 				currentBorrower = (Borrower) parameters.get(0);
 				currentBranch = (Branch) PresUtils.getLMSObjectSelection(
-						borrowerService.getBranchesWithLoans(currentBorrower), checkoutBranchPrompt, goBack);
+						borrowerService.getBranchesWithLoans(currentBorrower), returnBranchPrompt, goBack);
 				if (currentBranch == null)
 					continue;
 				currentBook = (Book) PresUtils.getLMSObjectSelection(

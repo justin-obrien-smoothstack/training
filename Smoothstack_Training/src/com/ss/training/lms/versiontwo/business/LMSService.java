@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -107,7 +108,8 @@ public class LMSService {
 	public ArrayList<LMSObject> getBranchesWithLoans(Borrower borrower) {
 		return ((ArrayList<LMSObject>) getAllObjects(LMS.branch)).stream().filter(branch -> {
 			for (Loan loan : ((Branch) branch).getLoans())
-				if (loan.getCardNo() == borrower.getCardNo())
+				if (loan.getCardNo() == borrower.getCardNo()
+						&& (loan.getDateIn() == null || loan.getDateIn().isAfter(LocalDateTime.now())))
 					return true;
 			return false;
 		}).collect(Collectors.toCollection(ArrayList::new));
