@@ -79,6 +79,23 @@ public class PresCrud {
 			System.out.println("Error: That date is in the future.");
 		}
 	}
+	private LocalDateTime getDateNotBefore(String prompt, LocalDateTime date) {
+		String input;
+		for (;;) {
+			System.out.println(prompt);
+			input = Presentation.scanner.nextLine();
+			LocalDateTime output;
+			try {
+				output = LocalDateTime.parse(input);
+			} catch (DateTimeParseException e) {
+				System.out.println("Error: That is not a valid date.");
+				continue;
+			}
+			if (!LocalDateTime.now().isBefore(output) && !output.isBefore(date))
+				return output;
+			System.out.println("Error: That date is in the future.");
+		}
+	}
 
 	protected int getOptionSelection(String prompt, List<String> options) {
 		int i, selectionNumber;
@@ -246,7 +263,7 @@ public class PresCrud {
 			}
 			loan.setDueDate(loan.getDateOut().plusDays(7));
 			if (getYesOrNo("Has the book been returned?")) {
-				loan.setDateIn(getNonFutureDate("When was the book returned?"));
+				loan.setDateIn(getDateNotBefore("When was the book returned?", loan.getDateOut()));
 			}
 			loans.add(loan);
 		} while (getYesOrNo("Add another loan?"));
@@ -306,14 +323,14 @@ public class PresCrud {
 				switch (options.get(number - 1)) {
 				case "Due date":
 				case "Change due date":
-					loan.setDueDate(getDate("When is the book due?"));
+					loan.setDueDate(getDateNotBefore("When is the book due?", loan.getDateOut()));
 					break;
 				case "Remove due date":
 					loan.setDueDate(null);
 					break;
 				case "Return date":
 				case "Change return date":
-					loan.setDateIn(getNonFutureDate("When was the book returned?"));
+					loan.setDateIn(getDateNotBefore("When was the book returned?", loan.getDateOut()));
 					break;
 				case "Remove return date":
 					loan.setDateIn(null);
@@ -389,7 +406,7 @@ public class PresCrud {
 			borrower.setAddress(PresUtils.getStringWithMaxLength("What is the borrower's phone number?", "phone number",
 					Presentation.maxStringFieldLength));
 		if (allBooks.size() != 0 && allBranches.size() != 0
-				&& getYesOrNo("Has this borrower ever checked out any books from our library?"))
+				&& getYesOrNo("Has this borrower ever checked out any of the books in our system from a library branch in our system?"))
 			addLoans(borrower, LMS.borrower);
 		if (getYesOrNo("Create this borrower?"))
 			return adminService.createBorrower(borrower);
@@ -406,10 +423,10 @@ public class PresCrud {
 		if (getYesOrNo("Do you know the branch's address?"))
 			branch.setAddress(PresUtils.getStringWithMaxLength("What is the branch's address?", "address",
 					Presentation.maxStringFieldLength));
-		if (allBooks.size() != 0 && getYesOrNo("Does this branch have copies of any books?"))
+		if (allBooks.size() != 0 && getYesOrNo("Does this branch have copies of any of the books in our system?"))
 			addCopies(branch, LMS.branch);
 		if (allBooks.size() != 0 && allBorrowers.size() != 0
-				&& getYesOrNo("Have any books ever been checked out from this branch?"))
+				&& getYesOrNo("Have any books in our system ever been checked out from this branch by a borrower in our system?"))
 			addLoans(branch, LMS.branch);
 		if (getYesOrNo("Create this branch?"))
 			return adminService.createBranch(branch);
@@ -443,8 +460,8 @@ public class PresCrud {
 			publisher.setAddress(PresUtils.getStringWithMaxLength("What is the publisher's address?", "address",
 					Presentation.maxStringFieldLength));
 		if (getYesOrNo("Do you know the publisher's phone number?"))
-			publisher.setPhone(PresUtils.getStringWithMaxLength("What is the publisher's phone number?",
-					"phone number", Presentation.maxStringFieldLength));
+			publisher.setPhone(PresUtils.getStringWithMaxLength("What is the publisher's phone number?", "phone number",
+					Presentation.maxStringFieldLength));
 		if (addableBooks.size() != 0 && getYesOrNo("Has this publisher published any of the books in our system?")) {
 			books = (ArrayList<Book>) getMultiObjectSelection("Which books has this publisher published?",
 					addableBooks);
