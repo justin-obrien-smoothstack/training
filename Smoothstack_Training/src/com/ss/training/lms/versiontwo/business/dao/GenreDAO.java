@@ -45,7 +45,7 @@ public class GenreDAO extends LMSDAO<Genre> {
 			genre = new Genre();
 			genre.setId(resultSet.getInt(genreId));
 			genre.setName(resultSet.getString(genreName));
-			genre.setBookIds(getRelations(tblBookAuthor, authorId, bookId, genre.getId()));
+			genre.setBookIds(getRelations(tblBookGenre, genreId, bookId, genre.getId()));
 			genres.add(genre);
 		}
 		return genres;
