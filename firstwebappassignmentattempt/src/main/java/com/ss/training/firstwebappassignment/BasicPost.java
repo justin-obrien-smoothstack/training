@@ -15,13 +15,13 @@ import javax.servlet.http.HttpServletResponse;
  * Servlet to validate username and password sent via POST
  */
 @WebServlet("/login")
-public class MyServlet extends HttpServlet {
+public class BasicPost extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public MyServlet() {
+    public BasicPost() {
         super();
     }
 

@@ -11,38 +11,38 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.gcit.dto.Credentials;
+import com.google.gson.Gson;
+
 /**
- * Servlet Validates login credentials sent via HTTP POST
+ * Validates login credentials sent via HTTP POST
+ * 
+ * @author Justin O'Brien
  */
 @WebServlet("/login")
 public class MyServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public MyServlet() {
-        super();
-    }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public MyServlet() {
+		super();
+	}
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
 		out.print("<html><body>Hello there </body></html>");
-		
+
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Map<String,String> userCredentials = new HashMap<String, String>();
-		String username = request.getParameter("username"), password = request.getParameter("password");
-		userCredentials.put("ThisIsNotMyPassword", "ThisIsMyUsername");
-		if(userCredentials.containsKey(password) && userCredentials.get(password).equals(username))
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		Map<String, String> goodCredentials = new HashMap<String, String>();
+		Gson gson = new Gson();
+		goodCredentials.put("ThisIsNotMyPassword", "ThisIsMyUsername");
+		Credentials credentials = gson.fromJson(request.getReader(), Credentials.class);
+		if (goodCredentials.containsKey(credentials.getPassword())
+				&& goodCredentials.get(credentials.getPassword()).equals(credentials.getUsername()))
 			response.setStatus(202);
 		else
 			response.sendError(401);
