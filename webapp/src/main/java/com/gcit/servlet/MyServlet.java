@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Servlet Validates login credentials sent via HTTP POST
  */
-@WebServlet("/hi")
+@WebServlet("/login")
 public class MyServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
