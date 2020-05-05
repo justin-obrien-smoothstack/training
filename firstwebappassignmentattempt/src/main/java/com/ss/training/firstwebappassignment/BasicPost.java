@@ -1,4 +1,4 @@
-package com.gcit.servlet;
+package com.ss.training.firstwebappassignment;
 
 import java.io.IOException;
 import java.io.PrintWriter;
