@@ -3,3 +3,8 @@
     color: gray;
     font-family: monospace;
 }
+
+.nav{
+    margin: auto;
+    text-align: center;
+}
